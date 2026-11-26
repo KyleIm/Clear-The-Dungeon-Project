@@ -1,28 +1,41 @@
 # Clear The Dungeon Project
 
-Clear The Dungeon Project studies decision-making in the roguelike game Dungeon & Rogue. Its goal is to achieve a clear rate of at least 90% in the actual Steam game. That figure is a target for evaluation.
+A local research project for Dungeon & Rogue, a roguelike on Steam. The goal is to achieve at least a **90% clear rate in the Steam game**. The latest result is a simulator baseline of **0 clears in 1,000 uniform-random runs**.
 
-## Approach
+## Current status
 
-- **Simulator.** Build a Python simulator of combat, progression, rewards, and randomness so policies can train against a reproducible game model.
-- **Local reinforcement learning.** Train and evaluate policies locally with PyTorch. Compare learned policies with baseline strategies across held-out seeds.
-- **Experiment analysis.** Use scikit-learn to analyze experiment data and investigate which decisions and encounter conditions are associated with wins and losses.
-- **Experiment records.** Use SQLite to store run configurations, seeds, outcomes, and evaluation metrics.
-- **Steam integration.** Develop a local macro interface to observe game state and translate policy decisions into inputs for the actual Steam game. Measure the clear rate across full runs and report the number of runs and uncertainty.
+| Milestone | Result | Report |
+|---|---|---|
+| Phase 1 · Static game data | Extracted 88 skills, 55 enemy variants, and 11 regions from Dungeon & Rogue 1.00. | [Game mechanics](docs/game_mechanics.md) |
+| Phase 2 · Python simulator | Seeded CLI and headless play through floor 100. The independent source audit found two Imitation reward cases, which were fixed and verified. Steam runtime equivalence is still unverified. | [Simulator guide](docs/simulator.md) · [Fidelity audit](docs/simulator_fidelity.md) |
+| Phase 2.5 · Local feasibility | Completed the CPU worker sweep and CUDA MLP benchmark. The synthetic pipeline reached 52,841 steps/s at 12 workers in repeated runs. | [Hardware and throughput benchmark](docs/hardware_benchmark.md) |
+| Phase 3A · Random baseline | Ran 1,000 games with 16 workers and logged both seeds and episode outcomes in SQLite. No clears, timeouts, or errors. The furthest run reached floor 21. | [Random baseline and plots](docs/baseline_random_1000.md) |
 
-## Roadmap and current status
+Greedy and heuristic baselines, reinforcement learning, and Steam integration are upcoming. The hardware benchmark uses synthetic updates, and the 90% target has yet to be evaluated in Steam.
 
-1. **Repository setup** — complete.
-2. **Phase 1 — Static game data and mechanics** — complete. The baseline covers 88 skills, 55 monster variants, and 11 regions.
-3. **Phase 2 — Python simulator** — implemented with a terminal player, silent policy runner, and rules tests. Independent source comparison verified the corrected Imitation reward timing.
-4. **Training** — establish baselines and train PyTorch policies locally.
-5. **Analysis** — record runs in SQLite and analyze results with scikit-learn.
-6. **Steam evaluation** — integrate the macro interface and test whether the real-game clear rate reaches 90%.
+## Run locally
 
-The current milestone is a seeded, standalone Python rules engine for Dungeon & Rogue 1.00. Training, experiment storage, and Steam integration are planned. The 90% Steam clear-rate target has yet to be measured.
+Python 3.10 or newer runs the simulator with the standard library. On Windows, the baseline launcher uses the project virtual environment or the Python 3.12 launcher.
 
-Play with `python -m simulator --seed 42` or use the [headless API](docs/simulator.md). Run the simulator suite with `python -m unittest discover -s tests -v` and validate the datasets with `python tests/validate_game_data.py`. Both use the Python standard library.
+```console
+python -m simulator --seed 42
+python -m unittest discover -s tests -v
+python tests/validate_game_data.py
+```
 
-See the [game mechanics](docs/game_mechanics.md), [fidelity audit](docs/simulator_fidelity.md), and [known issues](docs/known_issues.md) for reference rules, verification results, and remaining differences. The [observation inventory](docs/observation_space.md) distinguishes screen-visible information, values recoverable from history, and simulator internals.
+To reproduce the 1,000-game baseline on Windows, create a project `.venv` with Python 3.12, install the [baseline dependencies](experiments/requirements-baseline.txt), and run `run_baseline_random_1000.bat`. See the [baseline report](docs/baseline_random_1000.md#local-records-and-reproduction) for output paths and reproducibility details.
 
-The original game source, game assets, and credentials are kept outside this public repository.
+## Project approach
+
+- Use the Python simulator for reproducible combat, progression, and reward decisions.
+- Store experiment settings, seeds, outcomes, and metrics in SQLite. Analyze them with scikit-learn once that stage begins.
+- Train and evaluate policies locally with PyTorch, using baseline strategies and held-out seeds.
+- Integrate a local macro with the Steam game, then measure the clear rate across full runs and report uncertainty.
+
+The [observation inventory](docs/observation_space.md) identifies what can be read from the game screen, tracked from play history, or known only to the simulator. [Known issues](docs/known_issues.md) lists source anomalies and remaining verification limits.
+
+## Reporting convention
+
+Write all project reports in English. For each completed milestone, add a short result and a link to the full report in this README's **Current status** table. Keep detailed methods, measurements, tables, and plots in the linked report.
+
+The original game source, game assets, and credentials stay outside this public repository.

@@ -1,114 +1,114 @@
-# Phase 2 시뮬레이터 독립 정합성 검증
+# Phase 2 Independent Simulator Fidelity Audit
 
-## 기준과 결론
+## Baselines and findings
 
-- **원본 기준**은 Private Repository의 Dungeon & Rogue 1.00 커밋 `480dc17d1354055c783cb8a6a0cea9a22028093e`다. 이 커밋에서 `script.rpy`, `custom_screen.rpy`, `screens.rpy`, `options.rpy`를 다시 읽었다. 기존 분석 보고서나 공개 JSON의 설명문을 기대 결과로 사용하지 않았다.
-- **비교 대상**은 공개 시뮬레이터 커밋 `49b86c8295584735b5fbbb054a3ef76439eb1b6f`다. 게임 엔진과 원본 저장소는 감사 중 변경하지 않았다.
-- **주요 발견**은 적 Imitation의 적용·해제 시점에 따라 **승리 보상 스킬 후보가 원본과 다르게 바뀌는 구현 오류**다. 두 방향 모두 동일한 입력과 난수로 재현했다. 상점의 기술 교체, 사용 횟수 배분 및 비용 절감은 시험한 경우 원본의 상태 변화를 재현했다. `forget`은 기술 삭제 기능이 아니라 사용 횟수 1회 회수의 이름이다.
+- **Original source baseline.** Dungeon & Rogue 1.00 commit `480dc17d1354055c783cb8a6a0cea9a22028093e` in the private repository supplied the reference behavior. The audit reread `script.rpy`, `custom_screen.rpy`, `screens.rpy`, and `options.rpy` at that commit. Expected results came directly from the source, independent of prior analysis reports or descriptions in the public JSON.
+- **Simulator baseline.** The audit used public simulator commit `49b86c8295584735b5fbbb054a3ef76439eb1b6f`. The game engine and original repository stayed unchanged during the audit.
+- **Main finding.** Applying or removing enemy Imitation at certain points caused the simulator to offer different **victory skill reward candidates** from the original. Both discrepancies reproduced with identical inputs and random seeds. The tested shop operations for skill replacement, use allocation, and cost reduction reproduced the original state changes. The `forget` action reclaims 1 allocated use and retains the skill.
 
-## 1. 선택 가능한 행동 전수 대조
+## 1. Comparison of all available actions
 
-선택의 근거는 직접 실행 가능한 화면 동작과 라벨의 메뉴 분기다. 효과가 있는 선택, 누르면 아무 효과가 없는 버튼, 화면 이동을 구분했다. 튜플은 엔진의 `Game.get_legal_actions()`에서 보는 형식이다.
+The audit used actionable screen controls and menu branches in the original labels. It distinguishes choices that have an effect, no-op clicks, and screen navigation. The tuples use the format returned by `Game.get_legal_actions()`.
 
-| 원본에서 선택하는 행동 | 시뮬레이터 행동 | 대조 결과 |
+| Action in the original | Simulator action | Comparison |
 |---|---|---|
-| 장착 기술 시전. 잠기지 않은 슬롯이고 횟수 > 0 | `("skill", name)` | 일치. 전투 화면은 0회 및 잠긴 슬롯에서 시전을 허용하지 않는다. |
-| 모든 열린 슬롯이 정확히 0회일 때 Sacrifice | `("skill", "sacrifice")` | 일치. 일반 슬롯의 대체 선택이며 횟수를 배분하는 기술이 아니다. |
-| 전투의 정보 아이콘에 마우스를 올리기, 보상과 상점의 툴팁 보기 | `get_state()`의 정보 일부 | 인터페이스 차이. 클릭으로 전투를 진행하지 않으며 정보 열기 전용 행동도 없다. |
-| 35층 Ella 격파 직후 소매치기 | `("ella", "pickpocket")` | 경로 1과 속성 변경 시점 일치. |
-| 35층 Ella 격파 직후 도와주기 | `("ella", "help")` | 경로 2와 속성 변경 시점 일치. |
-| 승리 보상 Gold, Potion, Initialize, Stat, Exchange | `("reward", "Gold")`, `"Potion"`, `"Initialize"`, `"Stat"`, `"Exchange"` | 다섯 선택을 모두 제공한다. 후보가 없는 Exchange도 선택 후 진행한다. Imitation과 함께 쓰일 때 후보 생성 차이는 §3을 참조한다. |
-| 상점 메뉴의 기술 편성 | `("shop_menu", "skills")` | 원본은 진입 시 저장된 마나 잔액을 갱신한다. 엔진은 잔액을 계산한다. |
-| 기술 편성의 + 버튼 | `("memorize", name)` | 해당 슬롯에 1회 배분. 마나가 부족해 원본에서 아무 효과가 없는 클릭은 목록에 없다. |
-| 기술 편성의 − 버튼 | `("forget", name)` | 해당 슬롯에서 1회 회수. 습득 목록과 장착 슬롯은 유지한다. 원본은 0회에서도 클릭할 수 있으나 효과는 없다. |
-| 장착 기술 클릭 → 인벤토리에서 교체 기술 선택 | `("replace_skill", old, new)` | 두 화면 선택을 하나의 행동으로 합친다. 습득한 미장착 기술만 후보이고 새 기술의 배분은 0회다. |
-| 교체 인벤토리의 Back | 대응 행동 없음 | 인터페이스 차이. 원본은 변경 없이 편성 화면으로 돌아간다. 시뮬레이터에 교체를 기다리는 중간 상태가 없다. |
-| 기술 편성 Confirm | `("shop_back",)` | 상점 메뉴 복귀. |
-| 상점 메뉴의 기술 비용 절감 → 습득 기술 클릭 | `("shop_menu", "costs")` → `("reduce_skill_cost", name)` | 습득한 미장착 기술에도 적용된다. 원본은 골드 부족, 이미 절감, 비용 ≤1에서도 버튼을 보여주지만 클릭은 무효다. |
-| 기술 비용 절감 Confirm | `("shop_back",)` | 상점 메뉴 복귀. |
-| 상점 메뉴의 주 스탯 재분배 → ATK/DEF/HP/SPD 각각 ±1, ±10 | `("shop_menu", "stats")` → `("adjust_stat", stat, delta)` | 네 능력치의 16가지 조합을 표현한다. 원본에는 자원이 부족하거나 최저치를 침범하는 무효 클릭이 남아 있다. |
-| 재분배 Reset | `("reset_redistribution",)` | 네 기본값을 1로 만들고 차이를 배분 풀로 반환한다. |
-| 재분배 Confirm | `("shop_back",)` | 현재 스탯·상태 초기화와 회복 후 복귀. |
-| 상점 메뉴의 상품 구매 | `("shop_menu", "merchandise")` | 상품 화면 진입과 대응한다. 원본의 해당 라벨은 진입 시 저장도 수행한다. |
-| Reroll | `("reroll",)` | 원본 버튼은 항상 표시되고 콜백에 저장 호출도 있다. 시뮬레이터는 골드와 추가 스탯 합계가 충족될 때 계산을 제공한다. 원본 함수의 컴파일 문제와 저장 차이는 §3을 참조한다. |
-| 파란 열쇠, 파란 열쇠 구매 후 빨간 열쇠 | `("buy", "blue_key")`, `("buy", "red_key")` | 가격·선행 조건·슬롯 순서 대응. 골드와 잠금 슬롯은 있는데 미장착 기술이 없으면 원본과 시뮬레이터 모두 비용만 차감한다. |
-| 첫째·둘째·셋째 마나 물약 | `("buy", "blue_mana_potion")`, `"elemental_mana_potion"`, `"undead_mana_potion"` | 순차 구매와 최대 마나 +10이 대응한다. 원본에서 보이는 골드 부족 무효 클릭은 생략된다. |
-| Undead / Elemental / Beast로 속성 변경 | `("change_type", target)` | 대상 세 가지 대응. 원본 화면은 Normal 현재 속성과 현재 속성으로의 변경을 감추며, 함수는 변경 대상이 기본 속성과 같으면 무효로 처리한다. 엔진은 무효 선택을 제외한다. |
-| 상품 구매 Confirm | `("shop_back",)` | 상점 메뉴 복귀. |
-| Enter next area | `("leave_shop",)` | 배분 복사, 리롤 가격 리셋, 층·구역 카운터 증가와 다음 조우 준비가 대응한다. |
-| 시작 메뉴 Start 및 기존 저장 덮어쓰기 확인 | `reset(seed)` / 터미널 실행 | 새 게임은 제공한다. 저장 확인은 기능 누락이다. 시드 인자는 원본 버튼에 없는 시뮬레이터 기능이다. |
-| 시작 메뉴 Load, 주 메뉴 복귀 | 직접 대응 없음 | 기능 누락. 원본 저장 슬롯을 로드하거나 주 메뉴에서 재개할 수 없다. 터미널의 `q`는 프로세스에서 빠져나온다. |
-| 대사·크레딧 진행, Skip/Auto, History, Options, 표시·음향·언어, About, Badges, Return / Quit | 터미널의 프롬프트와 `q` 이외 직접 대응 없음 | 인터페이스 차이. 렌더링·대화·환경 설정 기능이다. 원본의 메뉴·롤백 버튼 도달성은 §3을 참조한다. |
+| Cast an equipped skill with an unlocked slot and uses > 0 | `("skill", name)` | Matches. The combat screen blocks casting from locked slots and slots with 0 uses. |
+| Use Sacrifice when every unlocked slot has exactly 0 uses | `("skill", "sacrifice")` | Matches. Sacrifice is a fallback for the regular slots and has no allocated uses. |
+| Hover over combat info icons or view tooltips in rewards and shops | Some information from `get_state()` | Interface difference. These clicks do not advance combat. The simulator has no dedicated action for opening information. |
+| Pickpocket immediately after defeating Ella on floor 35 | `("ella", "pickpocket")` | Route 1 and the timing of the type change match. |
+| Help Ella immediately after defeating her on floor 35 | `("ella", "help")` | Route 2 and the timing of the type change match. |
+| Choose Gold, Potion, Initialize, Stat, or Exchange after a victory | `("reward", "Gold")`, `"Potion"`, `"Initialize"`, `"Stat"`, `"Exchange"` | All five choices are available. Choosing Exchange advances the game even with no candidates. See §3 for the candidate generation differences involving Imitation. |
+| Open skill setup from the shop menu | `("shop_menu", "skills")` | The original refreshes its stored mana balance on entry. The simulator calculates the balance. |
+| Press + in skill setup | `("memorize", name)` | Allocates 1 use to the slot. When mana is insufficient, the simulator omits the action and clicking the original button has no effect. |
+| Press − in skill setup | `("forget", name)` | Reclaims 1 use from the slot. The skill remains learned and equipped. At 0 uses, the original button can still be clicked and has no effect. |
+| Click an equipped skill, then choose a replacement from the inventory | `("replace_skill", old, new)` | Combines the choices from two screens into one action. Only learned, unequipped skills are eligible. The new skill starts with 0 allocated uses. |
+| Press Back in the replacement inventory | No corresponding action | Interface difference. The original returns to skill setup without making a change. The simulator has no intermediate state awaiting a replacement. |
+| Press Confirm in skill setup | `("shop_back",)` | Returns to the shop menu. |
+| Open skill cost reduction from the shop menu, then click a learned skill | `("shop_menu", "costs")` → `("reduce_skill_cost", name)` | Applies to learned, unequipped skills too. The original shows the button when gold is insufficient, the cost has already been reduced, or the cost is ≤1. Clicking has no effect in these cases. |
+| Press Confirm in skill cost reduction | `("shop_back",)` | Returns to the shop menu. |
+| Open main stat redistribution from the shop menu, then adjust ATK/DEF/HP/SPD by ±1 or ±10 | `("shop_menu", "stats")` → `("adjust_stat", stat, delta)` | Represents 16 combinations across the four stats. The original still allows clicks with no effect when resources are insufficient or an adjustment would go below the minimum. |
+| Press Reset in redistribution | `("reset_redistribution",)` | Sets all four base values to 1 and returns the difference to the allocation pool. |
+| Press Confirm in redistribution | `("shop_back",)` | Resets current stats and status, restores health, and returns to the shop menu. |
+| Open merchandise from the shop menu | `("shop_menu", "merchandise")` | Corresponds to opening the merchandise screen. The original label also saves the game on entry. |
+| Press Reroll | `("reroll",)` | The original always shows the button, and its callback includes a save call. The simulator offers the calculation when the gold and bonus stat total meet the requirements. See §3 for the original compilation issue and saving differences. |
+| Buy the blue key, then buy the red key | `("buy", "blue_key")`, `("buy", "red_key")` | Price, prerequisites, and slot order match. If the player has sufficient gold and a locked slot but no unequipped skill, both versions deduct the cost as the only effect. |
+| Buy the first, second, or third mana potion | `("buy", "blue_mana_potion")`, `"elemental_mana_potion"`, `"undead_mana_potion"` | Purchase order and the +10 maximum mana increase match. The simulator omits purchases that would have no effect in the original because of insufficient gold. |
+| Change type to Undead, Elemental, or Beast | `("change_type", target)` | Supports all three targets. The original screen hides the choices when the current type is Normal and hides the option for the current type. The function has no effect when the target equals the base type. The simulator excludes no-op choices. |
+| Press Confirm in merchandise | `("shop_back",)` | Returns to the shop menu. |
+| Select Enter next area | `("leave_shop",)` | Matches the allocation copy, reroll price reset, floor and area counter increments, and preparation of the next encounter. |
+| Select Start and confirm overwriting an existing save | `reset(seed)` / launch the terminal | Starts a new game. Save overwrite confirmation is missing. The seed argument is an extra simulator feature. |
+| Select Load from the start menu or return to the main menu | No direct equivalent | Missing functionality. The simulator cannot load the original save slot or resume from the main menu. The terminal's `q` exits the process. |
+| Advance dialogue or credits, use Skip/Auto, History, Options, display, sound, language, About, Badges, or Return / Quit | Terminal prompts and `q`, with no other direct equivalents | Interface difference. These are rendering, dialogue, and settings controls. See §3 for whether the original menu and rollback controls are reachable. |
 
-**원본 근거**는 전투 `custom_screen.rpy:250–274`와 `script.rpy:2334–2337`, Ella `script.rpy:3823–3870`, 보상 `custom_screen.rpy:464–476`과 `script.rpy:4013–4067`, 상점 `custom_screen.rpy:276–460`과 `script.rpy:4244–4369`다. 시스템 메뉴는 `screens.rpy:294–299,416–445,470–525,646–676,780–870,924–996,1884–1900` 및 `options.rpy:15–23`을 확인했다. 대응 코드는 `simulator/game.py`의 행동 목록과 `step`, `shop.py`, `rewards.py`, 터미널 어댑터다.
+Source references for combat are `custom_screen.rpy:250–274` and `script.rpy:2334–2337`, for Ella `script.rpy:3823–3870`, for rewards `custom_screen.rpy:464–476` and `script.rpy:4013–4067`, and for shops `custom_screen.rpy:276–460` and `script.rpy:4244–4369`. The system menu review covered `screens.rpy:294–299,416–445,470–525,646–676,780–870,924–996,1884–1900` and `options.rpy:15–23`. The corresponding simulator code is the action list and `step` in `simulator/game.py`, `shop.py`, `rewards.py`, and the terminal adapter.
 
-일반 전투에서 이동·대기·도주·아이템 직접 사용·기술 영구 삭제·지역 지정 메뉴는 확인되지 않았다. 시뮬레이터에도 독립 행동으로 추가된 항목이 없다. 명시적 시드, JSON 리스트형 행동, 전체 상태 관측, 입력 없는 정책 실행은 원본에 없는 프로그램 인터페이스다. 보상 후보 전체, 준비된 적 스킬 목록, 상태 해제 카운터, Gate 순서 등이 구조화된 관측으로 제공되므로 실제 화면의 가시 정보만 사용한다는 전제의 정책과는 관측 조건이 다르다.
+The audit found no movement, wait, flee, direct item use, permanent skill removal, or area selection menu in ordinary combat. The simulator has no standalone actions for these either. Explicit seeding, JSON list actions, full state observation, and policy execution without interactive input are programmatic interfaces unique to the simulator. Structured observations expose the full reward candidate list, the prepared enemy skill list, status removal counters, and Gate order. Policies that receive those observations therefore have access to more information than policies restricted to what the original screen shows.
 
-## 2. 스킬 편성과 마나 재검증
+## 2. Skill setup and mana verification
 
-원본의 습득 목록(`playerskill_dex`), 장착 목록(`current_skills`), 슬롯별 사용 횟수(`memorized_skills`), 출발 저장본(`saved_skills`)은 역할이 서로 다르다.
+The original tracks four distinct collections. It records learned skills in `playerskill_dex`, equipped skills in `current_skills`, uses per slot in `memorized_skills`, and the allocation saved on departure in `saved_skills`.
 
-| 조작 | 원본에서 확인한 상태 변화 |
+| Operation | State changes verified in the original |
 |---|---|
-| 스킬 습득 | 승리 후 후보 중 최종 선택을 습득 목록에 추가한다. 습득만으로 장착하거나 횟수를 배분하지 않는다. |
-| 사용 횟수 +1 | `memorize_skill`이 현재 마나로 1회 비용을 감당할 수 있을 때 횟수를 1 늘리고 마나를 재계산한다. |
-| 사용 횟수 −1 | `forget_skill`이 양수인 횟수를 1 줄인다. 해당 기술은 계속 습득 및 장착 상태다. 0 아래로 내려가지 않는다. |
-| 전투 중 사용 | 행동이 차단되지 않아 효과 처리에 들어갈 때 1회 소모한다. 빗나감도 소모한다. Sacrifice와 플레이어 Mimic의 복제 행동은 별도로 처리한다. 원본의 `current_mana` 저장값은 시전 때 재계산되지 않는다. |
-| 스킬 교체 | 기존 기술이 습득 목록에 남고 장착 위치만 교체된다. 기존 배분 항목은 제거하고 새 기술의 횟수를 0으로 만든 뒤 비용을 다시 합산한다. 교체 후 이전 기술을 다시 장착해도 기존 배분이 돌아오지 않는다. |
-| 마나 비용 절감 | 최초 단가보다 이미 낮아졌거나 최초 단가가 1 이하이면 비용 절감이 적용되지 않는다. 한 번 적용되면 1000골드를 지불하고 단가가 1 낮아진다. 배분 횟수는 그대로이며 마나 잔액이 재계산된다. |
-| 최대 마나 증가 | 마나 물약은 최대치에 10을 더한다. 원본은 현재 저장 잔액에도 10을 더하며, 시뮬레이터는 최대치로부터 다시 계산한 값을 표시한다. |
-| 상점 출입 | 출발 시 배분 복사본을 저장하고 다음 상점에서 다시 사용한다. 상점 진입 전체가 기술을 잊거나 영구적으로 다시 배우는 과정은 아니다. |
+| Learn a skill | Adds the final selection from the post-victory candidates to the learned skill list. Equipping the skill and allocating uses are separate operations. |
+| Increase uses by 1 | When current mana covers 1 use, `memorize_skill` increases the count by 1 and recalculates mana. |
+| Decrease uses by 1 | `forget_skill` reduces a positive use count by 1, down to a minimum of 0. The skill remains learned and equipped. |
+| Use a skill in combat | Consumes 1 use when the action proceeds to effect resolution, including on a miss. Sacrifice and the player's Mimic copy action are handled separately. Casting leaves the original's stored `current_mana` value unchanged. |
+| Replace a skill | The old skill remains learned, and a new skill takes its equipped slot. The original removes the old allocation, sets the new skill's uses to 0, and recalculates the total cost. The old allocation stays discarded if the player re-equips that skill. |
+| Reduce mana cost | A skill is ineligible if its current cost is already below its starting cost or its starting cost was 1 or less. The one-time reduction costs 1000 gold and lowers the cost per use by 1. Allocated uses stay the same, and the mana balance is recalculated. |
+| Increase maximum mana | A mana potion adds 10 to the maximum. The original also adds 10 to the stored current balance. The simulator displays the balance recalculated from the maximum. |
+| Enter and leave the shop | On departure, the game saves a copy of the allocation and uses it again at the next shop. Learned skills persist across shop visits. |
 
-원본 `script.rpy:362–364,637–652,1546–1580,1686–1742,1887–1898,4136–4161,4276–4286,4318–4347`을 직접 읽고, 사설 참조 환경에서 실제 편성 및 경제 함수를 실행했다. 마나를 새로 계산한 시점부터 시작한 14회 연속 조작에서 배분·장착 목록, 골드, 마나 및 스탯을 대조했다. 최초 시드 24의 원본 **저장 잔액 170**과 시뮬레이터 **계산 잔액 0**은 서로 다르다. 편성 진입에 해당하는 원본의 재계산 직후에는 둘 다 0이다. 저장 필드의 직접 비교와 정상적인 편성 규칙의 비교를 분리해야 한다.
+The audit directly reviewed `script.rpy:362–364,637–652,1546–1580,1686–1742,1887–1898,4136–4161,4276–4286,4318–4347` and executed the original setup and economy functions in the private reference environment. After recalculating mana, it checked allocations, equipped skills, gold, mana, and stats across 14 consecutive operations. At the start with seed 24, the original's **stored balance was 170** and the simulator's **calculated balance was 0**. Both balances were 0 immediately after the original recalculated mana on entry to skill setup. A comparison of the stored field and a comparison of normal setup behavior measure different things.
 
-## 3. 차이 분류
+## 3. Differences observed in the audit
 
-아래 표의 F-01·F-02는 감사 기준 커밋에서 관찰한 결과다. 현재 상태는 §5에 기록했다.
+F-01 and F-02 describe behavior at the audit baseline commit. See §5 for the final status.
 
-### Doppelganger의 모방과 보상 시점
+### Doppelganger Imitation and reward timing
 
-Doppelganger의 기본 기술은 `imitation` 하나다. 아래 비교는 플레이어가 아직 `imitation`을 배우지 않은 경우다.
+Doppelganger's only base skill is `imitation`. The comparison assumes the player has yet to learn `imitation`.
 
-| 처치 시점 | 원본 | 시뮬레이터 |
+| When Doppelganger is defeated | Original | Simulator |
 |---|---|---|
-| 플레이어가 선공해 모방 시전 전에 처치 | `imitation` 획득 가능 | 동일. 별도 차등 테스트에서 보상 후보와 난수 상태가 모두 일치했다. |
-| Doppelganger가 먼저 모방을 쓰고 **같은 턴**에 처치 | `imitation` 획득 가능. 복제 목록은 생겼지만 그 턴의 보상 기준 목록은 아직 기본 기술 하나다. | 보상 없음. 복제 목록을 즉시 보상 기준에 반영한다. |
-| **다음 턴**에 모방이 유지된 채 처치 | 턴 시작 시 복제 기술을 선택 후보로 사용한다. 복제 기술이 모두 이미 습득한 기술이라면 보상 없음. | 같은 조건에서 보상 없음. |
-| 모방이 유지된 턴에 Doppelganger가 복제한 Recovery를 먼저 쓰고 처치 | 그 턴의 복제 목록으로 보상을 계산한다. 시험에서는 보상 없음. | 기본 기술 목록을 즉시 복원해 `imitation`을 후보로 제시했다. |
+| The player goes first and defeats it before it casts Imitation | `imitation` is available as a reward. | Matches. A separate differential test found that the reward candidates and RNG state both matched. |
+| Doppelganger casts Imitation first and is defeated **on the same turn** | `imitation` is available as a reward. The copy list exists, and that turn's reward list still uses the one base skill. | No skill reward. The copy list immediately becomes the list used for rewards. |
+| Doppelganger is defeated **on the next turn** with Imitation still active | The copied skills become the candidates at the beginning of the turn. If the player has already learned all of them, there is no skill reward. | No skill reward under the same conditions. |
+| Doppelganger first casts a copied Recovery on a turn when Imitation is active, then is defeated | Uses that turn's copied skill list for rewards. The tested case had no skill reward. | Immediately restores the base skill list and offers `imitation` as a candidate. |
 
-| 분류 | ID | 관찰 결과와 근거 |
+| Category | ID | Observation and evidence |
 |---|---|---|
-| 잘못된 구현 | F-01 | **적 Imitation 적용 직후 KO.** 원본은 `copy_from_player`에서 별도의 복제 후보 목록을 만들고 현재 턴의 `available_skills`는 유지한다. 시뮬레이터는 복제 즉시 `available_skills`도 바꾼다. Mansion 17층 Doppelganger가 먼저 모방하고 그 턴에 쓰러지는 통제 사례에서 원본 보상 후보는 `["imitation"]`, 시뮬레이터는 `[]`였다. 보상 프롬프트 시점의 난수 상태도 갈라졌다. |
-| 잘못된 구현 | F-02 | **적 Imitation 해제 직후 KO.** 원본은 그 턴의 복제 기술 목록을 현재 보상 기준으로 유지한다. 시뮬레이터는 복구 스냅샷으로 `available_skills`까지 되돌린다. 복제한 Recovery를 먼저 쓰고 그 턴에 쓰러지는 통제 사례에서 원본 후보는 `[]`, 시뮬레이터는 `["imitation"]`이었다. 두 사례의 핵심 근거는 `script.rpy:411–439,522–557,2339–2346,4013–4017`과 `simulator/skills.py`의 `_imitate`, `cure_status_effects`, `rewards.py`의 `prepare`다. |
-| 기능 누락 | F-03 | 원본은 슬롯 `1-1`에 저장을 호출하고 시작 메뉴에 Load를 제공하며, 종료 라벨에서는 저장 삭제를 시도한다. 시뮬레이터에는 저장·복원·삭제·덮어쓰기 확인이 없다. 상점 진입과 Reroll 클릭의 저장 부작용 역시 없다. |
-| 인터페이스 차이 | F-04 | 교체 슬롯 선택과 인벤토리 선택/Back을 단일 교체 행동으로 줄였다. 무효 클릭, Lock, 도구 설명과 메뉴 화면을 독립 행동으로 제공하지 않는다. `forget`은 원본 함수명에 대응하며 실제 의미는 `deallocate one use`다. 영구 삭제를 의미하는 행동은 양쪽 모두 없다. |
-| 인터페이스 차이 | F-05 | 마나 관측은 원본의 캐시 필드 대신 현재 배분에서 계산한다. 시드 24의 시작 상태에서 170 대 0을 재현했다. 편성 진입 후 조작 결과는 시험한 범위에서 일치한다. 명시적 시드와 구조화된 내부 상태도 독립 인터페이스다. |
-| 원본 버그 | F-06 | `reroll_stats`만 분리해 컴파일하면 전역 선언보다 앞선 `player_gold` 참조 때문에 `SyntaxError`가 난다. 시뮬레이터는 소스 본문에 명시된 계산을 구현했다. 감사에서는 원본을 고치거나 이 분기를 일치로 집계하지 않았다. |
-| 원본 버그 | F-07 | Hybrid Attack 첫 타격이 성공하고 두 번째가 실패하면 원본의 `hits`가 미정의 상태로 반환된다. 극단 명중 수치를 준 네 사례에서 `UnboundLocalError`가 났다. 시뮬레이터는 첫 타격을 유지한다. 이 수치가 원본의 정상 플레이로 발생하는지는 확인하지 않았다. |
-| 원본 버그 | F-08 | 플레이어 Imitation 직후 상태 일괄 해제의 지역변수 참조는 `UnboundLocalError`, Ella를 대상으로 모방하면 고정 레지스트리 조회에 `KeyError`가 발생했다. 시뮬레이터는 스냅샷 복구와 현재 Ella 기술 목록으로 계속 진행한다. 반복 모방의 중복 백업·마커 제거도 구현상의 차이다. 이 반복분기의 모든 조합을 판정한 것은 아니다. |
-| 원본 버그 | F-09 | 원본은 순회 중 상태를 삭제해 다음 항목을 건너뛸 수 있고, 35층 Ella의 선택을 후속 분기로 덮어쓰며, 상위 적 스킬 교체에서 `bonespear`를 비교한다. 이 감사 사례에서는 시뮬레이터가 그 동작과 난수 소비를 유지했다. |
-| 미확인 | F-10 | 저장·로드 및 엔진 난수 복원, Steam 빌드와 백업 커밋의 동등성, 원본의 지역화 문자열 비교 효과, 실제 설치본에서의 오류 발생 여부는 미확인이다. `screens.rpy`의 범용 파일 메뉴와 두 quick menu 선언을 확인했지만 실제 활성 메뉴·일반 키 경로는 엔진에서 검증하지 않았다. `options.rpy`는 롤백·퀵세이브를 끄고 game-menu 키 매핑을 비운다. |
+| Implementation bug | F-01 | **Enemy KO immediately after applying Imitation.** The original builds a separate list of copied candidates in `copy_from_player` and retains `available_skills` for the current turn. The simulator immediately changes `available_skills` as well. In a controlled case where Doppelganger on Mansion floor 17 cast Imitation first and was defeated that turn, the original offered `["imitation"]` and the simulator offered `[]`. Their RNG states also diverged at the reward prompt. |
+| Implementation bug | F-02 | **Enemy KO immediately after clearing Imitation.** The original retains that turn's copied skill list for the current reward. The simulator restores `available_skills` from the recovery snapshot as well. In a controlled case where Doppelganger first cast a copied Recovery and was defeated on the same turn, the original offered `[]` and the simulator offered `["imitation"]`. The main references for both cases are `script.rpy:411–439,522–557,2339–2346,4013–4017`, `_imitate` and `cure_status_effects` in `simulator/skills.py`, and `prepare` in `rewards.py`. |
+| Missing functionality | F-03 | The original calls save for slot `1-1`, offers Load on the start menu, and attempts to delete the save at the ending label. The simulator has no save, restore, delete, or overwrite confirmation. It also has no save side effects on entering the shop or clicking Reroll. |
+| Interface difference | F-04 | The simulator combines slot and inventory selection into a single replacement action, so there is no intermediate Back action. It exposes no standalone actions for no-op clicks, Lock, tooltips, or menu screens. `forget` corresponds to the original function name and means `deallocate one use`. Neither version offers a permanent skill removal action. |
+| Interface difference | F-05 | The simulator derives observed mana from the current allocation. The original exposes a cached field. Seed 24 reproduced the initial balances of 170 and 0. The tested operations matched after entering skill setup. Explicit seeding and structured internal state are also separate programmatic interfaces. |
+| Original bug | F-06 | Compiling `reroll_stats` in isolation raises `SyntaxError` because it references `player_gold` before the global declaration. The simulator implements the calculation specified in the source body. The audit left the original intact and excluded this branch from the matching cases. |
+| Original bug | F-07 | If the first hit of Hybrid Attack lands and the second misses, the original attempts to return an undefined `hits`. Four cases with extreme accuracy values raised `UnboundLocalError`. The simulator retains the first hit. Whether those values can occur during ordinary play in the original remains unverified. |
+| Original bug | F-08 | Clearing all statuses just after player Imitation raised `UnboundLocalError` on a local variable reference. Imitating Ella raised `KeyError` on a lookup in the fixed registry. The simulator continues using snapshot restoration and Ella's current skill list. Repeated Imitation also differs in how it handles duplicate backups and marker removal. The audit covered only some combinations in this repeated-use branch. |
+| Original bug | F-09 | The original can skip the next status when it removes a status during iteration, overrides the floor 35 Ella choice in a later branch, and compares against `bonespear` when replacing a higher-tier enemy skill. The simulator preserved those behaviors and their RNG consumption in the cases audited. |
+| Unverified | F-10 | Save and load behavior and engine RNG restoration, parity between the Steam build and the backed-up commit, the effect of localized string comparisons in the original, and whether the errors occur in an installed build remain unverified. The audit identified a general-purpose file menu and two quick menu declarations in `screens.rpy`. It did not run the engine to determine which menu is active or which normal key paths reach it. `options.rpy` disables rollback and quicksave, and clears game-menu key bindings. |
 
-## 4. 비공개 참조 실행 환경과 검증 결과
+## 4. Private reference harness and verification results
 
-별도 로컬 사설 작업공간에 차등 테스트를 만들었다. 이 환경은 핀 고정 원본 파일을 런타임에 읽어 **원본 `Char` 메서드와 선택된 Ren’Py 라벨의 Python 연산·조건을 실제로 실행**한다. 라벨을 옮기는 변환기는 제한된 문법만 허용하며 미지원 문장을 만나면 실패한다. 화면·소리·대사·업적·저장은 스텁으로 대체했다. 보상 화면은 선택값을 넘기되 Gold의 증가량은 원본 화면에서 읽고, Ella 메뉴에서는 선택한 원본 분기를 실행한다. 원본의 컴파일 오류를 먼저 검증한 뒤 다른 메서드를 검사할 수 있게 사설 메모리에서 Reroll 메서드만 참조 클래스 컴파일에서 제외했다. 시뮬레이터와 참조 실행기는 서로 다른 객체와 같은 시드의 독립 난수원을 사용했다. 양쪽 상태뿐 아니라 가능한 비교 지점에서 난수 상태도 확인했다.
+The audit used differential tests in a separate private local workspace. The harness reads the pinned source files at runtime and **executes the original `Char` methods and the Python operations and conditions in selected Ren’Py labels**. The label translator accepts a limited grammar and fails on unsupported statements. Stubs handle screens, audio, dialogue, achievements, and saves. The reward screen passes through the selected value and reads the Gold increment from the original screen. The Ella menu executes the selected original branch. After reproducing the original compilation error, the harness excluded only the Reroll method from the in-memory compilation of the reference class so that it could test the other methods. The simulator and reference harness used separate objects and independently seeded RNGs with the same seed. The audit checked both versions' state and compared their RNG states wherever possible.
 
-| 영역 | 비교 범위와 결과 |
+| Area | Coverage and results |
 |---|---|
-| 스킬 및 전투 | 원본 기술 레지스트리 **88개**의 이름과 수치 튜플을 확인했다. 양쪽 시전자, 일반·저체력·고회피·대역·상태 중첩 및 Hybrid 경계 조건의 전체 턴 **2,646건**에서 **2,642건**의 양쪽 캐릭터·대역 HP와 비교 스탯, 상태, 선택 행동, 사용 횟수, 골드, 난수 상태가 일치했다. 나머지 **4건**은 원본 Hybrid 예외다. 수정 없이 추적한 보상 목록 차이는 별도의 F-01·F-02에 기록했다. |
-| 상태이상 | 단일 상태 11종 및 정방향·역방향 중첩 목록에서 공격/Recovery와 시드를 조합한 **78건**이 일치했다. 행동 차단과 전후 HP, 최대 7회 해제 틱, 상태 순서와 난수 상태를 비교했다. Imitation 즉시 해제 예외는 별도 재현했다. |
-| 적 AI | 변형 55종 × 층 조건 8종 × 상태·스탯 조건 5종의 **2,200건**에서 선택 스킬, 선택 후보 목록, 난수 상태가 일치했다. |
-| 보상·상점 | 다섯 보상 선택을 순환시킨 진행 비교와 마나 재계산 뒤 **14개** 상점 조작을 비교했다. Doppelganger 보상 차이 2건과 Reroll의 참조 컴파일 실패는 별도 재현했다. |
-| 층별 진행 | 양쪽에서 적을 강제로 쓰러뜨리고 진행시킨 경로 1 **101개**·경로 2 **100개** 조우에서 층, 지역, 적 ID와 스탯, Ella 기술, 학습 목록, 골드 및 난수 상태가 일치했다. 이 테스트는 경로와 종료 조건을 검증하며 실제 공략 성능의 측정은 아니다. |
-| 패배·클리어 | 100층 승리의 종료 분기와 보상 스킵을 두 경로에서 확인했다. 플레이어 단독 KO와 동시 KO **2건**은 원본과 시뮬레이터 모두 게임 오버였다. |
+| Skills and combat | Checked the names and value tuples for **88** skills in the original registry. The **2,646** full-turn cases covered both casters, ordinary combat, low HP, high evasion, substitutes, overlapping statuses, and Hybrid edge cases. In **2,642** cases, the versions agreed on both characters' and substitutes' HP, compared stats, statuses, action choice, uses, gold, and RNG state. The remaining **4** cases reproduced the original Hybrid exception. F-01 and F-02 record the reward list differences observed at the unfixed baseline. |
+| Status effects | All **78** cases matched across 11 individual statuses and lists of overlapping statuses in forward and reverse order, varying attack or Recovery and the seed. The audit compared blocked actions, HP before and after, up to 7 status removal ticks, status order, and RNG state. The immediate Imitation removal exception was reproduced separately. |
+| Enemy AI | All **2,200** cases across 55 variants × 8 floor conditions × 5 status and stat conditions matched on the chosen skill, candidate list, and RNG state. |
+| Rewards and shops | Compared progression while cycling through all five reward choices, and **14** shop operations after recalculating mana. The 2 Doppelganger reward discrepancies and the Reroll reference compilation failure were reproduced separately. |
+| Floor progression | Forcing enemy defeats and advancing in both versions produced **101** encounters on route 1 and **100** on route 2. Floor, area, enemy ID and stats, Ella skills, learned skills, gold, and RNG state matched. The forced results let this test check routes and ending conditions. Performance in actual play falls outside its scope. |
+| Defeat and clear conditions | Verified the ending branch and reward skip after a floor 100 victory on both routes. The 2 cases, a player-only KO and a simultaneous KO, both resulted in game over in the original and simulator. |
 
-**전체 Ren’Py 엔진을 참조로 쓰는 방안.** 별도의 사설 체크아웃에 동일한 Ren’Py SDK 및 게임 빌드·리소스를 두고, 테스트 전용 화면 선택과 시드 주입을 사용하면 라벨 전환, 스크린 동작, 저장·복원까지 비교할 수 있다. 현재 환경에서 Ren’Py 실행 명령을 찾지 못했고 전체 프로젝트/배포 빌드를 실행하지 않았다. 이 절의 결과는 사용한 CPython 어댑터 범위에 해당한다. 원본 파일과 실행 하네스는 공개 저장소 밖에 유지했다.
+**Using the full Ren’Py engine as a reference.** A separate private checkout with the same Ren’Py SDK, game build, and resources could use test-only screen choices and seed injection to compare label transitions, screen behavior, and save and restore. The audit found no Ren’Py executable in the current environment and did not run the full project or a distribution build. These results cover the CPython adapter used in the audit. The original files and test harness stayed outside the public repository.
 
-## 5. Phase 2 최종 보완 및 재검증
+## 5. Final Phase 2 fixes and verification
 
-- **F-01·F-02 해결.** 보상은 그 턴에 적 AI가 선택을 시작할 때 구성한 스킬 목록을 사용한다. Imitation 시전 또는 해제는 복제 슬롯과 캐릭터 스탯에 영향을 주고, 보상에 사용할 현재 턴 목록은 유지한다. 다음 턴의 적 AI가 상태에 맞춰 새 목록을 선택한다.
-- **F-04 표시 개선.** CLI에 `Increase skill uses`와 `Decrease skill uses`를 표시한다. 내부 행동은 `memorize`와 `forget`으로 유지했다. 교체 UI의 두 단계를 합친 구조와 무효 클릭 생략은 그대로다.
-- **F-03·F-05 유지.** 저장·재개는 제공하지 않으며, 관측의 현재 마나는 live 배분으로 계산한다. 모든 관측 키는 [관측 정보 문서](observation_space.md)에 분류했다.
-- **F-06–F-09 유지.** Reroll은 소스에 기재된 계산으로 실행한다. Hybrid 두 번째 명중 실패에서는 첫 타격을 유지한다. Rogue 모방은 스냅샷으로 복구하고 Ella의 현재 기술을 사용할 수 있다. 상태 리스트 순회 건너뛰기, 35층 Ella의 덮어쓴 난수 선택, `bonespear` 비교 차이는 그대로다. [기존 차이와 검증 한계](known_issues.md)
+- **F-01 and F-02 fixed.** Rewards use the skill list the enemy AI builds when it starts choosing an action for the turn. Applying or clearing Imitation affects the copied slots and character stats while retaining the current turn's list for rewards. On the next turn, the enemy AI selects a new list based on the current status.
+- **F-04 labels clarified.** The CLI displays `Increase skill uses` and `Decrease skill uses`. The internal actions remain `memorize` and `forget`. Replacement still combines the two UI steps, and the simulator continues to omit no-op clicks.
+- **Saving and mana observation (F-03 and F-05).** Save and resume are absent. Observed current mana is calculated from the live allocation. The [observation space documentation](observation_space.md) categorizes every observation key.
+- **Original edge cases (F-06–F-09).** Reroll runs the calculation described in the source. A missed second Hybrid hit retains the first hit. Rogue Imitation restores from a snapshot and can use Ella's current skills. The status list iteration skip, the overridden random choice for floor 35 Ella, and the `bonespear` comparison persist. [Known differences and verification limits](known_issues.md)
 
-회귀 테스트 두 개에서 수정 전 후보가 각각 반대로 나오는 것을 확인했고, 수정 후 전체 테스트 58개가 통과했다. 사설 차등 테스트 재실행에서는 모방 전 선공 처치, 모방 적용과 같은 턴의 처치, 복제 Recovery와 같은 턴의 처치 모두 **보상 후보와 난수 상태가 일치**했다. 전투 2,642건, 상태 78건, 적 AI 2,200건, 진행 조우 201건, 상점 14건 및 패배 분기 2건의 기존 비교 결과가 유지됐다. 원본 Hybrid 예외 4건과 Reroll/Imitation 참조 예외도 계속 재현됐다. Steam 배포본의 런타임 동등성은 미확인이다.
+The two regression tests confirmed that the pre-fix candidate lists were reversed in the two cases. All 58 tests passed after the fix. The private differential suite was rerun and found that **reward candidates and RNG states matched** for all three timings tested. These were a first-strike defeat before Imitation, a defeat on the same turn Imitation was applied, and a defeat on the same turn a copied Recovery was used. The previous comparison results held for 2,642 combat cases, 78 status cases, 2,200 enemy AI cases, 201 progression encounters, 14 shop operations, and 2 defeat cases. The 4 original Hybrid exceptions and the Reroll and Imitation reference exceptions still reproduced. Runtime parity with the Steam release remains unverified.

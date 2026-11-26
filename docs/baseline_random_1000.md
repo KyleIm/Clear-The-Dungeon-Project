@@ -1,35 +1,35 @@
-# Phase 3A. Uniform Random Policy 1,000판 기준선
+# Phase 3A. Uniform Random Policy Baseline (1,000 Games)
 
-**16개 CPU 워커에서 독립적으로 1,000판을 실행했다.** 일반 패배 1,000판, 클리어 0판, 타임아웃 0판, 오류 0판이었다. 최고 도달 지점은 **21층**이다. 5층에 211판(21.1%), 10층에 37판(3.7%)이 도달했다.
+**We ran 1,000 independent games across 16 CPU workers.** The results were 1,000 losses, 0 clears, 0 timeouts, and 0 errors. The highest floor reached was **floor 21**. In total, 211 games (21.1%) reached floor 5, and 37 games (3.7%) reached floor 10.
 
-## 실험 조건
+## Experimental Setup
 
-- 실행 시작 시각은 2026-11-26 03:54:47 EST다. Windows 11, Python 3.12.10, Ryzen AI 7 350(8코어/16스레드)에서 실행했다.
-- 시뮬레이터 기준 커밋은 `ec70a7ba6b9a5a102501b813bef581a9a36cb444`이다. 각 워커는 독립된 엔진을 재사용하고 매 판 명시적 게임 시드로 초기화했다. Windows spawn 프로세스를 16개 띄우고 공통 시작 지점에 도달하도록 했다.
-- 마스터 시드 **314159**에서 중복 없는 정수 2,000개를 뽑아 게임·정책에 한 쌍씩 사용했다. 정책은 전투, 보상, 상점, 이벤트 등 각 현재 합법 행동 목록에서 한 항목을 균등 선택했다.
-- 한 판 최대 10,000행동 또는 판 시작 후 30초를 허용했다. 시간 제한은 행동 사이에서 확인한다. 일반 패배는 엔진의 게임 오버만 의미하며, 제한 초과와 실행 예외는 각각 별도로 기록한다.
-- [실험 코드](../experiments/random_baseline.py)와 Matplotlib 3.11.2로 결과를 생성했다. SQLite와 집계 JSON은 로컬에 저장했다.
+- The run started at 2026-11-26 03:54:47 EST. It used Windows 11, Python 3.12.10, and a Ryzen AI 7 350 (8 cores, 16 threads).
+- The simulator was at commit `ec70a7ba6b9a5a102501b813bef581a9a36cb444`. Each worker reused its own engine and reset it with an explicit game seed before each game. All 16 worker processes used the Windows spawn start method and synchronized at a common starting point.
+- We drew 2,000 unique integers from the master seed **314159** and assigned each run a pair consisting of a game seed and a policy seed. At each decision in combat, rewards, shops, events, and other game states, the policy sampled uniformly from the current list of legal actions.
+- Each game had a limit of 10,000 actions or 30 seconds from its start. The time limit was checked between actions. A loss was recorded only when the engine reported game over. Games that exceeded a limit and games that raised an exception were recorded separately.
+- We generated the results with the [experiment code](../experiments/random_baseline.py) and Matplotlib 3.11.2. The SQLite database and summary JSON were saved locally.
 
-## 전체 성과와 실행 시간
+## Overall Results and Runtime
 
-| 게임 오버 | 클리어 | 타임아웃 | 실행 오류 |
+| Game over | Clears | Timeouts | Runtime errors |
 |---:|---:|---:|---:|
 | 1,000 | 0 | 0 | 0 |
 
-관측 클리어율은 0%다. 독립 이항 모형으로 이 결과의 단측 95% 상한을 계산하면 약 0.30%다. 이 구간은 이 랜덤 정책의 클리어율에 해당한다.
+The observed clear rate was 0%. Under a binomial model with independent games, the one-sided 95% upper confidence bound for this random policy’s clear rate is approximately 0.30%.
 
-| 게임당 지표 | 평균 | 중앙값 | P95 | 최댓값 |
+| Per-game metric | Mean | Median | P95 | Maximum |
 |---|---:|---:|---:|---:|
-| 행동 수 | 18.44 | 12 | 49 | 872 |
-| 실행 시간 | 3.04 ms | 2.10 ms | 8.01 ms | 85.66 ms |
+| Actions | 18.44 | 12 | 49 | 872 |
+| Runtime | 3.04 ms | 2.10 ms | 8.01 ms | 85.66 ms |
 
-1,000판의 전체 시뮬레이션 벽시계 시간은 **0.733초**였다. 이 시간은 프로세스 준비, 워밍업용 엔진 생성, 시뮬레이션, 결과 수집을 포함한다. 게임당 시간은 reset부터 마지막 행동 및 결과 분류까지이며, 개별 워커가 병행 실행됐으므로 합계와 전체 벽시계 시간은 다르다. SQLite 저장과 그래프 렌더링은 두 시간 지표에서 제외했다. P95는 최근접 순위다.
+The total simulation wall-clock time for 1,000 games was **0.733 seconds**. This includes process setup, engine creation for warm-up, simulation, and result collection. Per-game runtime spans the engine reset through the final action and outcome classification. Because workers ran in parallel, the sum of individual runtimes differs from the total wall-clock time. Both timing metrics exclude SQLite writes and chart rendering. P95 uses the nearest-rank method.
 
-## 도달 층과 층별 생존율
+## Floors Reached and Survival by Floor
 
-최종 도달은 해당 층을 마지막으로 관측한 판 수다. 도달률의 분모는 전체 1,000판이다. 다음 층 진입률은 해당 층에 도달한 판 중 다음 층에 들어간 비율이다. 22–100층은 진입 표본이 0이라 조건부 비율을 표시하지 않았다.
+Games ending on a floor are those for which it was the last floor observed. The overall reach rate uses all 1,000 games as its denominator. The next-floor entry rate is the share of games that entered the next floor among those that reached the current floor. For floors 22–100, the conditional rate is undefined because 0 games reached them.
 
-| 층 | 최종 도달 | 도달 판 수 | 전체 도달률 | 다음 층 진입률 |
+| Floor | Games ending here | Games reaching floor | Overall reach rate | Next-floor entry rate |
 |---:|---:|---:|---:|---:|
 | 1 | 51 | 1000 | 100.0% | 94.9% (949/1000) |
 | 2 | 318 | 949 | 94.9% | 66.5% (631/949) |
@@ -54,15 +54,15 @@
 | 21 | 1 | 1 | 0.1% | 0.0% (0/1) |
 | 22–100 | 0 | 0 | 0% | — |
 
-![도달 층 분포 및 생존 곡선](figures/random_1000_floors.png)
+![Distribution of floors reached and survival curve](figures/random_1000_floors.png)
 
-## 몬스터별 사망 빈도와 초기 지역
+## Death Counts by Monster and Starting Area
 
-사망 빈도는 패배 시 교전 중이던 적을 기준으로 집계했다. 반동이나 동시 사망도 같은 적에 집계하므로 마지막 피해의 원인이나 조우당 사망 위험을 뜻하지 않는다. Ella 첫 변형(#51)이 91회로 가장 많았고, Skeleton 55회, Creature 54회가 뒤를 이었다. 표에 없는 몬스터의 관측 사망 빈도는 0이다.
+Death counts are grouped by the enemy the player was fighting when the game ended in a loss. Recoil deaths and simultaneous deaths count toward that enemy, so the figures capture the encounter at the time of death. They cannot establish the source of the final damage or the risk of death per encounter. The first Ella variant (#51) had the highest count at 91, followed by Skeleton at 55 and Creature at 54. All monsters omitted from the table had 0 observed deaths.
 
-<details><summary>몬스터별 사망 빈도 전체</summary>
+<details><summary>Full death counts by monster</summary>
 
-| ID | 몬스터 | 사망 판 수 |
+| ID | Monster | Deaths |
 |---:|---|---:|
 | 51 | Ella | 91 |
 | 33 | Skeleton | 55 |
@@ -115,7 +115,7 @@
 
 </details>
 
-| 초기 지역 | 판 수 | 평균 도달 층 | 5층 도달 | 10층 도달 |
+| Starting area | Games | Mean floor reached | Reached floor 5 | Reached floor 10 |
 |---|---:|---:|---:|---:|
 | Forest | 122 | 2.93 | 12/122 (9.8%) | 2/122 (1.6%) |
 | Fort | 93 | 3.86 | 31/93 (33.3%) | 6/93 (6.5%) |
@@ -127,21 +127,21 @@
 | Spiritland | 126 | 3.67 | 28/126 (22.2%) | 4/126 (3.2%) |
 | Temple | 92 | 3.15 | 10/92 (10.9%) | 1/92 (1.1%) |
 
-Party의 5층 진입 49.6%와 10층 진입 11.8%가 지역군 중 가장 높았다. 최고층 21층에 도달한 한 판은 Spiritland에서 시작했다. 첫 지역은 시작 기술과 적 구성을 함께 바꾸므로 지역 자체의 효과로 해석하기 어렵다.
+Party had the highest reach rates among starting areas, at 49.6% for floor 5 and 11.8% for floor 10. The only game to reach floor 21, the highest floor reached, started in Spiritland. Starting areas vary in both starting skills and enemy composition, making it difficult to isolate the effect of the area itself.
 
-![몬스터 사망 빈도와 초기 지역별 생존율](figures/random_1000_monsters_areas.png)
+![Death counts by monster and survival rates by starting area](figures/random_1000_monsters_areas.png)
 
-## 초기 스킬 구성
+## Starting Skill Loadouts
 
-슬롯 순서를 포함한 4개 스킬의 정확한 구성은 **767종**이었다. 569종은 1회만 등장했고, 가장 잦은 4종도 각 4회다. 전체 구성의 비교는 이 표본에서 변동성이 크다. 아래에 시작 기본기, 랭크 기술, 순서를 무시한 공격 기술 쌍으로 묶은 결과를 함께 제시한다.
+There were **767 distinct four-skill loadouts** when slot order was included. Of those, 569 appeared only once, and the 4 most common each appeared 4 times. Comparisons across complete loadouts are noisy in this sample. The results below also group games by starting basic skill, rank skill, and unordered attack-skill pair.
 
-| 시작 기본기 | 판 수 | 평균 도달 층 | 5층 도달 | 10층 도달 |
+| Starting basic skill | Games | Mean floor reached | Reached floor 5 | Reached floor 10 |
 |---|---:|---:|---:|---:|
 | skull dagger | 345 | 3.00 | 41/345 (11.9%) | 3/345 (0.9%) |
 | thunder | 318 | 3.59 | 73/318 (23.0%) | 15/318 (4.7%) |
 | wolf fang | 337 | 3.98 | 97/337 (28.8%) | 19/337 (5.6%) |
 
-| 랭크 기술 | 판 수 | 평균 도달 층 | 5층 도달 | 10층 도달 |
+| Rank skill | Games | Mean floor reached | Reached floor 5 | Reached floor 10 |
 |---|---:|---:|---:|---:|
 | power up | 100 | 4.38 | 36/100 (36.0%) | 9/100 (9.0%) |
 | defend | 102 | 4.32 | 34/102 (33.3%) | 9/102 (8.8%) |
@@ -154,26 +154,26 @@ Party의 5층 진입 49.6%와 10층 진입 11.8%가 지역군 중 가장 높았�
 | terror | 102 | 3.20 | 14/102 (13.7%) | 2/102 (2.0%) |
 | afterimage | 95 | 3.24 | 13/95 (13.7%) | 2/95 (2.1%) |
 
-랭크 기술에서는 Power Up(36.0%)과 Defend(33.3%)의 5층 도달률이 높았다. 공격 쌍 30종 중 Fast Claw + Kiss가 9/23(39.1%)으로 높았고, Drain + Whisker Needle과 Kiss + Magic Arrow는 각각 15/39(38.5%)였다. 순위는 기술 간 인과적 우위를 입증하지 않으며, 공격 쌍의 작은 표본과 첫 지역 구성을 고려해야 한다.
+Among rank skills, Power Up (36.0%) and Defend (33.3%) had high floor 5 reach rates. Among the 30 attack-skill pairs, Fast Claw + Kiss had a high reach rate at 9/23 (39.1%). Drain + Whisker Needle and Kiss + Magic Arrow each reached floor 5 in 15/39 games (38.5%). These are observational rankings, and interpreting them requires accounting for the small samples per attack-skill pair and the mix of starting areas.
 
-| 가장 자주 관측한 전체 구성 | 판 수 | 평균 도달 층 | 5층 도달 | 10층 도달 |
+| Most common complete loadouts | Games | Mean floor reached | Reached floor 5 | Reached floor 10 |
 |---|---:|---:|---:|---:|
 | skull dagger / drain / elemental orb / acceleration | 4 | 4.00 | 2/4 (50.0%) | 0/4 (0.0%) |
 | thunder / flesh explosion / double strike / acceleration | 4 | 3.25 | 0/4 (0.0%) | 0/4 (0.0%) |
 | thunder / kiss / soul strike / afterimage | 4 | 6.50 | 2/4 (50.0%) | 1/4 (25.0%) |
 | wolf fang / soul strike / kiss / terror | 4 | 2.50 | 0/4 (0.0%) | 0/4 (0.0%) |
 
-![초기 랭크 기술 및 공격 기술 쌍별 5층 도달률](figures/random_1000_skills.png)
+![Floor 5 reach rate by starting rank skill and attack-skill pair](figures/random_1000_skills.png)
 
-## 로컬 기록과 재현
+## Local Records and Reproduction
 
-공식 측정의 로컬 파일은 `data/baseline_random_1000/baseline.sqlite3`와 `data/baseline_random_1000/summary.json`이다. SQLite의 `run`에는 설정, `episodes`에는 판 ID, 두 시드, 초기 지역과 슬롯 순서, 종료 구분, 최고층, 사망 시 교전 적, 행동 수 및 판별 실행 시간이 있다. 집계 JSON에는 모든 층과 초기 구성의 집계가 있다.
+The official measurement files are stored locally at `data/baseline_random_1000/baseline.sqlite3` and `data/baseline_random_1000/summary.json`. In SQLite, `run` stores the configuration. The `episodes` table stores the game ID, both seeds, the starting area and slot order, the outcome category, the highest floor, the enemy in combat at the time of death, the action count, and the per-game runtime. The JSON summarizes every floor and starting loadout.
 
-Windows에서는 프로젝트 가상환경에 `experiments/requirements-baseline.txt`를 설치한 뒤 루트의 `run_baseline_random_1000.bat`을 실행한다. 기본 실행은 `data/baseline_<UTC timestamp>/`에 SQLite, JSON, PNG 3개를 저장한다. 출력 폴더를 고정하려면 존재하지 않는 폴더를 지정한다.
+On Windows, install `experiments/requirements-baseline.txt` in the project’s virtual environment, then run `run_baseline_random_1000.bat` from the project root. By default, the runner writes the SQLite database, JSON summary, and 3 PNG files to `data/baseline_<UTC timestamp>/`. To set a fixed output path, specify a directory that does not yet exist.
 
 ~~~bat
 .venv\Scripts\python.exe -m pip install -r experiments\requirements-baseline.txt
 run_baseline_random_1000.bat --games 1000 --workers 16 --master-seed 314159 --output data\baseline_replay
 ~~~
 
-SQLite `integrity_check`, 두 시드의 2,000개 전체 고유성, 층별 합계와 사망 집계 합을 확인했다. Windows 배치 파일로 재실행한 1,000판은 시간 필드를 제외한 모든 판별 기록이 기준 실행과 일치했다. 타임아웃·오류 분리 동작은 별도 테스트로 확인했다. 게임 로직과 실제 학습·보상 모델은 이번 변경에 포함되지 않았다.
+We ran SQLite’s `integrity_check`, confirmed that all 2,000 game and policy seeds were unique, and checked the floor totals and the sum of the death counts. Replaying 1,000 games with the Windows batch file reproduced every per-game field apart from timing. Separate tests confirmed that timeouts and errors are recorded as distinct outcomes. Game logic and the actual training and reward models were outside the scope of this change.

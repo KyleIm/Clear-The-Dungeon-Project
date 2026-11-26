@@ -1,38 +1,38 @@
-# Phase 2.5 로컬 하드웨어 및 학습 가능성 평가
+# Phase 2.5 Local Hardware and Training Feasibility Assessment
 
-측정일은 2026-11-25 현지 시간이다. 대상 시뮬레이터는 커밋 `2cd09698b9940beecc815123f79433aa8b60cd49`다. 벤치마크는 Windows 11 로컬 머신에서 실행했고 기존 게임 로직과 의존성을 변경하지 않았다.
+The initial measurements were taken on 2026-11-25 local time, using simulator commit `2cd09698b9940beecc815123f79433aa8b60cd49`. The benchmark ran on a local Windows 11 machine with the existing game logic and dependencies.
 
-1–4절은 최초 하드웨어 및 환경 수집 측정이다. 프로젝트 가상환경에 CUDA PyTorch를 설치한 뒤의 수치와 새 시간 추정은 5절에 있다.
+Sections 1–4 report the initial hardware and environment measurements. Section 5 reports measurements after CUDA-enabled PyTorch was installed in the project virtual environment and gives updated time estimates.
 
-**시뮬레이션만 실행할 때는 16워커가 최고 처리량인 초당 약 90,193스텝을 기록했다.** 학습기까지 함께 실행할 초기 설정은 8워커가 적합하다. 8워커에서 초당 70,380스텝과 약 50%의 논리 CPU 용량을 사용했고, 16워커에서는 약 94%를 사용했다. PyTorch가 설치되어 있지 않아 신경망 계산과 학습기 동시 실행 성능은 측정하지 않았다.
+**For simulation alone, 16 workers achieved the highest throughput at approximately 90,193 steps/s.** The initial assessment suggested 8 workers for a concurrent learner. Eight workers achieved 70,380 steps/s and used about 50% of logical CPU capacity. Sixteen workers used about 94%. Section 5 gives the updated recommendation based on a synthetic learner running alongside the simulator.
 
-## 1. 로컬 하드웨어 및 런타임
+## 1. Local Hardware and Runtime
 
-| 항목 | 확인 결과 |
+| Item | Result |
 |---|---|
-| OS 및 전원 모드 | Windows 11 Home, 빌드 26200. Windows 균형 조정 모드. |
-| CPU | AMD Ryzen AI 7 350 w/ Radeon 860M, 물리 8코어 / 논리 16코어. |
-| GPU | NVIDIA GeForce RTX 5070 Laptop GPU. `nvidia-smi`가 보고한 VRAM 총 8,151 MiB, 조사 시점 조회의 여유 7,887 MiB. AMD Radeon 내장 GPU도 감지했다. |
-| RAM | 32 GiB 장착(16 GiB × 2, 구성 속도 5600 MT/s), Windows가 보고한 가시 메모리 31.12 GiB. |
-| SSD | 1.024 TB NVMe SSD. 프로젝트가 있는 NTFS C: 볼륨에서 629.81 GiB(676.26 GB) 여유. |
-| Python | CPython 3.12.10, Windows AMD64 64비트. |
-| NVIDIA 드라이버 및 CUDA | 드라이버 617.42, WDDM, `nvidia-smi`의 CUDA UMD 13.4, GPU compute capability 12.0. `nvcc`는 PATH에 없고 기본 CUDA Toolkit 설치 폴더에서 설치본을 확인하지 못했다. |
-| PyTorch 및 GPU 연산 | 벤치마크 인터프리터에서 `import torch`가 `ModuleNotFoundError`로 실패했다. `torch.cuda.is_available()`와 실제 CUDA 커널 실행은 미확인이다. `psutil`도 설치되어 있지 않아 프로세스 계측에는 표준 라이브러리와 Windows API를 썼다. |
+| OS and power mode | Windows 11 Home, build 26200. Windows Balanced power mode. |
+| CPU | AMD Ryzen AI 7 350 w/ Radeon 860M, 8 physical cores / 16 logical CPUs. |
+| GPU | NVIDIA GeForce RTX 5070 Laptop GPU. `nvidia-smi` reported 8,151 MiB of total VRAM, with 7,887 MiB free at the time of inspection. The system also detected an integrated AMD Radeon GPU. |
+| RAM | 32 GiB installed (16 GiB × 2 at a configured speed of 5600 MT/s). Windows reported 31.12 GiB of visible memory. |
+| SSD | 1.024 TB NVMe SSD. The NTFS C: volume hosting the project had 629.81 GiB (676.26 GB) free. |
+| Python | CPython 3.12.10, 64-bit Windows AMD64. |
+| NVIDIA driver and CUDA | Driver 617.42, WDDM, CUDA UMD 13.4 as reported by `nvidia-smi`, and GPU compute capability 12.0. `nvcc` was absent from PATH. The default CUDA Toolkit install directory showed no installation. |
+| PyTorch and GPU computation | `import torch` failed with `ModuleNotFoundError` in the benchmark interpreter. `torch.cuda.is_available()` and CUDA kernel execution were unverified. The process measurements used the standard library and Windows APIs because `psutil` was absent. |
 
-CPU/RAM/SSD/OS는 Windows CIM·Storage cmdlet, GPU는 `nvidia-smi --query-gpu=name,compute_cap,memory.total,driver_version --format=csv`, Python은 `python -VV`로 확인했다. CUDA UMD 값은 드라이버가 보고하는 호환 수준이다. 후속 설치 시 Windows x64·Python 3.12·Blackwell(SM 12.0)에 맞는 CUDA 빌드를 선택하고 PyTorch 버전, 번들 CUDA 버전, 장치 이름, 장치에서의 텐서 연산 성공을 확인해야 한다. PyTorch의 Windows Blackwell 안내는 CUDA 13.0+ 휠에 Windows 드라이버 580.88 이상을 명시한다. 조사한 617.42는 그 요구를 충족하지만 설치할 개별 빌드의 호환성은 실동작으로 확인해야 한다. [PyTorch Blackwell 빌드 안내](https://pytorch.org/blog/pytorch-2-12-release-blog/) · [NVIDIA CUDA 드라이버 호환성](https://docs.nvidia.com/deploy/cuda-compatibility/latest/minor-version-compatibility.html)
+Windows CIM and Storage cmdlets identified the CPU, RAM, SSD, and OS. GPU details came from `nvidia-smi --query-gpu=name,compute_cap,memory.total,driver_version --format=csv`, and Python details came from `python -VV`. The CUDA UMD value indicates the driver-reported compatibility level. For a subsequent install, select a CUDA build for Windows x64, Python 3.12, and Blackwell (SM 12.0). Verify the PyTorch version, bundled CUDA version, device name, and successful execution of a tensor operation on the device. PyTorch's Windows Blackwell guidance specifies Windows driver 580.88 or later for CUDA 13.0+ wheels. The measured 617.42 driver meets that requirement. Verify the selected build by running it. [PyTorch Blackwell build guidance](https://pytorch.org/blog/pytorch-2-12-release-blog/) · [NVIDIA CUDA driver compatibility](https://docs.nvidia.com/deploy/cuda-compatibility/latest/minor-version-compatibility.html)
 
-## 2. 시뮬레이터 실측
+## 2. Simulator Measurements
 
-### 방법
+### Method
 
-- 환경 스텝은 실제 `Game.step(action)` 호출 1회다. 전투, 보상, 이벤트, 상점 행동을 모두 포함한다. 전투 턴은 실행 직전 단계가 `combat`인 스텝이다. 종료 후 `Game.reset(seed)`는 별도로 세고, 그 시간은 전체 처리량에 반영했다.
-- 각 프로세스는 `GameData`를 한 번 로드하고 독립 `Game`과 시드가 고정된 균등 랜덤 정책을 사용했다. 정책은 `get_legal_actions()`에서 고른다. `step()`이 반환하는 전체 상태 스냅샷을 포함한다. 1워커는 단일 프로세스 직접 실행, 2/4/8/16워커는 Windows `spawn`으로 실행했다.
-- 짧은 워밍업 후 공통 시작 신호로 약 4초씩 측정했다. 각 워커 구성을 3회 반복했고 아래에는 중앙값과 스텝 처리량 범위를 표시했다. 시작·데이터 로드는 계측 구간에서 뺐다. 워커별 집계만 부모 프로세스로 전달했으므로 관측 직렬화, 스텝별 IPC, 모델 추론 및 저장은 포함되지 않는다.
-- CPU는 측정 구간 워커의 process CPU time 합을 벽시계 시간으로 나눈 값이다. 논리 CPU 16개 기준 비율이며 다른 프로그램의 CPU 사용량은 제외한다. RAM은 Windows `K32GetProcessMemoryInfo`의 워커별 working set과 private committed bytes 합이다. Working set 합에는 공유 페이지 중복이 있을 수 있고 private bytes는 물리 상주량이 아니다.
+- One environment step is one call to `Game.step(action)` and includes combat, reward, event, and shop actions. A combat turn is a step whose phase immediately before execution is `combat`. Calls to `Game.reset(seed)` after termination were counted separately, and their time was included in overall throughput.
+- Each process loaded `GameData` once and ran an independent `Game` with a fixed-seed uniform random policy. The policy selected from `get_legal_actions()`. The benchmark included the full state snapshot returned by `step()`. The 1-worker case ran directly in a single process. The 2/4/8/16-worker cases used Windows `spawn`.
+- After a short warm-up, a common start signal began each measurement window of approximately 4 seconds. Each worker configuration ran 3 times. The table reports medians and the step throughput range. Process startup and data loading took place outside the measurement window. Workers sent only aggregate results to the parent process, so the measurement excludes observation serialization, per-step IPC, model inference, and saving.
+- CPU use is the sum of worker process CPU time during the measurement window divided by elapsed wall-clock time. The percentage uses 16 logical CPUs as total capacity and excludes other programs. RAM values sum the workers' working sets and private committed bytes reported by Windows `K32GetProcessMemoryInfo`. Summed working sets can count shared pages more than once. Private bytes measure committed memory, regardless of residency.
 
-### 워커별 결과
+### Results by Worker Count
 
-| 워커 | 환경 스텝/s 중앙값 (최소–최대) | 전투 턴/s | 종료 후 초기화/s | 사용 논리 CPU 상당 / 전체 용량 | 종료 시 working set 합 | 개별 peak working set 합 | private bytes 합 |
+| Workers | Median environment steps/s (min–max) | Combat turns/s | Post-termination resets/s | Logical CPU equivalents used / total capacity | Total working set at end | Sum of individual peak working sets | Total private bytes |
 |---:|---:|---:|---:|---:|---:|---:|---:|
 | 1 | 11,984 (11,932–15,976) | 11,772 | 66.75 | 1.00 / 6.25% | 23.57 MiB | 24.64 MiB | 16.20 MiB |
 | 2 | 28,459 (28,434–28,938) | 28,120 | 115.25 | 2.00 / 12.48% | 45.34 MiB | 48.24 MiB | 31.33 MiB |
@@ -40,57 +40,57 @@ CPU/RAM/SSD/OS는 Windows CIM·Storage cmdlet, GPU는 `nvidia-smi --query-gpu=na
 | 8 | 70,380 (68,951–71,011) | 60,898 | 2,831.64 | 7.93 / 49.58% | 181.77 MiB | 192.37 MiB | 124.11 MiB |
 | 16 | 90,193 (88,599–90,530) | 75,293 | 4,341.52 | 15.06 / 94.15% | 361.72 MiB | 383.61 MiB | 248.63 MiB |
 
-임의 정책의 진행 깊이 때문에 초기화와 전투의 비율은 구성마다 달랐다. 위 초기화/s는 그 작업 부하에서 실제로 발생한 초기화 수이고 `reset()` 자체의 처리 한계는 아래 별도 측정에 있다. 단일 프로세스 전체 혼합 구간에서 전투 스텝 호출 시간만 합산하면 초당 12,582턴이었다. 프로세스 생성, 데이터 로드, 워밍업 및 준비 신호 확인 비용의 중앙값은 2/4/8/16워커 각각 0.281/0.301/0.390/0.605초였다. 시스템 전체 RAM 사용은 각 그룹 실행 전과 종료 후 약 17.0 GiB였다. 개별 peak working set의 합은 프로세스별 고점이 동시에 발생했는지를 확인하는 지표가 아니다.
+The mix of resets and combat turns varied by configuration because the random policy reached different depths. The table gives the resets that occurred in that workload. A separate measurement below gives the throughput limit of `reset()` itself. Across the mixed single-process run, total time spent in combat step calls yielded 12,582 turns/s. The median cost of process creation, data loading, warm-up, and readiness signaling was 0.281/0.301/0.390/0.605 seconds for 2/4/8/16 workers, respectively. Total system RAM use was approximately 17.0 GiB before and after each group of runs. Each process may have reached its peak working set at a different time.
 
-같은 시드에서 **워커마다 동일한 16,000스텝**을 실행하는 대조 측정도 2회씩 했다. 스텝/s 중앙값은 1워커 13,501, 8워커 87,941, 16워커 95,553이었다. 이 대조에서 16워커는 8워커보다 약 9% 빨랐다. 서로 다른 시드를 쓴 기본 실험에서는 약 28% 빨랐다. 두 방법 모두 16워커가 앞섰지만, 작업 구성에 따라 이득이 달라졌다. 짧은 구간이므로 장시간 동시 학습이나 열로 인한 클럭 변화를 측정한 결과는 아니다.
+As a control, each configuration ran twice with the same seed and **exactly 16,000 steps per worker**. Median steps/s were 13,501 with 1 worker, 87,941 with 8 workers, and 95,553 with 16 workers. In this control, 16 workers were about 9% faster than 8 workers. In the main experiment with different seeds, they were about 28% faster. Both methods favored 16 workers, with the size of the gain depending on the workload mix. The short windows leave sustained concurrent training and heat-related changes in clock speed unmeasured.
 
-### API 호출 비용
+### API Call Costs
 
-독립 호출당 벽시계 비용을 5회 반복해 중앙값을 구했다. `get_state()`와 전투 행동 목록은 1층 시작 상태에서 측정했다. 상점 행동 목록은 편성 화면에서 모든 기술을 습득한 경우를 만들어 측정했다. `reset()`은 매번 같은 시드로 호출했고 데이터 재로딩은 포함하지 않았다.
+The table gives the median wall-clock cost per isolated call across 5 runs. Measurements of `get_state()` and the combat action list used the initial state on floor 1. The shop action list was measured at the lineup screen with all skills acquired. Each `reset()` call used the same seed and excluded data reloading.
 
-| 작업 | 호출당 중앙값 | 처리량 |
+| Operation | Median per call | Throughput |
 |---|---:|---:|
-| `get_state()` | 73.03 µs | 13,693 호출/s |
-| `get_legal_actions()`, 전투 시작 상태 | 0.895 µs | 약 1,117,521 호출/s |
-| `get_legal_actions()`, 모든 기술을 습득한 상점 편성 상태 | 24.71 µs | 40,473 호출/s |
-| `reset()`, 전체 초기화 및 첫 관측 반환 | 243.64 µs | 4,104 초기화/s |
+| `get_state()` | 73.03 µs | 13,693 calls/s |
+| `get_legal_actions()` at combat start | 0.895 µs | approximately 1,117,521 calls/s |
+| `get_legal_actions()` at the shop lineup screen with all skills acquired | 24.71 µs | 40,473 calls/s |
+| `reset()` with full initialization and return of the first observation | 243.64 µs | 4,104 resets/s |
 
-별도 10,000스텝 `cProfile` 실행에서 전체 누적 시간은 3.059초였고, `get_state()` 호출의 누적 시간이 2.571초였다. 그 안의 `dataclasses.asdict`는 2.492초였다. `resolve_turn`은 0.160초, `get_legal_actions()`는 0.034초였다. 프로파일 계측 오버헤드가 포함되고 부모·자식 시간을 더하면 중복된다. 절대 처리량 대신 병목 위치를 확인하는 데 사용했다. 현재 단독 실행의 첫 병목은 네 캐릭터의 스냅샷을 반복 복사하는 Python 작업이었다.
+In a separate 10,000-step `cProfile` run, the total cumulative time was 3.059 seconds. Calls to `get_state()` accounted for 2.571 seconds, of which `dataclasses.asdict` accounted for 2.492 seconds. `resolve_turn` took 0.160 seconds, and `get_legal_actions()` took 0.034 seconds. These figures include profiling overhead, and summing parent and child times would double-count some work. The profile served to locate bottlenecks. The main bottleneck in the standalone run was the Python work of repeatedly copying the snapshots of all four characters.
 
-## 3. 소규모 MLP 및 결합 처리량
+## 3. Small MLP and Combined Throughput
 
-**측정에 필요한 미설치 패키지는 PyTorch다.** 조사 후 패키지나 CUDA Toolkit을 설치하지 않았다. 따라서 히든 크기 64/128/256/512 × 배치 크기 64/256/1024의 12가지 조합 모두에서 CPU/GPU forward·backward 시간, GPU VRAM 피크, CPU 대비 가속률과 시뮬레이션 결합 처리량은 미측정이다. 위 VRAM 여유 수치는 장치 유휴 상태 조사이며 모델의 메모리 사용량이 아니다.
+**PyTorch was the missing package required for these measurements.** The initial survey ended before installing packages or the CUDA Toolkit. CPU/GPU forward and backward times, peak GPU VRAM, GPU speedup over the CPU, and combined throughput with the simulator remained unmeasured for all 12 combinations of hidden width 64/128/256/512 and batch size 64/256/1024. The free VRAM reported above describes the idle device.
 
-후속 측정은 같은 크기의 합성 FP32 입력·출력을 쓰고 학습 신호에 게임 데이터나 보상 함수를 사용하지 않는 방식으로 수행할 수 있다. 워밍업과 GPU 동기화 후 forward, backward, 옵티마이저 갱신을 구분하고 CPU 스레드 수와 GPU의 peak allocated/reserved 메모리를 기록한다. 결합 측정에서는 관측 수집·배치 전송·합성 업데이트를 한 파이프라인에서 실행하고 동일한 워커 수의 단독 실측과 비교한다.
+A follow-up benchmark can use synthetic FP32 inputs and outputs of the same sizes and avoid any game data or reward function in the training signal. After warm-up and GPU synchronization, time the forward pass, backward pass, and optimizer update separately. Record the CPU thread count and the GPU's peak allocated and reserved memory. For the combined measurement, run observation collection, batch transfer, and synthetic updates in the same pipeline. Compare that throughput with standalone measurements at the same worker count.
 
-## 4. 학습 비용 추정과 권장 환경
+## 4. Estimated Training Cost and Recommended Setup
 
-아래는 기본 실험의 중앙값 `R`에 대해 `N / R`로 산출한 **환경 스텝 수집만의 벽시계 추정**이다. 업데이트·추론·IPC·저장 및 장시간 성능 저하는 반영하지 않았다. 실제 정책이 상점과 후반 층을 더 자주 방문하면 처리량이 달라질 수 있다.
+The table estimates **wall-clock time for environment step collection alone** using `N / R`, where `R` is the median in the main experiment. It excludes updates, inference, IPC, saving, and sustained performance degradation. Throughput can vary if the actual policy visits the shop and later floors more often.
 
-| 환경 스텝 | 1워커 | 2워커 | 4워커 | 8워커 | 16워커 |
+| Environment steps | 1 worker | 2 workers | 4 workers | 8 workers | 16 workers |
 |---:|---:|---:|---:|---:|---:|
-| 100만 | 83.4초 | 35.1초 | 20.2초 | 14.2초 | 11.1초 |
-| 1,000만 | 13분 54초 | 5분 51초 | 3분 22초 | 2분 22초 | 1분 51초 |
-| 1억 | 2시간 19분 | 58분 34초 | 33분 40초 | 23분 41초 | 18분 29초 |
-| 10억 | 23시간 11분 | 9시간 46분 | 5시간 37분 | 3시간 57분 | 3시간 5분 |
+| 1,000,000 | 83.4 s | 35.1 s | 20.2 s | 14.2 s | 11.1 s |
+| 10,000,000 | 13 min 54 s | 5 min 51 s | 3 min 22 s | 2 min 22 s | 1 min 51 s |
+| 100,000,000 | 2 h 19 min | 58 min 34 s | 33 min 40 s | 23 min 41 s | 18 min 29 s |
+| 1,000,000,000 | 23 h 11 min | 9 h 46 min | 5 h 37 min | 3 h 57 min | 3 h 5 min |
 
-신경망 계산 비용은 새 스텝 `B`개마다 `U`번 갱신하는 경우 `ceil(N / B) × U × 측정된 갱신 시간`으로 별도 계산할 수 있다. 이 항은 PyTorch 실측이 없어 미정이다. 순차 실행이면 수집과 학습 시간을 합산한다. 겹쳐 실행할 때는 병목 단계, 전송 오버헤드 및 CPU 경쟁을 조합한 실측이 필요하다. 예를 들어 256스텝당 갱신 1회라면 수집 시간이 8워커 기준 약 3.64 ms, 16워커 기준 약 2.84 ms다. 이보다 갱신과 배치 전달이 오래 걸린다면 환경 워커를 더 늘려도 학습 처리량 개선이 제한될 수 있다.
+If the network runs `U` updates for every `B` new steps, estimate the neural network cost separately as `ceil(N / B) × U × measured update time`. The initial measurements leave this term undetermined. Add collection and training times for sequential execution. For concurrent execution, measure the combined effect of the slowest stage, transfer overhead, and CPU contention. For example, at 1 update per 256 steps, collection takes about 3.64 ms with 8 workers and about 2.84 ms with 16 workers. If the update and batch delivery take longer, adding environment workers may yield only a limited training throughput gain.
 
-**권장 초기 설정은 로컬 Python 3.12 가상환경, 환경 워커 8개, 별도 학습기 1개다.** 8워커는 물리 코어 수와 일치하고 이번 측정에서 논리 CPU 용량의 약 절반을 남겼다. 순수 수집용으로는 측정한 구성 중 16워커가 가장 빠르다. 학습기를 돌릴 때의 최적 워커 수는 미확인이므로 PyTorch 사용 가능 후 4/8/16워커를 다시 비교한다. 메모리는 이번 시뮬레이터 워커 범위에서 병목이 아니었다. 향후 1억·10억 스텝에서는 관측 직렬화, 배치 전달, 리플레이 보관 및 체크포인트의 메모리·디스크 비용을 별도로 측정해야 한다.
+**The recommended initial setup is a local Python 3.12 virtual environment, 8 environment workers, and 1 separate learner.** Eight workers match the physical core count and left about half of logical CPU capacity available in this benchmark. For collection alone, 16 workers were the fastest measured configuration. The optimal worker count with the learner was unverified at this point. Retest 4/8/16 workers when PyTorch is available. Memory did not constrain any measured simulator worker count. For runs of 100 million or 1 billion steps, measure the memory and disk costs of observation serialization, batch delivery, replay storage, and checkpointing separately.
 
-## 5. CUDA PyTorch 후속 실측
+## 5. CUDA PyTorch Follow-up Measurements
 
-앞 절의 PyTorch 미설치·미측정 기록은 최초 조사 시점의 결과다. 아래는 2026-11-26 현지 시간에 프로젝트 가상환경을 만든 뒤 수행한 로컬 후속 실측이다. 기존 게임 로직, 정책, 보상 함수는 변경하지 않았다.
+The earlier sections describe the initial survey, when PyTorch was absent and its measurements were pending. The local follow-up measurements below were taken on 2026-11-26 local time, after creating the project virtual environment. The benchmarks used the existing game logic, policy, and reward function.
 
-- 프로젝트의 `.venv`에 공식 Windows CUDA 13.2 인덱스의 PyTorch **2.15.0+cu132**를 설치했다. 공식 인덱스와 휠의 SHA-256이 일치했다. 번들 CUDA는 **13.2**이고, CUDA 장치는 **NVIDIA GeForce RTX 5070 Laptop GPU**, SM 12.0, PyTorch가 보고한 총 장치 메모리는 8,123 MiB였다. [PyTorch 2.15 공식 릴리스](https://pytorch.org/blog/pytorch-2-15-release-blog/)
-- CUDA 텐서 [1, 2, 3, 4]의 제곱합 **30**과 CUDA 그래디언트 **[2, 4, 6, 8]**을 일치 확인했다. 별도 CUDA MLP에서 역전파와 AdamW 갱신을 실행해 유한한 파라미터가 실제로 바뀌는 것도 확인했다.
+- The project `.venv` used PyTorch **2.15.0+cu132** from the official Windows CUDA 13.2 index. The wheel's SHA-256 matched the official index. The bundled CUDA version was **13.2**. The CUDA device was an **NVIDIA GeForce RTX 5070 Laptop GPU**, SM 12.0, with 8,123 MiB of total device memory reported by PyTorch. [Official PyTorch 2.15 release](https://pytorch.org/blog/pytorch-2-15-release-blog/)
+- A CUDA tensor [1, 2, 3, 4] produced the expected sum of squares, **30**, and CUDA gradient, **[2, 4, 6, 8]**. A separate CUDA MLP ran backpropagation and an AdamW update, and its parameters changed and remained finite.
 
-### MLP 단독 벤치마크
+### Standalone MLP Benchmark
 
-구조는 입력 → H → H → 64이며 ReLU, FP32, 합성 입력·타깃, MSE, AdamW를 사용했다. CPU intra-op 스레드는 8개이고 inter-op 스레드는 1개다. 워밍업 후 3개 시간 구간의 중앙값을 냈다. 전체 ms/step은 그래디언트 초기화와 forward·backward·옵티마이저 갱신을 포함한다. GPU는 8업데이트마다 동기화했다. F/B/O는 별도의 24회 계측에서 구한 forward+loss / backward / optimizer 중앙값이다. CPU는 벽시계, GPU 구간은 CUDA 이벤트 기준이다. 구간별 중앙값의 합과 전체 벽시계 중앙값은 계측 방법과 런치 오버헤드 때문에 다를 수 있다. VRAM은 PyTorch 할당기 기준 peak allocated / reserved다.
+The architecture was input → H → H → 64, with ReLU, FP32, synthetic inputs and targets, MSE, and AdamW. The CPU used 8 intra-op threads and 1 inter-op thread. After warm-up, the benchmark took the median of 3 measurement windows. Overall ms/step includes zeroing gradients, the forward and backward passes, and the optimizer update. The GPU synchronized every 8 updates. F/B/O gives the median times for forward pass plus loss, backward pass, and optimizer update from 24 separate measurements. CPU timings use wall-clock time, and GPU phase timings use CUDA events. The sum of the phase medians can differ from the overall wall-clock median because of the measurement method and launch overhead. VRAM figures are the peak allocated and reserved memory reported by the PyTorch allocator.
 
-| 입력 | 히든 H×2 | 배치 | CPU F/B/O (ms) | CPU ms/step · 샘플/s | GPU F/B/O (ms) | GPU ms/step · 샘플/s | GPU peak alloc/reserved (MiB) | GPU 가속 |
-|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Input width | Hidden H×2 | Batch size | CPU F/B/O (ms) | CPU ms/step · samples/s | GPU F/B/O (ms) | GPU ms/step · samples/s | GPU peak allocated/reserved (MiB) | GPU speedup |
+|---:|---:|---:|---:|---:|---:|---:|---:|
 | 128 | 128 | 64 | 0.083/0.137/0.251 | 0.505 · 126,716 | 0.172/0.316/0.519 | 1.058 · 60,487 | 32.7/34.0 | 0.48× |
 | 128 | 128 | 256 | 0.135/0.213/0.199 | 0.633 · 404,443 | 0.184/0.402/0.584 | 1.099 · 233,022 | 33.2/36.0 | 0.58× |
 | 128 | 128 | 1024 | 0.293/0.480/0.277 | 1.336 · 766,628 | 0.158/0.292/0.554 | 1.037 · 987,314 | 35.3/38.0 | 1.29× |
@@ -128,14 +128,15 @@ CPU/RAM/SSD/OS는 Windows CIM·Storage cmdlet, GPU는 `nvidia-smi --query-gpu=na
 | 512 | 512 | 1024 | 3.723/5.781/1.165 | 10.092 · 101,471 | 0.245/0.557/0.873 | 1.929 · 530,789 | 48.0/64.0 | 5.23× |
 | 512 | 512 | 4096 | 11.791/19.121/1.072 | 33.276 · 123,092 | 0.751/0.962/0.507 | 2.237 · 1,830,661 | 73.5/118.0 | 14.87× |
 
-GPU는 36가지 중 **24가지**에서 CPU보다 빨랐다. 벽시계 가속률 범위는 **0.48–16.91×**다. 최저 조합(입력/H/배치)은 128/128/64, 최고 조합은 256/512/4096였다.
-배치별 GPU/CPU 가속률 중앙값은 64: 0.61×, 256: 1.08×, 1024: 1.96×, 4096: 8.17×였다. 이 값은 8스레드 CPU 기준이다.
+The GPU was faster than the CPU in **24 of the 36 cases**. Wall-clock speedup ranged from **0.48× to 16.91×**. The lowest speedup came from 128/128/64 (input/H/batch), and the highest came from 256/512/4096.
 
-### 시뮬레이터 + 배치 추론 + 합성 업데이트
+Median GPU speedups by batch size were 0.61× for 64, 1.08× for 256, 1.96× for 1024, and 8.17× for 4096. These values use the 8-thread CPU baseline.
 
-Windows spawn 워커가 기존 엔진의 합법 행동을 랜덤 선택하고, 상태 8개 스칼라를 담은 256차원 FP32 운반용 데이터를 256스텝씩 모아 큐에 보냈다. 이는 학습용 관측 설계와 무관한 성능 테스트 입력이다. GPU 학습기 1개가 CPU→GPU 전송, 배치 forward, 별도 forward·backward 및 AdamW 업데이트 1회를 수행한 뒤 동기화했다. 추론 출력은 게임 행동에 사용하지 않았고, 손실 타깃은 합성 난수다. 처리량은 학습기가 소비까지 끝낸 스텝을 센다. 워커 초기화 및 GPU 워밍업은 제외하고 구성별 12초 이상씩 두 번 실행했다. 워커 순서는 두 번째 반복에서 역순으로 했다.
+### Simulator + Batched Inference + Synthetic Updates
 
-| 워커 | 처리 스텝/s 중앙값 (범위) | 업데이트/s | CPU 시스템 / 벤치마크 % | GPU 평균 / 피크 % | 시스템 RAM 관측 피크 GiB | 워커 WS 합 / 학습기 WS 피크 MiB | 장치 VRAM 피크 / Torch alloc MiB | 큐 수신 대기 % |
+Windows spawn workers randomly selected legal actions from the existing engine. They packed 8 state scalars into 256-dimensional FP32 transport data and queued batches of 256 steps. This transport data served as a benchmark input independent of the training observation design. A single GPU learner ran a CPU-to-GPU transfer, a batched forward pass, a separate forward and backward pass, and one AdamW update before synchronizing. The game actions came from the random policy, and the loss targets came from synthetic random values. Throughput counts steps fully consumed by the learner. Each configuration ran twice for at least 12 seconds per run, excluding worker initialization and GPU warm-up. The second repetition reversed the worker-count order.
+
+| Workers | Median processed steps/s (range) | Updates/s | System / benchmark CPU (%) | Mean / peak GPU (%) | Observed peak system RAM (GiB) | Total worker / peak learner working set (MiB) | Peak device VRAM / Torch allocated (MiB) | Queue receive time (%) |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 1 | 10,076 (8,403–11,749) | 39.4 | 15.9 / 7.2 | 3.1 / 17 | 22.09 | 23 / 1301 | 310 / 35.4 | 88.4 |
 | 4 | 35,442 (27,647–43,237) | 138.4 | 39.1 / 27.2 | 6.3 / 10 | 22.14 | 91 / 1301 | 310 / 35.4 | 61.3 |
@@ -143,25 +144,27 @@ Windows spawn 워커가 기존 엔진의 합법 행동을 랜덤 선택하고, �
 | 12 | 52,841 (47,957–57,725) | 206.4 | 85.1 / 66.3 | 7.7 / 13 | 22.56 | 277 / 1301 | 310 / 35.4 | 28.7 |
 | 16 | 54,357 (52,740–55,975) | 212.3 | 88.9 / 73.7 | 7.8 / 11 | 22.57 | 372 / 1301 | 310 / 35.4 | 20.6 |
 
-CPU 시스템 값은 Windows 전체 busy time이며 벤치마크 값은 워커·학습기 프로세스 CPU 시간 합을 16 논리 CPU로 정규화한 값이다. GPU와 장치 VRAM은 500 ms 간격 nvidia-smi 표본이며 장치 VRAM에는 CUDA 컨텍스트도 포함된다. Torch alloc은 텐서 할당 피크다. 워커 working set은 종료 직전 합이며 공유된 페이지가 중복될 수 있다. 학습기와 시스템 RAM은 약 0.5초 간격 관측 피크다. 큐 수신 시간에는 대기와 역직렬화가 모두 들어간다.
+System CPU measures total Windows busy time. Benchmark CPU sums the worker and learner process CPU times and normalizes them to 16 logical CPUs. GPU utilization and device VRAM came from `nvidia-smi` samples taken every 500 ms. Device VRAM includes the CUDA context. Torch allocated memory is the peak tensor allocation. Worker working sets are summed just before exit and may count shared pages more than once. Learner working set and system RAM are observed peaks sampled at approximately 0.5-second intervals. Queue receive time includes waiting and deserialization.
 
-측정 창은 12.00–12.03초였다. 최고 중앙값은 **16워커, 54,357스텝/s**였다. 해당 구성의 시작 2초를 제외한 완전한 2초 구간은 **51,712–60,160스텝/s**였다. GPU 단독의 동일 크기 업데이트(입력 256, H=256, 배치 256) 비용은 **1.203 ms/step**이었다. 이 값은 큐 수신·추론 추가 1회·전송을 제외한다. 결합 수치는 이 항들을 포함한 소비 완료 기준이다.
+The measurement windows lasted 12.00–12.03 seconds. The highest median was **54,357 steps/s with 16 workers**. Full 2-second intervals after the first 2 seconds ranged from **51,712 to 60,160 steps/s** in that configuration. A standalone GPU update of the same size (input 256, H=256, batch 256) took **1.203 ms/step**, excluding queue receipt, the additional inference pass, and transfer. Combined throughput includes those operations and counts steps fully consumed by the learner.
 
-권장 구성인 12워커의 추가 60.0초 연속 실행은 **59,185스텝/s**였다. 시작 2초를 제외한 완전한 2초 구간 범위는 52,864–66,176스텝/s였다. 시스템 CPU 81.7%, 평균 GPU 9.4%, 시스템 RAM 관측 피크 21.99 GiB, 장치 VRAM 관측 피크 310 MiB, GPU 온도 피크 66°C였다.
+An additional 60.0-second continuous run with the recommended 12 workers achieved **59,185 steps/s**. Full 2-second intervals after the first 2 seconds ranged from 52,864 to 66,176 steps/s. System CPU usage was 81.7%, mean GPU usage was 9.4%, observed peak system RAM was 21.99 GiB, observed peak device VRAM was 310 MiB, and peak GPU temperature was 66°C.
 
-### 합성 학습량 시간 재추정
+### Updated Time Estimates for Synthetic Training
 
-각 워커의 결합 중앙값으로 환경 스텝 수를 나눴다. 조건은 256스텝당 배치 추론 1회와 합성 업데이트 1회다. 평가, 실제 RL 모델/손실, 리플레이, 체크포인트 및 장시간 열 안정성은 이 추정에 들어가지 않는다. 위 최초 수집 단독 시간과 합산할 필요가 없다.
+Each estimate divides the environment step count by the combined median for the worker count shown. The benchmark ran 1 batched inference pass and 1 synthetic update per 256 steps. The estimates exclude evaluation, a real RL model and loss, replay, checkpointing, and long-run thermal stability. The combined estimates already include the collection time.
 
-| 환경 스텝 | 1워커 | 4워커 | 8워커 | 12워커 | 16워커 |
+| Environment steps | 1 worker | 4 workers | 8 workers | 12 workers | 16 workers |
 |---:|---:|---:|---:|---:|---:|
-| 100만 | 1분 39초 | 28.2초 | 19.7초 | 18.9초 | 18.4초 |
-| 1,000만 | 16분 32초 | 4분 42초 | 3분 17초 | 3분 9초 | 3분 4초 |
-| 1억 | 2시간 45분 24초 | 47분 2초 | 32분 53초 | 31분 32초 | 30분 40초 |
-| 10억 | 27시간 34분 3초 | 7시간 50분 15초 | 5시간 28분 54초 | 5시간 15분 25초 | 5시간 6분 37초 |
+| 1,000,000 | 1 min 39 s | 28.2 s | 19.7 s | 18.9 s | 18.4 s |
+| 10,000,000 | 16 min 32 s | 4 min 42 s | 3 min 17 s | 3 min 9 s | 3 min 4 s |
+| 100,000,000 | 2 h 45 min 24 s | 47 min 2 s | 32 min 53 s | 31 min 32 s | 30 min 40 s |
+| 1,000,000,000 | 27 h 34 min 3 s | 7 h 50 min 15 s | 5 h 28 min 54 s | 5 h 15 min 25 s | 5 h 6 min 37 s |
 
-이 합성 구성에서 시작 설정은 **12워커 + GPU 학습기 1개**를 권장한다. 최고 처리량의 95% 이내인 구성 중 워커가 가장 적은 값이다. 실제 모델·배치·관측 전달 방식을 도입하면 다시 측정해야 한다.
-최고 처리량 구성에서 GPU 평균 사용률은 7.8%였고, 큐 수신·역직렬화가 벽시계의 20.6%를 차지했다. 작은 배치의 잦은 동기화와 상태 수집·전달도 합성 파이프라인에 포함된다. 이 수치는 GPU 커널 자체가 포화했다는 증거를 제공하지 않으며, CPU 프로세스 간 전송과 GPU 런치 비용을 서로 분리해 계측하지 않았다.
-PyTorch 외에 NumPy는 설치하지 않았다. 벤치마크는 PyTorch 텐서 연산과 Python 버퍼를 사용했으며 NumPy 브리지 초기화 경고가 실행을 막지 않았다.
+For this synthetic setup, start with **12 workers and 1 GPU learner**. This is the fewest workers among configurations that reached at least 95% of peak throughput. Measure again with the actual model, batch size, and observation delivery method.
 
-최종 확인에서 `.venv`의 `pip check`, 시뮬레이터 테스트 58개, 정적 게임 데이터 검증이 모두 통과했다. 가상환경, 공식 휠 및 벤치마크 스크립트와 원시 로그는 로컬에 유지했다.
+In the highest-throughput configuration, mean GPU utilization was 7.8%, and queue receipt and deserialization accounted for 20.6% of wall-clock time. The synthetic pipeline also included frequent synchronization for small batches and state collection and transfer. The measurements leave GPU kernel saturation undetermined and combine CPU interprocess transfer and GPU launch overhead.
+
+The environment used PyTorch without NumPy. The benchmark used PyTorch tensor operations and Python buffers, and execution continued after a NumPy bridge initialization warning.
+
+In the final check, `pip check` in `.venv`, all 58 simulator tests, and static game data validation passed. The virtual environment, official wheel, benchmark scripts, and raw logs remained on the local machine.
