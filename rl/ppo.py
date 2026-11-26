@@ -60,16 +60,33 @@ class ActorCritic(nn.Module):
         action = distribution.logits.argmax(dim=-1) if deterministic else distribution.sample()
         return action, distribution.log_prob(action), value
 
-    @torch.inference_mode()
-    def greedy_actions(self, obs):
-        """Evaluate masked argmax without critic, distribution or dynamic GPU indexing."""
+    def _evaluation_logits(self, obs):
         encoding = self._encode(obs)
         logits = encoding.new_full((len(encoding), self.num_actions), -torch.inf)
         phases = obs['phase'].reshape(-1, 1)
         for phase, name in enumerate(PHASE_NAMES):
             scores = self.policy_heads[name](encoding)
             logits[:, getattr(self, f'{name}_ids')] = scores.masked_fill(phases != phase, -torch.inf)
-        return logits.masked_fill(~obs['action_mask'].bool(), -torch.inf).argmax(dim=-1)
+        return logits.masked_fill(~obs['action_mask'].bool(), -torch.inf)
+
+    @torch.inference_mode()
+    def greedy_actions(self, obs):
+        """Evaluate masked argmax without a critic or a distribution."""
+        return self._evaluation_logits(obs).argmax(dim=-1)
+
+    @torch.inference_mode()
+    def evaluation_actions(self, obs, draws=None):
+        logits = self._evaluation_logits(obs)
+        probabilities = logits.softmax(dim=-1)
+        greedy = logits.argmax(dim=-1)
+        if draws is None:
+            return greedy, probabilities
+        draws = torch.as_tensor(draws, dtype=probabilities.dtype, device=probabilities.device)
+        draws = draws.clamp(max=1 - torch.finfo(probabilities.dtype).eps)
+        sampled = (probabilities.cumsum(dim=-1) <= draws[:, None]).sum(dim=-1)
+        sampled = sampled.clamp(max=self.num_actions - 1)
+        valid = obs['action_mask'].gather(1, sampled[:, None]).squeeze(1).bool()
+        return torch.where(valid, sampled, greedy), probabilities
 
 
 class Rollout:

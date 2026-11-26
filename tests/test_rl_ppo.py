@@ -25,6 +25,10 @@ class MaskedPPOTests(unittest.TestCase):
             torch.testing.assert_close(log_prob, torch.zeros(4))
             self.assertEqual(value.shape, (4,))
         torch.testing.assert_close(model.greedy_actions(obs), torch.arange(4, 8))
+        for draws in (None, [0, 0.1, 0.9, 0.999999999]):
+            action, probabilities = model.evaluation_actions(obs, draws)
+            torch.testing.assert_close(action, torch.arange(4, 8))
+            torch.testing.assert_close(probabilities, obs['action_mask'].float())
         obs['action_mask'].fill_(True)
         legacy, _, _ = model.act(obs, deterministic=True)
         torch.testing.assert_close(model.greedy_actions(obs), legacy)
@@ -45,6 +49,20 @@ class MaskedPPOTests(unittest.TestCase):
         advantages, returns = rollout.compute_advantages(gamma=0.5, gae_lambda=0.5)
         np.testing.assert_allclose(advantages[:, 0], [3.0, 2.0, -3.0])
         np.testing.assert_allclose(returns[:, 0], [4.0, 5.0, -1.0])
+
+    def test_seeded_draws_are_slot_local_and_masked(self):
+        model = ActorCritic(2, [0, 1, 2, 3, 0], [4])
+        with torch.no_grad():
+            for parameter in model.parameters():
+                parameter.zero_()
+        obs = {'features': torch.zeros(2, 2), 'phase': torch.zeros(2, dtype=torch.long),
+               'action_mask': torch.tensor([[True, False, False, False, True]] * 2)}
+        action, mass = model.evaluation_actions(obs, [0.25, 0.75])
+        torch.testing.assert_close(action, torch.tensor([0, 4]))
+        torch.testing.assert_close(mass, obs['action_mask'].float() / 2)
+        reversed_obs = {key: value.flip(0) for key, value in obs.items()}
+        reversed_actions, _ = model.evaluation_actions(reversed_obs, [0.75, 0.25])
+        torch.testing.assert_close(reversed_actions, action.flip(0))
 
     def _check_update(self, device):
         torch.manual_seed(11)

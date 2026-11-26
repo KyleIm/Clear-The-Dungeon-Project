@@ -10,6 +10,7 @@ import numpy as np
 
 from simulator.data_loader import GameData
 from simulator.game import Game
+from .strategic_shop import PARENTS, StrategicShop, strategic_catalog
 
 
 PHASES = ("combat", "reward", "shop", "event")
@@ -40,7 +41,7 @@ class DungeonEnv(gym.Env):
 
     metadata = {"render_modes": []}
 
-    def __init__(self, stage: dict, *, action_limit=10_000, early_deadlock=False):
+    def __init__(self, stage: dict, *, action_limit=10_000, early_deadlock=False, shop_policy='legacy'):
         super().__init__()
         if type(action_limit) is not int or action_limit < 1:
             raise ValueError("action_limit must be a positive integer")
@@ -58,6 +59,10 @@ class DungeonEnv(gym.Env):
             raise ValueError("Reward weights must be finite")
         self.action_limit = action_limit
         self.early_deadlock = early_deadlock
+        if shop_policy not in {'legacy', 'strategic'}:
+            raise ValueError('Unknown shop policy profile')
+        self.strategic_shop = (StrategicShop(stage.get('shop_repeat_epsilon', 0.0001))
+                               if shop_policy == 'strategic' else None)
         self.data = _game_data()
         self.game = Game(self.data)
         self.shop = self.data.config["shop"]
@@ -96,6 +101,9 @@ class DungeonEnv(gym.Env):
         shop.extend(("buy", item) for item in self.items)
         shop.extend(("change_type", kind) for kind in TYPES)
         shop.append(("shop_back",))
+        if self.strategic_shop is not None:
+            shop = strategic_catalog(self, [action for action in shop
+                                            if action[0] in {'reduce_skill_cost', 'reroll', 'buy', 'change_type'}])
         event = [("ella", "pickpocket"), ("ella", "help")]
         blocks = combat, reward, shop, event
         return (tuple(action for block in blocks for action in block),
@@ -107,6 +115,10 @@ class DungeonEnv(gym.Env):
         self.action_space.seed(game_seed)
         self._state = self.game.reset(game_seed)
         self.actions = 0
+        self.engine_actions = 0
+        strategic = getattr(self, 'strategic_shop', None)
+        if strategic is not None:
+            strategic.reset()
         self.finished = False
         self.target_success = False
         self.previous_action = None
@@ -164,6 +176,12 @@ class DungeonEnv(gym.Env):
         }
 
     def _public_actions(self, state, shop_state=None):
+        strategic = getattr(self, 'strategic_shop', None)
+        if state['phase'] == 'shop' and strategic is not None:
+            return strategic.actions(self, state)
+        return self._primitive_public_actions(state, shop_state)
+
+    def _primitive_public_actions(self, state, shop_state=None):
         phase = state["phase"]
         if phase == "combat":
             p = state["player"]
@@ -292,6 +310,9 @@ class DungeonEnv(gym.Env):
         merch = bool(shop and shop["menu"] == "merchandise")
         features.extend((float(merch), _scaled(shop["reroll_price"], 100) if merch else 0.0))
         features.extend(float(item in p["purchases"]) for item in self.items)
+        strategic = getattr(self, 'strategic_shop', None)
+        if strategic is not None:
+            features.extend(strategic.features(self, state, _scaled, _one_hot))
         return {"features": np.asarray(features, dtype=np.float32), "phase": np.int64(stage), "action_mask": mask}
 
     def _decode(self, action):
@@ -305,6 +326,8 @@ class DungeonEnv(gym.Env):
     def legal_ids_in_engine_order(self):
         """Preserve seeded random-baseline order after verifying public legality."""
         ids = [self._action_ids[action] for action in self._public_actions(self._state)]
+        if self._state['phase'] == 'shop' and getattr(self, 'strategic_shop', None) is not None:
+            return ids
         by_tuple = defaultdict(deque)
         for action in ids:
             by_tuple[self._decode(action)].append(action)
@@ -317,6 +340,20 @@ class DungeonEnv(gym.Env):
         if len(ordered) != len(ids):
             raise RuntimeError("Public legal-action projection has an extra action")
         return ordered
+
+    def decision_labels(self):
+        """Semantic labels for each currently legal action for evaluation statistics."""
+        labels = {}
+        phase = self._state['phase']
+        for action in self._public_actions(self._state):
+            index = self._action_ids[action]
+            if phase in {'combat', 'reward', 'event'}:
+                labels[index] = self._decode(index)[1]
+            elif action[0] == 'shop_strategy':
+                labels[index] = PARENTS[action[1]]
+            else:
+                labels[index] = 'draft:' + ':'.join(map(str, action))
+        return labels
 
     def _deadlocked(self, state):
         p, m = state["player"], state["monster"]
@@ -351,7 +388,13 @@ class DungeonEnv(gym.Env):
             raise ValueError(f"Action {action!r} is masked in the current phase")
         before = self._state
         decoded = self._decode(action)
-        after = self._state = self.game.step(decoded)
+        strategic = getattr(self, 'strategic_shop', None)
+        if before['phase'] == 'shop' and strategic is not None:
+            after, penalty, shop_info = strategic.step(self, before, decoded)
+        else:
+            after, penalty, shop_info = self.game.step(decoded), 0.0, {'engine_steps': 1}
+        self._state = after
+        self.engine_actions = getattr(self, 'engine_actions', self.actions) + shop_info['engine_steps']
         self.actions += 1
         self.previous_action = self.action_catalog[action][0]
         self.previous_skill = decoded[1] if decoded[0] in {"skill", "memorize", "forget", "reduce_skill_cost"} else None
@@ -377,8 +420,13 @@ class DungeonEnv(gym.Env):
             outcome = "timeout"
         truncated = outcome in {"deadlock", "timeout"}
         self.finished = terminal or truncated
+        if truncated and strategic is not None and after['phase'] == 'shop':
+            shop_info['shop_visit'] = strategic.visit(left=False)
         reward = (self.weights.get("target", 0.0) * int(target_hit)
                   + self.weights.get("floor", 0.0) * floor_progress
                   + self.weights.get("clear", 1.0) * int(outcome == "clear")
-                  + self.weights.get("death", 0.0) * int(outcome == "death"))
-        return self.observe(after), float(reward), terminal, truncated, self._info(outcome, deadlocked)
+                  + self.weights.get("death", 0.0) * int(outcome == "death")
+                  + penalty)
+        return self.observe(after), float(reward), terminal, truncated, dict(
+            self._info(outcome, deadlocked), **shop_info, engine_actions=self.engine_actions,
+            shop_timeout=outcome == 'timeout' and after['phase'] == 'shop')

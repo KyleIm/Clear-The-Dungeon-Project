@@ -5,6 +5,7 @@ from copy import deepcopy
 from hashlib import sha256
 import json
 import logging
+import math
 from pathlib import Path
 import random
 from tempfile import TemporaryDirectory
@@ -13,6 +14,7 @@ from time import perf_counter
 import numpy as np
 
 from experiments.random_baseline_large import run_lock
+from .decision_stats import DecisionStats
 from .environment import DungeonEnv
 from .reporting import EpisodeStats, ExperimentStore, Telemetry, generate_report
 from .vector import open_vector
@@ -20,7 +22,9 @@ from .vector import open_vector
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG = ROOT / 'rl' / 'training.json'
+SHOP_CONFIG = ROOT / 'rl' / 'shop_training.json'
 CHECKPOINT_VERSION = 1
+EVAL_MODES = ('deterministic', 'stochastic')
 
 
 def seed_for(master, domain, index=0):
@@ -40,6 +44,10 @@ def check_config(cfg):
         raise ValueError('The curriculum must contain nine stages and a valid initial stage')
     if any(not 0 <= stage['advance_rate'] <= 1 for stage in cfg['curriculum']):
         raise ValueError('Curriculum advancement rates must be between 0 and 1')
+    for stage in cfg['curriculum']:
+        epsilon = stage.get('shop_repeat_epsilon', 0.0001)
+        if isinstance(epsilon, bool) or not isinstance(epsilon, (int, float)) or not math.isfinite(epsilon) or epsilon < 0:
+            raise ValueError('shop_repeat_epsilon must be finite and nonnegative in every stage')
     if any(value is not None and value <= 0 for value in cfg['budget'].values()) or not any(cfg['budget'].values()):
         raise ValueError('Set at least one positive training budget')
     ppo = cfg['ppo']
@@ -50,6 +58,11 @@ def check_config(cfg):
             or max(ppo['gamma'], ppo['gae_lambda']) > 1):
         raise ValueError('Invalid PPO settings')
     evaluation = cfg['evaluation']
+    if cfg.get('shop_policy', 'legacy') not in ('legacy', 'strategic'):
+        raise ValueError('shop_policy must be legacy or strategic')
+    if any(evaluation.get(f'{split}_policy', 'deterministic') not in EVAL_MODES
+           for split in ('validation', 'test')):
+        raise ValueError('Evaluation policy must be deterministic or stochastic')
     if min(evaluation[key] for key in ('interval_steps', 'validation_episodes', 'test_episodes', 'action_limit')) < 1:
         raise ValueError('Evaluation episode counts, interval and action limit must be positive')
 
@@ -71,17 +84,34 @@ def model_for(env, cfg, device):
                        cfg['ppo']['hidden_dims']).to(device)
 
 
+def evaluation_mode(cfg, split, policy):
+    if policy == 'random':
+        return 'random'
+    if policy == 'ppo':
+        default = ('stochastic' if split == 'validation' and cfg.get('shop_policy') == 'strategic'
+                   else 'deterministic')
+        return cfg['evaluation'].get(f'{split}_policy', default)
+    if policy in ('ppo_deterministic', 'ppo_stochastic'):
+        return policy.removeprefix('ppo_')
+    raise ValueError(f'Unknown evaluation policy {policy!r}')
+
+
 def evaluate(cfg, model, stage, store, *, split, step, elapsed, train_episodes,
              device, policies=('ppo', 'random'), evaluation_elapsed=0.0):
     """Run paired seed panels with one GPU action batch per active worker round."""
     evaluation = cfg['evaluation']
-    options = dict(stage=cfg['curriculum'][stage - 1], action_limit=evaluation['action_limit'])
+    profile = cfg.get('shop_policy', 'legacy')
+    options = dict(stage=cfg['curriculum'][stage - 1], action_limit=evaluation['action_limit'],
+                   shop_policy=profile)
     n = evaluation[f'{split}_episodes']
     workers = min(cfg['workers'], n)
     catalog = DungeonEnv(**options).action_catalog
     rows = {}
     for policy in policies:
+        mode = evaluation_mode(cfg, split, policy)
+        label = policy if mode == 'random' else f'ppo_{mode}'
         stats = EpisodeStats()
+        decisions = DecisionStats()
         active = {}
         next_index = actions = rounds = max_uncapped_actions = 0
         policy_seconds = worker_seconds = 0.0
@@ -101,15 +131,17 @@ def evaluate(cfg, model, stage, store, *, split, step, elapsed, train_episodes,
                 if next_index == n:
                     break
                 seed = seed_for(cfg['master_seed'], split, next_index)
-                policy_seed = seed_for(cfg['master_seed'], f'{split}-random-policy', next_index)
+                stream = 'random' if mode == 'random' else 'ppo'
+                policy_seed = seed_for(cfg['master_seed'], f'{split}-{stream}-policy', next_index)
+                decisions.reset_slot(slot)
                 active[slot] = dict(seed=seed, policy_seed=policy_seed,
-                                    rng=random.Random(policy_seed) if policy == 'random' else None,
+                                    rng=random.Random(policy_seed),
                                     reward=0.0, actions=0, started=perf_counter(), recent=[])
                 seeds[slot] = seed
                 next_index += 1
             if seeds:
-                for slot, (obs, _) in worker_call('reset', seeds).items():
-                    active[slot]['observation'] = obs
+                for slot, ((obs, info), labels) in worker_call('eval_reset', seeds).items():
+                    active[slot].update(observation=obs, labels=labels, floor=info['floor'])
 
         def progress():
             seconds = perf_counter() - started
@@ -125,7 +157,7 @@ def evaluate(cfg, model, stage, store, *, split, step, elapsed, train_episodes,
                 remaining = max(max(lengths, default=0), pending / workers) * seconds / max(1, rounds)
             eta = f'{remaining:.1f}s' if remaining is not None else 'pending first completion'
             longest = max((episode['actions'] for episode in active.values()), default=0)
-            print(f'{split} {policy} | {done}/{n} episodes | {actions:,} actions '
+            print(f'{split} {label} | {done}/{n} episodes | {actions:,} actions '
                   f'| longest active {longest:,}/{evaluation["action_limit"]:,} '
                   f'| elapsed {seconds:.1f}s | ETA {eta}', flush=True)
 
@@ -134,37 +166,45 @@ def evaluate(cfg, model, stage, store, *, split, step, elapsed, train_episodes,
             refill(range(workers))
             while active:
                 slots = list(active)
-                if policy == 'random':
+                if mode == 'random':
                     legal = worker_call('legal', dict.fromkeys(slots))
                     before = perf_counter()
                     choices = [active[slot]['rng'].choice(legal[slot]) for slot in slots]
+                    probabilities = [{action: 1 / len(legal[slot]) for action in legal[slot]}
+                                     for slot in slots]
                 else:
                     before = perf_counter()
                     observations = batch_observations([active[slot]['observation'] for slot in slots])
-                    batch_actions = model.greedy_actions(tensors(observations, device))
+                    draws = [active[slot]['rng'].random() for slot in slots] if mode == 'stochastic' else None
+                    batch_actions, scores = model.evaluation_actions(tensors(observations, device), draws)
                     choices = batch_actions.cpu().tolist()
+                    probabilities = scores.cpu().numpy()
                 policy_seconds += perf_counter() - before
                 rounds += 1
-                transitions = worker_call('step', dict(zip(slots, choices)))
+                transitions = worker_call('eval_step', dict(zip(slots, choices)))
                 actions += len(slots)
                 finished = []
-                for slot, choice in zip(slots, choices):
-                    obs, reward, terminal, truncated, info = transitions[slot]
+                for slot, choice, scores in zip(slots, choices, probabilities):
+                    (obs, reward, terminal, truncated, info), labels = transitions[slot]
                     episode = active[slot]
+                    decisions.record(episode['observation']['phase'], episode['floor'],
+                                     episode['labels'], choice, scores, slot=slot)
+                    decisions.transition(info, slot=slot)
                     episode['reward'] += reward
                     episode['actions'] += 1
-                    episode['observation'] = obs
+                    episode.update(observation=obs, labels=labels, floor=info['floor'])
                     episode['recent'] = [*episode['recent'][-7:], catalog[choice]]
                     if terminal or truncated:
                         if info['outcome'] != 'timeout':
                             max_uncapped_actions = max(max_uncapped_actions, episode['actions'])
-                        row = dict(info, split=split, policy=policy, stage=stage, step=step,
+                        row = dict(info, split=split, policy=label, stage=stage, step=step,
                                    seed=episode['seed'],
-                                   policy_seed=episode['policy_seed'] if policy == 'random' else None,
+                                   policy_seed=episode['policy_seed'] if mode != 'deterministic' else None,
                                    actions=episode['actions'], reward=episode['reward'],
                                    elapsed=perf_counter() - episode['started'],
                                    last_actions=episode['recent'])
                         stats.add(row)
+                        decisions.episode(row, slot=slot)
                         store.episode(row)
                         finished.append(slot)
                 for slot in finished:
@@ -176,14 +216,15 @@ def evaluate(cfg, model, stage, store, *, split, step, elapsed, train_episodes,
         progress()
         seconds = perf_counter() - started
         evaluation_elapsed += seconds
-        rows[policy] = dict(stats.summary(), policy=policy, split=split, step=step, stage=stage,
+        rows[policy] = dict(stats.summary(), policy=label, split=split, step=step, stage=stage,
+                            shop_policy=profile, decision_stats=decisions.summary(),
                             elapsed=elapsed, training_seconds=elapsed, train_episodes=train_episodes,
                             evaluation_seconds=seconds,
                             evaluation_elapsed=evaluation_elapsed, eval_actions=actions,
                             eval_workers=workers, decision_batches=rounds, policy_seconds=policy_seconds,
                             worker_seconds=worker_seconds, action_limit=evaluation['action_limit'])
         store.evaluation(rows[policy])
-        print(f'{split} {policy}: {n} games, clear {rows[policy]["clear_rate"]:.1%}, '
+        print(f'{split} {label}: {n} games, clear {rows[policy]["clear_rate"]:.1%}, '
               f'target {rows[policy]["target_success_rate"]:.1%} | '
               f'{seconds:.2f}s ({policy_seconds:.2f}s policy, {worker_seconds:.2f}s workers/IPC)', flush=True)
     return rows
@@ -258,7 +299,8 @@ class TrainingRun:
 
     def options(self):
         return dict(stage=self.cfg['curriculum'][self.state['stage'] - 1],
-                    action_limit=self.cfg['action_limit'], early_deadlock=self.cfg['early_deadlock'])
+                    action_limit=self.cfg['action_limit'], early_deadlock=self.cfg['early_deadlock'],
+                    shop_policy=self.cfg.get('shop_policy', 'legacy'))
 
     def reset_slots(self, vector, slots):
         seeds = {}
@@ -419,6 +461,8 @@ def train(cfg, directory, *, resume=False, stage=None):
             if not db_path.exists():
                 raise ValueError('The experiment database for this checkpoint is missing')
             original = checkpoint['config']
+            if original.get('shop_policy', 'legacy') != cfg.get('shop_policy', 'legacy'):
+                raise ValueError('Checkpoint Shop Head and observation schema differ. Start a new run or use the matching configuration.')
             fixed = ('master_seed', 'workers', 'action_limit', 'early_deadlock', 'curriculum')
             if any(original[key] != cfg[key] for key in fixed) or original['ppo']['hidden_dims'] != cfg['ppo']['hidden_dims']:
                 raise ValueError('Resume requires matching seed, workers, environment, curriculum and hidden dimensions')
@@ -441,12 +485,13 @@ def evaluate_checkpoint(cfg, directory, *, split='test', policies=('ppo', 'rando
         if cfg['master_seed'] != saved_cfg['master_seed']:
             raise ValueError('The evaluation master seed must match the training checkpoint')
         stage, state = checkpoint['state']['stage'], checkpoint['state']
-        env = DungeonEnv(saved_cfg['curriculum'][stage - 1])
+        profile = saved_cfg.get('shop_policy', 'legacy')
+        env = DungeonEnv(saved_cfg['curriculum'][stage - 1], shop_policy=profile)
         model = model_for(env, saved_cfg, cfg['device'])
         model.load_state_dict(checkpoint['model'])
         model.eval()
         with ExperimentStore(db_path) as store:
-            result = evaluate(dict(cfg, curriculum=saved_cfg['curriculum']), model, stage, store,
+            result = evaluate(dict(cfg, curriculum=saved_cfg['curriculum'], shop_policy=profile), model, stage, store,
                               split=split, step=state['step'], elapsed=state['elapsed'],
                               train_episodes=state['episodes'], device=cfg['device'], policies=policies)
         generate_report(db_path, directory / f'{split}_report')
@@ -492,11 +537,12 @@ def validate():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command', choices=('train', 'resume', 'evaluate', 'report', 'validate'))
-    parser.add_argument('--config', type=Path, default=DEFAULT_CONFIG)
+    parser.add_argument('--config', type=Path)
     parser.add_argument('--output', type=Path)
     parser.add_argument('--stage', type=int)
     parser.add_argument('--split', choices=('validation', 'test'), default='test')
-    parser.add_argument('--policy', choices=('both', 'ppo', 'random'), default='both')
+    parser.add_argument('--policy', choices=('both', 'ppo', 'random', 'ppo_deterministic', 'ppo_stochastic',
+                                            'compare'), default='both')
     args = parser.parse_args()
     if args.command == 'validate':
         import unittest
@@ -505,7 +551,7 @@ def main():
         if not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful():
             raise SystemExit(1)
         return
-    cfg = read_config(args.config)
+    cfg = read_config(args.config or (SHOP_CONFIG if args.command == 'train' else DEFAULT_CONFIG))
     directory = args.output or ROOT / cfg['output']
     directory.mkdir(parents=True, exist_ok=True)
     logging.basicConfig(filename=directory / 'errors.log', encoding='utf-8', level=logging.ERROR)
@@ -513,7 +559,8 @@ def main():
         if args.command in ('train', 'resume'):
             train(cfg, directory, resume=args.command == 'resume', stage=args.stage)
         elif args.command == 'evaluate':
-            policies = ('ppo', 'random') if args.policy == 'both' else (args.policy,)
+            policies = {'both': ('ppo', 'random'), 'compare': ('ppo_deterministic', 'ppo_stochastic')}.get(
+                args.policy, (args.policy,))
             evaluate_checkpoint(cfg, directory, split=args.split, policies=policies)
         else:
             for stem in ('training', 'validation_evaluation', 'test_evaluation'):

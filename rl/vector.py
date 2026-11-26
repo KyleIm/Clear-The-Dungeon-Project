@@ -10,11 +10,16 @@ from .environment import DungeonEnv
 def _transition(env, command, arg):
     if command == 'legal':
         return env.legal_ids_in_engine_order()
-    if command == 'reset':
-        return env.reset(seed=arg)
-    if command == 'step':
-        return env.step(arg)
-    raise ValueError(f'Unknown worker command {command!r}')
+    if command in ('reset', 'eval_reset'):
+        result = env.reset(seed=arg)
+    elif command in ('step', 'eval_step'):
+        result = env.step(arg)
+    else:
+        raise ValueError(f'Unknown worker command {command!r}')
+    if command.startswith('eval_'):
+        labels = {} if env.finished else env.decision_labels()
+        return result, labels
+    return result
 
 
 def _worker(pipe, options):

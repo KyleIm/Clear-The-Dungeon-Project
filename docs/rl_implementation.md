@@ -14,12 +14,12 @@ run_rl_validation.bat
 | Launcher | Behavior |
 |---|---|
 | `run_rl_validation.bat` | Runs the small RL tests, including real updates on CPU and on CUDA when available. It writes integration fixtures to a temporary directory. |
-| `run_training.bat` | Starts a new run using `rl/training.json`. Default output is `data/rl_default`. A fresh experiment requires a fresh output directory. |
-| `resume_training.bat` | Restores the same run's `latest.pt` and database. Raise the cumulative budget in the settings before resuming a run that used its entire budget. |
+| `run_training.bat` | Starts a new strategic-shop run using `rl/shop_training.json` and `data/rl_shop_strategic`. A fresh experiment requires a fresh output directory. |
+| `resume_training.bat` | Restores the same run's `latest.pt` and database. Legacy runs use `rl/training.json` by default. Strategic runs use `--config rl\shop_training.json`. Raise the cumulative budget before resuming a run that used it. |
 | `run_evaluation.bat` | Evaluates the saved model and Uniform Random Policy on the same independent test seeds and with the same action limit. Use `--split validation` for exploratory evaluation. Reserve the test split for a selected checkpoint. |
 | `generate_training_report.bat` | Regenerates English Markdown and Matplotlib charts from available local training, validation and test databases. |
 
-Double-click the launchers for the defaults, or use CMD to supply a different JSON file, run directory or curriculum stage. Example commands for a separate run are below. Copy and edit `rl/training.json` before running them.
+Double-click the launchers for the defaults, or use CMD to supply a different JSON file, run directory or curriculum stage. Example commands for a separate run are below. Copy and edit `rl/shop_training.json` for a strategic run. [Strategic shop policy and evaluation](shop_policy_redesign.md)
 
 ```bat
 run_training.bat --config my_training.json --output data\trial_01
@@ -32,7 +32,7 @@ Checkpoints and databases are local. Load only checkpoints from your own trusted
 
 ## Environment and leakage control
 
-`rl.environment.DungeonEnv` implements Gymnasium `reset` and `step` with 1,088 FP32 features, a discrete phase and a 667-entry action mask. It encodes visible actors, stats, HP and substitute bars, status icon presence, skill inventory, ordered slots, current uses, rewards, shop controls and tracked history. Hidden body HP under a substitute uses a last-seen value and age. Learned skill costs and purchase flags represent trackable inventory changes. Enemy internal actions, future encounters, reward pools, exact status counters, raw IDs and RNG state stay outside the model. The adapter projects observations before crossing the worker boundary. It uses public availability rules for masking and validates the available mappings against the simulator in tests. [Observation inventory](observation_space.md)
+`rl.environment.DungeonEnv` implements Gymnasium `reset` and `step` with a fixed FP32 feature vector, a discrete phase and an action mask. The legacy profile has 1,088 features and 667 action IDs. The strategic profile has 2,234 features and 416 action IDs. The environment encodes visible actors, stats, HP and substitute bars, status icon presence, skill inventory, ordered slots, current uses, rewards, shop controls and tracked history. Hidden body HP under a substitute uses a last-seen value and age. Learned skill costs and purchase flags represent trackable inventory changes. Enemy internal actions, future encounters, reward pools, exact status counters, raw IDs and RNG state stay outside the model. The adapter projects observations before crossing the worker boundary. It uses public availability rules for masking and validates the available mappings against the simulator in tests. [Observation inventory](observation_space.md) · [Strategic shop interface](shop_policy_redesign.md)
 
 One step is one accepted game decision. Termination means clear or death. Truncation means the action cap or the separately configurable confirmed Mimic–Counter lock. The detector gates on verified conditions including the single forced Counter action, priority order, Mimic's available move, positive HP, and absence of substitutes and active statuses. Privileged fields used to certify the lock stay outside policy features and masks. Independent evaluation retains the 10,000-action limit, logs the confirmed lock alongside a faithful timeout, and counts both as non-clears. The learner stops GAE continuation at episode boundaries, bootstraps ordinary time limits from the last observation, and uses zero continuation for death, clear and a proven absorbing lock. [Mimic timeout analysis](mimic_timeout_analysis.md)
 
