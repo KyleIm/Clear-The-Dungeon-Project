@@ -1,0 +1,41 @@
+{
+  "output": "data/rl_default",
+  "master_seed": 903104,
+  "device": "cuda",
+  "workers": 12,
+  "torch_cpu_threads": 2,
+  "initial_stage": 1,
+  "action_limit": 10000,
+  "early_deadlock": true,
+  "checkpoint_every_updates": 5,
+  "budget": {"steps": 1000000, "episodes": null, "seconds": null},
+  "ppo": {
+    "hidden_dims": [128, 128],
+    "learning_rate": 0.0003,
+    "gamma": 0.999,
+    "gae_lambda": 0.95,
+    "entropy_coef": 0.01,
+    "batch_size": 256,
+    "rollout_size": 128,
+    "clip_range": 0.2,
+    "update_epochs": 4
+  },
+  "evaluation": {
+    "interval_steps": 50000,
+    "validation_episodes": 128,
+    "test_episodes": 1000,
+    "action_limit": 10000,
+    "auto_advance": true
+  },
+  "curriculum": [
+    {"name": "Next-floor progression", "target": "next_floor", "advance_rate": 0.85, "weights": {"clear": 1, "death": 0, "floor": 0.006, "target": 0.30}},
+    {"name": "Floor 5 boss defeat", "target": "boss", "floor": 5, "advance_rate": 0.65, "weights": {"clear": 1, "death": 0, "floor": 0.005, "target": 0.27}},
+    {"name": "Floor 10 boss defeat", "target": "boss", "floor": 10, "advance_rate": 0.55, "weights": {"clear": 1, "death": 0, "floor": 0.004, "target": 0.23}},
+    {"name": "Floor 20 boss defeat", "target": "boss", "floor": 20, "advance_rate": 0.45, "weights": {"clear": 1, "death": 0, "floor": 0.003, "target": 0.20}},
+    {"name": "Floor 40 progression", "target": "floor", "floor": 40, "advance_rate": 0.40, "weights": {"clear": 1, "death": 0, "floor": 0.002, "target": 0.16}},
+    {"name": "Floor 60 progression", "target": "floor", "floor": 60, "advance_rate": 0.35, "weights": {"clear": 1, "death": 0, "floor": 0.0015, "target": 0.12}},
+    {"name": "Floor 80 progression", "target": "floor", "floor": 80, "advance_rate": 0.30, "weights": {"clear": 1, "death": 0, "floor": 0.001, "target": 0.08}},
+    {"name": "Full game clear", "target": "clear", "advance_rate": 0.20, "weights": {"clear": 1, "death": 0, "floor": 0.0005, "target": 0}},
+    {"name": "Clear rate optimization", "target": "clear", "advance_rate": 0.90, "weights": {"clear": 1, "death": 0, "floor": 0, "target": 0}}
+  ]
+}

@@ -13,8 +13,9 @@ A local research project for Dungeon & Rogue, a roguelike on Steam. The goal is 
 | Phase 3A · Million-game baseline | Completed 1,000,000 episodes with skill and encounter telemetry. Recorded 999,913 defeats, 87 action-limit timeouts, and zero clears or execution errors. | [Results and plots](docs/baseline_random_1m_results.md) · [Runner guide](docs/baseline_random_1m.md) |
 | Phase 3A · Timeout investigation | Replayed all 87 timeouts and reproduced the Counter–Mimic combat deadlock with the original Ren’Py combat code. | [Mimic timeout analysis](docs/mimic_timeout_analysis.md) |
 | Phase 3B · RL environment design | Specified Steam-observable inputs, masked actions, reward candidates, a Gymnasium adapter, and an independent evaluation protocol. | [RL environment design](docs/rl_environment_design.md) |
+| Phase 3C · Local RL implementation | Added a standalone masked PPO learner, nine curriculum stages, resumable checkpoints, paired evaluation and Windows launchers. Validation uses tiny local fixtures. | [Local RL implementation and launch instructions](docs/rl_implementation.md) |
 
-Greedy and heuristic baselines, reinforcement learning, and Steam integration are upcoming. The hardware benchmark uses synthetic updates, and the 90% target has yet to be evaluated in Steam.
+Full local training, greedy and heuristic comparisons, and Steam evaluation are upcoming. The 90% target has yet to be evaluated in Steam.
 
 ## Run locally
 
