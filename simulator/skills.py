@@ -84,7 +84,7 @@ def _recoil(character, damage):
 
 def _imitate(game, caster, opponent):
     if caster.imitation_backup is None:
-        fields = COPIED_STATS + ("current_skills", "memorized_skills", "available_skills")
+        fields = COPIED_STATS + ("current_skills", "memorized_skills")
         caster.imitation_backup = {name: getattr(caster, name) for name in fields}
     for name in COPIED_STATS:
         setattr(caster, name, getattr(opponent, name))
@@ -97,8 +97,9 @@ def _imitate(game, caster, opponent):
         caster.current_skills = copied + [locked] * (slots["total"] - len(copied))
         caster.memorized_skills = dict.fromkeys(copied, slots["imitation_uses_per_skill"])
     else:
+        # Enemy AI uses the copied slots on its next selection. The list
+        # already selected this turn remains the source of victory rewards.
         caster.current_skills = [name for name in opponent.current_skills if name != locked]
-        caster.available_skills = caster.current_skills.copy()
 
     if not caster.has_status_effect("imitation"):
         caster.apply_status_effect("imitation")

@@ -5,6 +5,7 @@ import random
 import unittest
 from unittest.mock import patch
 
+from simulator import __main__ as cli
 from simulator.game import Game
 from simulator.headless import play_headless
 
@@ -55,6 +56,27 @@ class GameTests(unittest.TestCase):
         action = a.get_legal_actions()[0]
         self.assertEqual(a.step(action), b.step(list(action)))
 
+    def test_cli_labels_skill_uses_without_changing_api(self):
+        game = Game()
+        game.reset(24)
+        game.phase, game.shop_menu = "shop", "skills"
+        skill = game.player.current_skills[0]
+        game.player.memorized_skills[skill] -= 1
+        self.assertIn(("memorize", skill), game.get_legal_actions())
+        self.assertIn(("forget", skill), game.get_legal_actions())
+
+        output = StringIO()
+        with (
+            patch.object(cli, "Game", return_value=game),
+            patch.object(game, "reset", return_value=game.get_state()),
+            patch("sys.argv", ["simulator"]),
+            patch("builtins.input", return_value="q"),
+            redirect_stdout(output),
+        ):
+            cli.main()
+        self.assertIn(f"Increase skill uses {skill}", output.getvalue())
+        self.assertIn(f"Decrease skill uses {skill}", output.getvalue())
+
     def test_death_beats_victory_on_simultaneous_knockout(self):
         game = Game()
         game.reset(1)
@@ -68,6 +90,48 @@ class GameTests(unittest.TestCase):
         self.assertFalse(game.is_cleared())
         self.assertEqual(game.get_state()["phase"], "game_over")
         self.assertEqual(game.get_legal_actions(), [])
+
+    def doppelganger_encounter(self):
+        game = Game()
+        game.reset(24)
+        game.floor, game.area = 17, "Mansion"
+        game.monster = game.monster_roster[8]
+        game.player.base_speed = game.player.speed = 1
+        return game
+
+    def test_ko_after_imitation_uses_the_turns_original_reward_deck(self):
+        game = self.doppelganger_encounter()
+        game.monster.hp = 1
+        game.step(("skill", game.player.current_skills[0]))
+        self.assertTrue(game.monster.has_status_effect("imitation"))
+        self.assertEqual(game.phase, "reward")
+        self.assertEqual(game.reward_candidates, ["imitation"])
+        self.assertEqual(game.reward_skill, "imitation")
+        game.step(("reward", "Gold"))
+        self.assertIn("imitation", game.player.learned_skills)
+
+    def test_ko_after_copied_recovery_uses_the_turns_copied_reward_deck(self):
+        game = self.doppelganger_encounter()
+        player = game.player
+        player.current_skills[1] = "recovery"
+        player.memorized_skills["recovery"] = 2
+        player.learned_skills.append("recovery")
+        game.step(("skill", "recovery"))
+        self.assertTrue(game.monster.has_status_effect("imitation"))
+        active = [skill for skill in player.current_skills if skill != "lock"]
+        for seed in range(100):
+            if random.Random(seed).choice(active) == "recovery":
+                game.rng.seed(seed)
+                break
+        else:
+            self.fail("No seed selected the copied Recovery")
+        game.monster.hp = 1
+        game.step(("skill", player.current_skills[0]))
+        self.assertEqual(game.monster.ram_action, "recovery")
+        self.assertFalse(game.monster.has_status_effect("imitation"))
+        self.assertEqual(game.phase, "reward")
+        self.assertEqual(game.reward_candidates, [])
+        self.assertIsNone(game.reward_skill)
 
     def test_complete_progression_both_ella_paths(self):
         for route in ("pickpocket", "help"):

@@ -14,7 +14,7 @@ Clear The Dungeon Project studies decision-making in the roguelike game Dungeon 
 
 1. **Repository setup** — complete.
 2. **Phase 1 — Static game data and mechanics** — complete. The baseline covers 88 skills, 55 monster variants, and 11 regions.
-3. **Phase 2 — Python simulator** — implemented with a terminal player, silent policy runner, and rules tests.
+3. **Phase 2 — Python simulator** — implemented with a terminal player, silent policy runner, and rules tests. Independent source comparison verified the corrected Imitation reward timing.
 4. **Training** — establish baselines and train PyTorch policies locally.
 5. **Analysis** — record runs in SQLite and analyze results with scikit-learn.
 6. **Steam evaluation** — integrate the macro interface and test whether the real-game clear rate reaches 90%.
@@ -23,6 +23,6 @@ The current milestone is a seeded, standalone Python rules engine for Dungeon & 
 
 Play with `python -m simulator --seed 42` or use the [headless API](docs/simulator.md). Run the simulator suite with `python -m unittest discover -s tests -v` and validate the datasets with `python tests/validate_game_data.py`. Both use the Python standard library.
 
-See the [game mechanics](docs/game_mechanics.md) and [known issues](docs/known_issues.md) for the reference rules and verification limits.
+See the [game mechanics](docs/game_mechanics.md), [fidelity audit](docs/simulator_fidelity.md), and [known issues](docs/known_issues.md) for reference rules, verification results, and remaining differences. The [observation inventory](docs/observation_space.md) distinguishes screen-visible information, values recoverable from history, and simulator internals.
 
 The original game source, game assets, and credentials are kept outside this public repository.

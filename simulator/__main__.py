@@ -3,6 +3,8 @@ import argparse
 
 from .game import Game
 
+ACTION_LABELS = {"memorize": "Increase skill uses", "forget": "Decrease skill uses"}
+
 
 def show_state(state):
     player, monster = state["player"], state["monster"]
@@ -38,7 +40,7 @@ def main():
         show_state(state)
         actions = game.get_legal_actions()
         for index, action in enumerate(actions, start=1):
-            label = " ".join(map(str, action))
+            label = " ".join((ACTION_LABELS.get(action[0], action[0]), *map(str, action[1:])))
             if action[0] == "skill" and action[1] in state["player"]["memorized_skills"]:
                 label += f" ({state['player']['memorized_skills'][action[1]]} uses)"
             print(f"{index}. {label}")
