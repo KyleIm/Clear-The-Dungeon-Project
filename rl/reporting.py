@@ -432,6 +432,13 @@ def generate_report(db_path, output_dir):
         progress_text += f" Recorded training wall-clock time was {last['elapsed'] / 3600:.3f} hours."
     if last.get("throughput") is not None:
         progress_text += f" The last measured throughput was {last['throughput']:.1f} steps/s."
+    timed = [row for row in stages if row.get('evaluation_seconds') is not None]
+    timing = [f"- {_label(row)}, stage {row['stage']}, step {row['step']:,}. "
+              f"Training {row.get('training_seconds', row['elapsed']):.2f}s. Evaluation panel {row['evaluation_seconds']:.2f}s. "
+              f"Cumulative evaluation {row['evaluation_elapsed']:.2f}s. "
+              f"Policy {row['policy_seconds']:.2f}s and workers/IPC {row['worker_seconds']:.2f}s. "
+              f"{row['eval_actions']:,} actions across {row['decision_batches']:,} batches."
+              for row in timed]
     report.write_text("\n".join([
         "# Local reinforcement learning results", "", progress_text, "",
         "The table shows all completed training episodes and the latest evaluation for each stage, policy, and split. "
@@ -444,6 +451,7 @@ def generate_report(db_path, output_dir):
         *(_summary_line(f"{_label(row)} · stage {row['stage']} · step {row['step']:,}", row) for row in stages),
         "", "Rates use completed records. A confirmed lock can also count as a timeout in the faithful evaluation profile. "
         "The historical million-game random run had zero clears and used its own seed manifest.", "",
+        *(["## Evaluation timings", "", *timing, ""] if timing else []),
         "## Learning curves", "", "![Learning curves](learning_curves.png)", "",
         "## Floor-wise survival", "", "![Floor-wise survival](floor_survival.png)", "",
         "## Policy heads and updates", "", "![Policy head statistics](head_statistics.png)", "",

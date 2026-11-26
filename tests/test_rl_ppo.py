@@ -24,6 +24,13 @@ class MaskedPPOTests(unittest.TestCase):
             torch.testing.assert_close(action, torch.arange(4, 8))
             torch.testing.assert_close(log_prob, torch.zeros(4))
             self.assertEqual(value.shape, (4,))
+        torch.testing.assert_close(model.greedy_actions(obs), torch.arange(4, 8))
+        obs['action_mask'].fill_(True)
+        legacy, _, _ = model.act(obs, deterministic=True)
+        torch.testing.assert_close(model.greedy_actions(obs), legacy)
+        single = torch.cat([model.greedy_actions({key: value[i:i + 1] for key, value in obs.items()})
+                            for i in range(4)])
+        torch.testing.assert_close(model.greedy_actions(obs), single)
 
     def test_gae_bootstraps_a_cutoff_without_leaking_into_next_episode(self):
         rollout = Rollout(3, 1, 2, 4)

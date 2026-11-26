@@ -72,42 +72,120 @@ def model_for(env, cfg, device):
 
 
 def evaluate(cfg, model, stage, store, *, split, step, elapsed, train_episodes,
-             device, policies=('ppo', 'random')):
-    """Use frozen, paired manifests and the faithful action cap for every policy."""
+             device, policies=('ppo', 'random'), evaluation_elapsed=0.0):
+    """Run paired seed panels with one GPU action batch per active worker round."""
     evaluation = cfg['evaluation']
-    env = DungeonEnv(cfg['curriculum'][stage - 1], action_limit=evaluation['action_limit'])
+    options = dict(stage=cfg['curriculum'][stage - 1], action_limit=evaluation['action_limit'])
     n = evaluation[f'{split}_episodes']
+    workers = min(cfg['workers'], n)
+    catalog = DungeonEnv(**options).action_catalog
     rows = {}
     for policy in policies:
         stats = EpisodeStats()
-        for index in range(n):
-            seed = seed_for(cfg['master_seed'], split, index)
-            policy_seed = seed_for(cfg['master_seed'], f'{split}-random-policy', index)
-            rng = random.Random(policy_seed)
-            observation, _ = env.reset(seed=seed)
-            reward_sum = 0.0
-            started = perf_counter()
-            finished = False
-            while not finished:
+        active = {}
+        next_index = actions = rounds = max_uncapped_actions = 0
+        policy_seconds = worker_seconds = 0.0
+        started = last_progress = perf_counter()
+
+        def worker_call(command, args):
+            nonlocal worker_seconds
+            before = perf_counter()
+            result = vector.call(command, args)
+            worker_seconds += perf_counter() - before
+            return result
+
+        def refill(slots):
+            nonlocal next_index
+            seeds = {}
+            for slot in slots:
+                if next_index == n:
+                    break
+                seed = seed_for(cfg['master_seed'], split, next_index)
+                policy_seed = seed_for(cfg['master_seed'], f'{split}-random-policy', next_index)
+                active[slot] = dict(seed=seed, policy_seed=policy_seed,
+                                    rng=random.Random(policy_seed) if policy == 'random' else None,
+                                    reward=0.0, actions=0, started=perf_counter(), recent=[])
+                seeds[slot] = seed
+                next_index += 1
+            if seeds:
+                for slot, (obs, _) in worker_call('reset', seeds).items():
+                    active[slot]['observation'] = obs
+
+        def progress():
+            seconds = perf_counter() - started
+            done = stats.episodes
+            remaining = None
+            if done:
+                typical = stats.action_sum / done
+                lengths = [max(1, evaluation['action_limit'] - ep['actions'])
+                           if ep['actions'] >= max(1, max_uncapped_actions) else max(1, typical - ep['actions'])
+                           for ep in active.values()]
+                typical = (actions + sum(lengths)) / next_index
+                pending = sum(lengths) + (n - next_index) * typical
+                remaining = max(max(lengths, default=0), pending / workers) * seconds / max(1, rounds)
+            eta = f'{remaining:.1f}s' if remaining is not None else 'pending first completion'
+            longest = max((episode['actions'] for episode in active.values()), default=0)
+            print(f'{split} {policy} | {done}/{n} episodes | {actions:,} actions '
+                  f'| longest active {longest:,}/{evaluation["action_limit"]:,} '
+                  f'| elapsed {seconds:.1f}s | ETA {eta}', flush=True)
+
+        progress()
+        with open_vector(workers, options) as vector:
+            refill(range(workers))
+            while active:
+                slots = list(active)
                 if policy == 'random':
-                    action = rng.choice(env.legal_ids_in_engine_order())
+                    legal = worker_call('legal', dict.fromkeys(slots))
+                    before = perf_counter()
+                    choices = [active[slot]['rng'].choice(legal[slot]) for slot in slots]
                 else:
-                    action, _, _ = model.act(tensors(batch_observations([observation]), device),
-                                             deterministic=True)
-                    action = int(action.item())
-                observation, reward, terminated, truncated, info = env.step(action)
-                reward_sum += reward
-                finished = terminated or truncated
-            row = dict(info, split=split, policy=policy, stage=stage, step=step, seed=seed,
-                       policy_seed=policy_seed if policy == 'random' else None,
-                       actions=env.actions, reward=reward_sum, elapsed=perf_counter() - started)
-            stats.add(row)
-            store.episode(row)
+                    before = perf_counter()
+                    observations = batch_observations([active[slot]['observation'] for slot in slots])
+                    batch_actions = model.greedy_actions(tensors(observations, device))
+                    choices = batch_actions.cpu().tolist()
+                policy_seconds += perf_counter() - before
+                rounds += 1
+                transitions = worker_call('step', dict(zip(slots, choices)))
+                actions += len(slots)
+                finished = []
+                for slot, choice in zip(slots, choices):
+                    obs, reward, terminal, truncated, info = transitions[slot]
+                    episode = active[slot]
+                    episode['reward'] += reward
+                    episode['actions'] += 1
+                    episode['observation'] = obs
+                    episode['recent'] = [*episode['recent'][-7:], catalog[choice]]
+                    if terminal or truncated:
+                        if info['outcome'] != 'timeout':
+                            max_uncapped_actions = max(max_uncapped_actions, episode['actions'])
+                        row = dict(info, split=split, policy=policy, stage=stage, step=step,
+                                   seed=episode['seed'],
+                                   policy_seed=episode['policy_seed'] if policy == 'random' else None,
+                                   actions=episode['actions'], reward=episode['reward'],
+                                   elapsed=perf_counter() - episode['started'],
+                                   last_actions=episode['recent'])
+                        stats.add(row)
+                        store.episode(row)
+                        finished.append(slot)
+                for slot in finished:
+                    del active[slot]
+                refill(finished)
+                if perf_counter() - last_progress >= 2.0:
+                    progress()
+                    last_progress = perf_counter()
+        progress()
+        seconds = perf_counter() - started
+        evaluation_elapsed += seconds
         rows[policy] = dict(stats.summary(), policy=policy, split=split, step=step, stage=stage,
-                            elapsed=elapsed, train_episodes=train_episodes)
+                            elapsed=elapsed, training_seconds=elapsed, train_episodes=train_episodes,
+                            evaluation_seconds=seconds,
+                            evaluation_elapsed=evaluation_elapsed, eval_actions=actions,
+                            eval_workers=workers, decision_batches=rounds, policy_seconds=policy_seconds,
+                            worker_seconds=worker_seconds, action_limit=evaluation['action_limit'])
         store.evaluation(rows[policy])
         print(f'{split} {policy}: {n} games, clear {rows[policy]["clear_rate"]:.1%}, '
-              f'target {rows[policy]["target_success_rate"]:.1%}', flush=True)
+              f'target {rows[policy]["target_success_rate"]:.1%} | '
+              f'{seconds:.2f}s ({policy_seconds:.2f}s policy, {worker_seconds:.2f}s workers/IPC)', flush=True)
     return rows
 
 
@@ -148,7 +226,7 @@ class TrainingRun:
         random.seed(seed_for(cfg['master_seed'], 'python'))
         np.random.seed(seed_for(cfg['master_seed'], 'numpy') % 2**32)
         torch.manual_seed(seed_for(cfg['master_seed'], 'torch'))
-        self.state = dict(stage=cfg['initial_stage'], step=0, episodes=0, elapsed=0.0,
+        self.state = dict(stage=cfg['initial_stage'], step=0, episodes=0, elapsed=0.0, evaluation_elapsed=0.0,
                           update=0, next_game=0, stage_changes=0,
                           next_eval=cfg['evaluation']['interval_steps'])
         self.stats = EpisodeStats()
@@ -255,11 +333,14 @@ class TrainingRun:
         throughput = len(self.rollout) * self.cfg['workers'] / duration
         self.store.update(dict(self.stats.summary(), **stats, step=self.state['step'],
                                stage=self.state['stage'], elapsed=self.state['elapsed'],
+                               training_seconds=self.state['elapsed'],
+                               evaluation_elapsed=self.state['evaluation_elapsed'],
                                throughput=throughput, telemetry=self.telemetry.sample()))
         budget = self.cfg['budget']
         print(f'Stage {self.state["stage"]} | steps {self.state["step"]:,}/{budget["steps"] or "unlimited"} '
               f'| episodes {self.state["episodes"]:,}/{budget["episodes"] or "unlimited"} '
-              f'| elapsed {self.state["elapsed"]:.1f}s | {throughput:,.0f} steps/s', flush=True)
+              f'| train {self.state["elapsed"]:.1f}s | evaluation {self.state["evaluation_elapsed"]:.1f}s '
+              f'| {throughput:,.0f} steps/s', flush=True)
 
     def run(self, switch_to):
         initial = self.checkpoint
@@ -285,13 +366,16 @@ class TrainingRun:
                     self.save(vector)
                 if switch_to is None or switch_to == stage:
                     switch_to = None
-                    while not _expired(self.cfg, self.state):
-                        self._collect_update(vector)
+                    while True:
                         if self.state['step'] >= self.state['next_eval']:
+                            # Keep next_eval due in this checkpoint so an interrupted panel restarts on resume.
+                            self.save(vector)
                             validation = evaluate(
                                 self.cfg, self.model, stage, self.store, split='validation',
                                 step=self.state['step'], elapsed=self.state['elapsed'],
-                                train_episodes=self.state['episodes'], device=self.device, policies=('ppo',))
+                                train_episodes=self.state['episodes'], device=self.device, policies=('ppo',),
+                                evaluation_elapsed=self.state['evaluation_elapsed'])
+                            self.state['evaluation_elapsed'] = validation['ppo']['evaluation_elapsed']
                             self.state['next_eval'] = self.state['step'] + self.cfg['evaluation']['interval_steps']
                             if (self.cfg['evaluation']['auto_advance'] and stage < 9 and
                                     validation['ppo']['target_success_rate'] >= self.options()['stage']['advance_rate']):
@@ -302,7 +386,12 @@ class TrainingRun:
                                 self.state['stage_9_target_met'] = True
                                 self.store.log_event(dict(step=self.state['step'], stage=stage, kind='stage_9_target_met',
                                                           clear_rate=validation['ppo']['clear_rate']))
-                        if self.state['update'] % self.cfg['checkpoint_every_updates'] == 0:
+                            self.save(vector)
+                        if _expired(self.cfg, self.state):
+                            break
+                        self._collect_update(vector)
+                        if (self.state['step'] < self.state['next_eval'] and
+                                self.state['update'] % self.cfg['checkpoint_every_updates'] == 0):
                             self.save(vector)
                 if switch_to is None:
                     self.save(vector)
@@ -339,7 +428,7 @@ def train(cfg, directory, *, resume=False, stage=None):
         return result
 
 
-def evaluate_checkpoint(cfg, directory, *, split='test'):
+def evaluate_checkpoint(cfg, directory, *, split='test', policies=('ppo', 'random')):
     import torch
 
     check_config(cfg)
@@ -359,13 +448,15 @@ def evaluate_checkpoint(cfg, directory, *, split='test'):
         with ExperimentStore(db_path) as store:
             result = evaluate(dict(cfg, curriculum=saved_cfg['curriculum']), model, stage, store,
                               split=split, step=state['step'], elapsed=state['elapsed'],
-                              train_episodes=state['episodes'], device=cfg['device'])
+                              train_episodes=state['episodes'], device=cfg['device'], policies=policies)
         generate_report(db_path, directory / f'{split}_report')
     return result
 
 
 def validate():
     """Run eight training decisions and tiny capped evaluation fixtures."""
+    from unittest.mock import patch
+
     cfg = read_config(DEFAULT_CONFIG)
     cfg.update(workers=2, device='cpu', action_limit=2, torch_cpu_threads=1)
     cfg['budget'] = dict(steps=4, episodes=None, seconds=None)
@@ -374,8 +465,18 @@ def validate():
     cfg['curriculum'][0]['advance_rate'] = 0.0  # Exercise the transition without winning a real floor.
     with TemporaryDirectory() as temp:
         directory = Path(temp)
-        first = train(cfg, directory)
+        with patch(f'{__package__}.runner.evaluate', side_effect=KeyboardInterrupt):
+            try:
+                train(cfg, directory)
+            except KeyboardInterrupt:
+                pass
+            else:
+                raise AssertionError('Expected to interrupt the pending validation')
+        before = read_checkpoint(directory / 'latest.pt')['state']
+        assert before['step'] == before['next_eval'] == 4 and before['evaluation_elapsed'] == 0
+        first = train(cfg, directory, resume=True)
         assert first['stage'] == 2 and len(list(directory.glob('stage-*.pt'))) == 2
+        assert first['evaluation_elapsed'] > 0
         resumed = deepcopy(cfg)
         resumed['budget']['steps'] = 8
         resumed['evaluation']['interval_steps'] = 100
@@ -395,6 +496,7 @@ def main():
     parser.add_argument('--output', type=Path)
     parser.add_argument('--stage', type=int)
     parser.add_argument('--split', choices=('validation', 'test'), default='test')
+    parser.add_argument('--policy', choices=('both', 'ppo', 'random'), default='both')
     args = parser.parse_args()
     if args.command == 'validate':
         import unittest
@@ -411,7 +513,8 @@ def main():
         if args.command in ('train', 'resume'):
             train(cfg, directory, resume=args.command == 'resume', stage=args.stage)
         elif args.command == 'evaluate':
-            evaluate_checkpoint(cfg, directory, split=args.split)
+            policies = ('ppo', 'random') if args.policy == 'both' else (args.policy,)
+            evaluate_checkpoint(cfg, directory, split=args.split, policies=policies)
         else:
             for stem in ('training', 'validation_evaluation', 'test_evaluation'):
                 if (directory / f'{stem}.sqlite3').exists():

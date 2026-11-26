@@ -7,6 +7,16 @@ import traceback
 from .environment import DungeonEnv
 
 
+def _transition(env, command, arg):
+    if command == 'legal':
+        return env.legal_ids_in_engine_order()
+    if command == 'reset':
+        return env.reset(seed=arg)
+    if command == 'step':
+        return env.step(arg)
+    raise ValueError(f'Unknown worker command {command!r}')
+
+
 def _worker(pipe, options):
     env = DungeonEnv(**options)
     with pipe:
@@ -20,10 +30,8 @@ def _worker(pipe, options):
                 elif command == 'restore':
                     env = arg
                     result = None
-                elif command == 'reset':
-                    result = env.reset(seed=arg)
                 else:
-                    result = env.step(arg)
+                    result = _transition(env, command, arg)
                 pipe.send((True, result))
         except EOFError:
             return
@@ -60,10 +68,8 @@ class Vector:
                 elif command == 'restore':
                     self.envs[i] = arg
                     result[i] = None
-                elif command == 'reset':
-                    result[i] = self.envs[i].reset(seed=arg)
                 else:
-                    result[i] = self.envs[i].step(arg)
+                    result[i] = _transition(self.envs[i], command, arg)
             return result
         for i, arg in args.items():
             self.pipes[i].send((command, arg))

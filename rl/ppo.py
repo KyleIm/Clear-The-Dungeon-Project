@@ -60,6 +60,17 @@ class ActorCritic(nn.Module):
         action = distribution.logits.argmax(dim=-1) if deterministic else distribution.sample()
         return action, distribution.log_prob(action), value
 
+    @torch.inference_mode()
+    def greedy_actions(self, obs):
+        """Evaluate masked argmax without critic, distribution or dynamic GPU indexing."""
+        encoding = self._encode(obs)
+        logits = encoding.new_full((len(encoding), self.num_actions), -torch.inf)
+        phases = obs['phase'].reshape(-1, 1)
+        for phase, name in enumerate(PHASE_NAMES):
+            scores = self.policy_heads[name](encoding)
+            logits[:, getattr(self, f'{name}_ids')] = scores.masked_fill(phases != phase, -torch.inf)
+        return logits.masked_fill(~obs['action_mask'].bool(), -torch.inf).argmax(dim=-1)
+
 
 class Rollout:
     """Store projected decisions in reusable CPU arrays for one PPO rollout."""
