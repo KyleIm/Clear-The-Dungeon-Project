@@ -16,3 +16,15 @@ These observations refer to the Ren'Py 1.00 source revision in [game_config.json
 | Current type and base type gate different shop actions. | The shop screen checks current type and hides type potions when it is Normal. The purchase method separately compares the requested type with base type. See `custom_screen.rpy` lines 390–401 and `Char.buy_type_change` lines 1744–1751. |
 
 The exact Steam build behavior, engine-level RNG seeds, reproducibility across saved-game reloads and any differences caused by compiled game artifacts are unverified. Source-only comparisons in Phase 1 do not establish a real-game clear rate.
+
+## Phase 2 simulator decisions
+
+| Source ambiguity or failure | Simulator behavior |
+|---|---|
+| Reroll references globals before its declarations. | Runs the stated two-cut algorithm and price updates using the separately seeded reroll stream. Actual Ren'Py execution needs runtime verification. |
+| Player Imitation restoration and Ella registry lookup can fail. | Keeps an original snapshot per character and uses the current encounter deck when Ella has no static deck. The immediate cure still preserves the source's list-removal behavior for other conditions. The restored character's Imitation record is removed so it cannot refer to a cleared snapshot. |
+| Repeated Imitation can accumulate source backups and status records. | Keeps the first pre-copy snapshot for the duration of Imitation and uses one marker. A repeat copy updates the active attributes and skills. Runtime behavior of repeated use needs verification. |
+| Hybrid Attack can reach its return without setting the hit count when the first roll succeeds and the second fails (lines 1396–1413). | Retains the first hit and its damage in that branch. Other second-hit routing follows the action wrappers. |
+| The stored mana balance can lag behind actual uses. | Reports the computed balance and checks allocations against the live uses. The original recalculates at the relevant allocation screens. |
+
+The simulator retains floor-35 Ella's overwritten random draw, the unmatched upgrade key, cure-list skipping, and second-hit routing to the body. Achievements, saves, and presentation are outside the simulator interface.
