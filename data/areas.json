@@ -1,0 +1,236 @@
+{
+  "regions": [
+    {
+      "id": "Forest",
+      "selection_condition": "Shuffle remaining regions at chapter entry, take and remove the first.",
+      "normal_monster_ids": [
+        1,
+        20,
+        25,
+        28,
+        29,
+        31,
+        38,
+        14
+      ],
+      "first_area_pool_size": 7,
+      "entry_monster_id": 28,
+      "midboss_id": 22,
+      "boss_id": 43
+    },
+    {
+      "id": "Fort",
+      "selection_condition": "Shuffle remaining regions at chapter entry, take and remove the first.",
+      "normal_monster_ids": [
+        3,
+        4,
+        18,
+        24,
+        33,
+        10,
+        32,
+        40
+      ],
+      "first_area_pool_size": 5,
+      "entry_monster_id": 33,
+      "midboss_id": 9,
+      "boss_id": 42
+    },
+    {
+      "id": "Graveyard",
+      "selection_condition": "Shuffle remaining regions at chapter entry, take and remove the first.",
+      "normal_monster_ids": [
+        3,
+        4,
+        6,
+        26,
+        33,
+        1,
+        12,
+        31
+      ],
+      "first_area_pool_size": 5,
+      "entry_monster_id": 33,
+      "midboss_id": 17,
+      "boss_id": 44
+    },
+    {
+      "id": "Highland",
+      "selection_condition": "Shuffle remaining regions at chapter entry, take and remove the first.",
+      "normal_monster_ids": [
+        15,
+        25,
+        37,
+        40,
+        2,
+        4,
+        10,
+        27
+      ],
+      "first_area_pool_size": 4,
+      "entry_monster_id": 25,
+      "midboss_id": 5,
+      "boss_id": 48
+    },
+    {
+      "id": "Mansion",
+      "selection_condition": "Shuffle remaining regions at chapter entry, take and remove the first.",
+      "normal_monster_ids": [
+        6,
+        18,
+        21,
+        24,
+        26,
+        39,
+        38
+      ],
+      "first_area_pool_size": 5,
+      "entry_monster_id": 24,
+      "midboss_id": 8,
+      "boss_id": 49
+    },
+    {
+      "id": "Party",
+      "selection_condition": "Shuffle remaining regions at chapter entry, take and remove the first.",
+      "normal_monster_ids": [
+        2,
+        19,
+        34,
+        36,
+        1,
+        13,
+        21,
+        37
+      ],
+      "first_area_pool_size": 4,
+      "entry_monster_id": 19,
+      "midboss_id": 23,
+      "boss_id": 41
+    },
+    {
+      "id": "Ruin",
+      "selection_condition": "Shuffle remaining regions at chapter entry, take and remove the first.",
+      "normal_monster_ids": [
+        1,
+        13,
+        20,
+        29,
+        28,
+        35,
+        12
+      ],
+      "first_area_pool_size": 6,
+      "entry_monster_id": 28,
+      "midboss_id": 7,
+      "boss_id": 45
+    },
+    {
+      "id": "Spiritland",
+      "selection_condition": "Shuffle remaining regions at chapter entry, take and remove the first.",
+      "normal_monster_ids": [
+        10,
+        12,
+        14,
+        16,
+        27,
+        34,
+        36,
+        35
+      ],
+      "first_area_pool_size": 7,
+      "entry_monster_id": 39,
+      "midboss_id": 30,
+      "boss_id": 46
+    },
+    {
+      "id": "Temple",
+      "selection_condition": "Shuffle remaining regions at chapter entry, take and remove the first.",
+      "normal_monster_ids": [
+        10,
+        14,
+        16,
+        27,
+        32,
+        39,
+        25,
+        15
+      ],
+      "first_area_pool_size": 6,
+      "entry_monster_id": 39,
+      "midboss_id": 11,
+      "boss_id": 47
+    },
+    {
+      "id": "Gate",
+      "selection_condition": "Floor 91",
+      "encounter_rule": "Replay the ordered queue of nine stage bosses on floors 91–99."
+    },
+    {
+      "id": "Lair",
+      "selection_condition": "Floor 100",
+      "encounter_rule": "Dragon from pick_monster called by battle_system."
+    }
+  ],
+  "floor_rules": {
+    "normal_floors": [
+      1,
+      90
+    ],
+    "modulus": 10,
+    "entry_remainder": 1,
+    "midboss_remainder": 7,
+    "stage_boss_remainder": 0,
+    "reduced_pool_below_floor": 10,
+    "normal_selection": "Uniform choice from full or reduced region pool on remaining floors, except Ella overrides.",
+    "boss_exit": "Append boss on entry. On victory, recover player, reset battle stats and restore saved skill uses before opening shop.",
+    "additional_stats": {
+      "points_per_decade": 5,
+      "allocation_order": [
+        "accuracy",
+        "evade",
+        "damage_reduction"
+      ],
+      "sampling": "Draw two inclusive cuts from 0 to total, sort them, and use the three resulting segment lengths.",
+      "applies_to": "Normal progression paths including fixed entry and midboss encounters when they use those paths. Stage bosses, Gate rematches, Ella and Dragon bypass it."
+    }
+  },
+  "ella_encounters": [
+    {
+      "floor": 5,
+      "monster_ids": [
+        51
+      ],
+      "condition": "After a floor 4 win."
+    },
+    {
+      "floor": 35,
+      "monster_ids": [
+        52
+      ],
+      "condition": "After a floor 34 win."
+    },
+    {
+      "floor": 75,
+      "monster_ids": [
+        53,
+        54
+      ],
+      "condition": "After a floor 74 win. Path 1 uses ID 53, path 2 uses ID 54."
+    },
+    {
+      "floor": 99,
+      "monster_ids": [
+        55
+      ],
+      "condition": "After the last Gate boss win, path 1 and Ella encounter counter 0 add a battle on the same floor. Path 2 instead restores HP, stats and saved uses and opens the shop."
+    }
+  ],
+  "late_game": {
+    "gate_first_floor": 91,
+    "gate_last_floor": 99,
+    "final_floor": 100,
+    "final_boss_id": 50,
+    "boss_order": "FIFO in initial stage-boss encounter order, reset and recover each rematch.",
+    "lair_entry": "Path 1 proceeds after winning the extra Ella fight. Path 2 proceeds from the shop's Enter next area action."
+  }
+}

@@ -1,0 +1,1997 @@
+[
+  {
+    "id": 1,
+    "key": "arachne",
+    "name": "Arachne",
+    "type": "Beast",
+    "base_stats": {
+      "attack": 97,
+      "defense": 86,
+      "hp": 94,
+      "speed": 63
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "wolf fang",
+      "plague",
+      "fast claw",
+      "spider web"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1948
+  },
+  {
+    "id": 2,
+    "key": "balloon",
+    "name": "Balloon",
+    "type": "Elemental",
+    "base_stats": {
+      "attack": 92,
+      "defense": 55,
+      "hp": 108,
+      "speed": 65
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "thunder",
+      "counter",
+      "power up",
+      "sing"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1949
+  },
+  {
+    "id": 3,
+    "key": "banshee",
+    "name": "Banshee",
+    "type": "Undead",
+    "base_stats": {
+      "attack": 90,
+      "defense": 60,
+      "hp": 74,
+      "speed": 76
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "skull dagger",
+      "despair",
+      "sticky",
+      "fog"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1950
+  },
+  {
+    "id": 4,
+    "key": "bonemare",
+    "name": "Bonemare",
+    "type": "Undead",
+    "base_stats": {
+      "attack": 70,
+      "defense": 90,
+      "hp": 95,
+      "speed": 105
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "skull dagger",
+      "recovery",
+      "curse",
+      "sturdy kick"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1951
+  },
+  {
+    "id": 5,
+    "key": "chimera",
+    "name": "Chimera",
+    "type": "Beast",
+    "base_stats": {
+      "attack": 80,
+      "defense": 100,
+      "hp": 102,
+      "speed": 98
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "wolf fang",
+      "despair",
+      "afterimage",
+      "hybrid attack"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1952
+  },
+  {
+    "id": 6,
+    "key": "creature",
+    "name": "Creature",
+    "type": "Undead",
+    "base_stats": {
+      "attack": 80,
+      "defense": 100,
+      "hp": 80,
+      "speed": 70
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "skull dagger",
+      "counter",
+      "weakness",
+      "sap screw"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1953
+  },
+  {
+    "id": 7,
+    "key": "cyclops",
+    "name": "Cyclops",
+    "type": "Beast",
+    "base_stats": {
+      "attack": 104,
+      "defense": 80,
+      "hp": 110,
+      "speed": 86
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "wolf fang",
+      "counter",
+      "terror",
+      "blindfist"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1954
+  },
+  {
+    "id": 8,
+    "key": "doppelganger",
+    "name": "Doppelganger",
+    "type": "Undead",
+    "base_stats": {
+      "attack": 15,
+      "defense": 50,
+      "hp": 155,
+      "speed": 60
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "imitation"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1955
+  },
+  {
+    "id": 9,
+    "key": "dullahan",
+    "name": "Dullahan",
+    "type": "Undead",
+    "base_stats": {
+      "attack": 96,
+      "defense": 92,
+      "hp": 92,
+      "speed": 100
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "skull dagger",
+      "soul strike",
+      "power up",
+      "battojutsu"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1956
+  },
+  {
+    "id": 10,
+    "key": "esteed",
+    "name": "Esteed",
+    "type": "Elemental",
+    "base_stats": {
+      "attack": 90,
+      "defense": 95,
+      "hp": 70,
+      "speed": 105
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "thunder",
+      "shooting star",
+      "power up",
+      "discharge"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1957
+  },
+  {
+    "id": 11,
+    "key": "fireminion",
+    "name": "Fireminion",
+    "type": "Elemental",
+    "base_stats": {
+      "attack": 110,
+      "defense": 85,
+      "hp": 80,
+      "speed": 85
+    },
+    "additional_stats": {
+      "evade": 10,
+      "accuracy": 10,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "thunder",
+      "elemental orb",
+      "weakness",
+      "fireball"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1958
+  },
+  {
+    "id": 12,
+    "key": "gnome",
+    "name": "Gnome",
+    "type": "Elemental",
+    "base_stats": {
+      "attack": 55,
+      "defense": 92,
+      "hp": 83,
+      "speed": 80
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 10
+    },
+    "skills": [
+      "thunder",
+      "heal",
+      "terror",
+      "earth castle"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1959
+  },
+  {
+    "id": 13,
+    "key": "goldenmonkey",
+    "name": "Goldenmonkey",
+    "type": "Beast",
+    "base_stats": {
+      "attack": 79,
+      "defense": 100,
+      "hp": 110,
+      "speed": 51
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "wolf fang",
+      "recovery",
+      "power up",
+      "gold rush"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1960
+  },
+  {
+    "id": 14,
+    "key": "golem",
+    "name": "Golem",
+    "type": "Elemental",
+    "base_stats": {
+      "attack": 50,
+      "defense": 90,
+      "hp": 86,
+      "speed": 79
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 15
+    },
+    "skills": [
+      "thunder",
+      "paralyze",
+      "afterimage",
+      "rigid"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1961
+  },
+  {
+    "id": 15,
+    "key": "hawgle",
+    "name": "Hawgle",
+    "type": "Beast",
+    "base_stats": {
+      "attack": 93,
+      "defense": 81,
+      "hp": 78,
+      "speed": 128
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "wolf fang",
+      "pierce",
+      "power up",
+      "flash beak"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1962
+  },
+  {
+    "id": 16,
+    "key": "iceminion",
+    "name": "Iceminion",
+    "type": "Elemental",
+    "base_stats": {
+      "attack": 80,
+      "defense": 70,
+      "hp": 58,
+      "speed": 102
+    },
+    "additional_stats": {
+      "evade": 10,
+      "accuracy": 10,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "thunder",
+      "magic arrow",
+      "meditation",
+      "icebolt"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1963
+  },
+  {
+    "id": 17,
+    "key": "jack",
+    "name": "Jack",
+    "type": "Undead",
+    "base_stats": {
+      "attack": 93,
+      "defense": 94,
+      "hp": 106,
+      "speed": 87
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "skull dagger",
+      "flesh explosion",
+      "defend",
+      "pumpkin seed"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1964
+  },
+  {
+    "id": 18,
+    "key": "jiangshi",
+    "name": "Jiangshi",
+    "type": "Undead",
+    "base_stats": {
+      "attack": 72,
+      "defense": 72,
+      "hp": 72,
+      "speed": 104
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "skull dagger",
+      "drain",
+      "weakness",
+      "release"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1965
+  },
+  {
+    "id": 19,
+    "key": "kettle",
+    "name": "Kettle",
+    "type": "Elemental",
+    "base_stats": {
+      "attack": 66,
+      "defense": 80,
+      "hp": 70,
+      "speed": 84
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "thunder",
+      "kiss",
+      "distraction",
+      "typereverse"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1966
+  },
+  {
+    "id": 20,
+    "key": "lizardman",
+    "name": "Lizardman",
+    "type": "Beast",
+    "base_stats": {
+      "attack": 100,
+      "defense": 104,
+      "hp": 95,
+      "speed": 61
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "wolf fang",
+      "fast claw",
+      "sticky",
+      "dinolize"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1967
+  },
+  {
+    "id": 21,
+    "key": "mimic",
+    "name": "Mimic",
+    "type": "Undead",
+    "base_stats": {
+      "attack": 100,
+      "defense": 50,
+      "hp": 100,
+      "speed": 20
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 30
+    },
+    "skills": [
+      "mimic"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1968
+  },
+  {
+    "id": 22,
+    "key": "minocentaur",
+    "name": "Minocentaur",
+    "type": "Beast",
+    "base_stats": {
+      "attack": 104,
+      "defense": 84,
+      "hp": 90,
+      "speed": 102
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "wolf fang",
+      "double strike",
+      "acceleration",
+      "bullseye"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1969
+  },
+  {
+    "id": 23,
+    "key": "monocle",
+    "name": "Monocle",
+    "type": "Elemental",
+    "base_stats": {
+      "attack": 70,
+      "defense": 70,
+      "hp": 123,
+      "speed": 107
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "thunder",
+      "elemental orb",
+      "afterimage",
+      "aim"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1970
+  },
+  {
+    "id": 24,
+    "key": "mummy",
+    "name": "Mummy",
+    "type": "Undead",
+    "base_stats": {
+      "attack": 84,
+      "defense": 65,
+      "hp": 75,
+      "speed": 96
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "skull dagger",
+      "plague",
+      "weakness",
+      "tie up"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1971
+  },
+  {
+    "id": 25,
+    "key": "naga",
+    "name": "Naga",
+    "type": "Beast",
+    "base_stats": {
+      "attack": 83,
+      "defense": 84,
+      "hp": 65,
+      "speed": 88
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "wolf fang",
+      "double strike",
+      "defend",
+      "molt"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1972
+  },
+  {
+    "id": 26,
+    "key": "phantom",
+    "name": "Phantom",
+    "type": "Undead",
+    "base_stats": {
+      "attack": 70,
+      "defense": 70,
+      "hp": 74,
+      "speed": 106
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "skull dagger",
+      "drain",
+      "acceleration",
+      "fracture"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1973
+  },
+  {
+    "id": 27,
+    "key": "phoneix",
+    "name": "Phoneix",
+    "type": "Elemental",
+    "base_stats": {
+      "attack": 87,
+      "defense": 50,
+      "hp": 93,
+      "speed": 110
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "thunder",
+      "shooting star",
+      "heal",
+      "firebird"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1974
+  },
+  {
+    "id": 28,
+    "key": "rat",
+    "name": "Rat",
+    "type": "Beast",
+    "base_stats": {
+      "attack": 56,
+      "defense": 64,
+      "hp": 82,
+      "speed": 98
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "wolf fang",
+      "whisker needle",
+      "curse",
+      "jiujitsu"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1975
+  },
+  {
+    "id": 29,
+    "key": "rhinoman",
+    "name": "Rhinoman",
+    "type": "Beast",
+    "base_stats": {
+      "attack": 84,
+      "defense": 80,
+      "hp": 100,
+      "speed": 96
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "wolf fang",
+      "pierce",
+      "power up",
+      "recoilless"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1976
+  },
+  {
+    "id": 30,
+    "key": "salamander",
+    "name": "Salamander",
+    "type": "Elemental",
+    "base_stats": {
+      "attack": 90,
+      "defense": 80,
+      "hp": 85,
+      "speed": 105
+    },
+    "additional_stats": {
+      "evade": 10,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "thunder",
+      "recovery",
+      "curse",
+      "flame wheel"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1977
+  },
+  {
+    "id": 31,
+    "key": "scorpion",
+    "name": "Scorpion",
+    "type": "Beast",
+    "base_stats": {
+      "attack": 90,
+      "defense": 90,
+      "hp": 86,
+      "speed": 94
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "wolf fang",
+      "double strike",
+      "weakness",
+      "stinger"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1978
+  },
+  {
+    "id": 32,
+    "key": "shieldminion",
+    "name": "Shieldminion",
+    "type": "Elemental",
+    "base_stats": {
+      "attack": 91,
+      "defense": 122,
+      "hp": 59,
+      "speed": 78
+    },
+    "additional_stats": {
+      "evade": 10,
+      "accuracy": 10,
+      "damage_reduction": 10
+    },
+    "skills": [
+      "thunder",
+      "paralyze",
+      "defend",
+      "shield slam"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1979
+  },
+  {
+    "id": 33,
+    "key": "skeleton",
+    "name": "Skeleton",
+    "type": "Undead",
+    "base_stats": {
+      "attack": 100,
+      "defense": 50,
+      "hp": 80,
+      "speed": 70
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "skull dagger",
+      "soul strike",
+      "meditation",
+      "bonemerang"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1980
+  },
+  {
+    "id": 34,
+    "key": "slime",
+    "name": "Slime",
+    "type": "Elemental",
+    "base_stats": {
+      "attack": 4,
+      "defense": 124,
+      "hp": 116,
+      "speed": 6
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "heal",
+      "recovery",
+      "paralyze",
+      "immune"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1981
+  },
+  {
+    "id": 35,
+    "key": "troll",
+    "name": "Troll",
+    "type": "Beast",
+    "base_stats": {
+      "attack": 86,
+      "defense": 110,
+      "hp": 100,
+      "speed": 44
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "heal",
+      "counter",
+      "elemental orb",
+      "trick or treat"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1982
+  },
+  {
+    "id": 36,
+    "key": "undine",
+    "name": "Undine",
+    "type": "Elemental",
+    "base_stats": {
+      "attack": 80,
+      "defense": 83,
+      "hp": 90,
+      "speed": 67
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "thunder",
+      "kiss",
+      "defend",
+      "regenerate"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1983
+  },
+  {
+    "id": 37,
+    "key": "unicorn",
+    "name": "Unicorn",
+    "type": "Beast",
+    "base_stats": {
+      "attack": 95,
+      "defense": 70,
+      "hp": 90,
+      "speed": 105
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "wolf fang",
+      "pierce",
+      "acceleration",
+      "blessed horn"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1984
+  },
+  {
+    "id": 38,
+    "key": "werewolf",
+    "name": "Werewolf",
+    "type": "Beast",
+    "base_stats": {
+      "attack": 100,
+      "defense": 80,
+      "hp": 77,
+      "speed": 103
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "wolf fang",
+      "fast claw",
+      "meditation",
+      "rage"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1985
+  },
+  {
+    "id": 39,
+    "key": "wisp",
+    "name": "Wisp",
+    "type": "Elemental",
+    "base_stats": {
+      "attack": 76,
+      "defense": 71,
+      "hp": 56,
+      "speed": 97
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "thunder",
+      "shooting star",
+      "meditation",
+      "will of wisp"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1986
+  },
+  {
+    "id": 40,
+    "key": "wyvern",
+    "name": "Wyvern",
+    "type": "Beast",
+    "base_stats": {
+      "attack": 104,
+      "defense": 60,
+      "hp": 80,
+      "speed": 116
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "wolf fang",
+      "fast claw",
+      "afterimage",
+      "poison tail"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1987
+  },
+  {
+    "id": 41,
+    "key": "genie",
+    "name": "Genie",
+    "type": "Elemental",
+    "base_stats": {
+      "attack": 102,
+      "defense": 102,
+      "hp": 94,
+      "speed": 102
+    },
+    "additional_stats": {
+      "evade": 10,
+      "accuracy": 10,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "tornado",
+      "paralyze",
+      "terror",
+      "magician hat"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1988
+  },
+  {
+    "id": 42,
+    "key": "grimreaper",
+    "name": "Grimreaper",
+    "type": "Undead",
+    "base_stats": {
+      "attack": 85,
+      "defense": 94,
+      "hp": 75,
+      "speed": 106
+    },
+    "additional_stats": {
+      "evade": 10,
+      "accuracy": 40,
+      "damage_reduction": 10
+    },
+    "skills": [
+      "undead missile",
+      "soul strike",
+      "terror",
+      "deathscythe"
+    ],
+    "action_rules": [
+      {
+        "condition": "Self accuracy minus player evasion >= 30 and player HP > player base HP",
+        "selection": "slot 3"
+      },
+      {
+        "condition": "Self accuracy minus player evasion < 0",
+        "selection": "slot 2"
+      },
+      {
+        "condition": "Otherwise",
+        "selection": "uniform slots 0–1"
+      }
+    ],
+    "source_line": 1989
+  },
+  {
+    "id": 43,
+    "key": "lionheart",
+    "name": "Lionheart",
+    "type": "Beast",
+    "base_stats": {
+      "attack": 95,
+      "defense": 130,
+      "hp": 140,
+      "speed": 25
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 10
+    },
+    "skills": [
+      "tiger claw",
+      "whisker needle",
+      "defend",
+      "heart of lion"
+    ],
+    "action_rules": [
+      {
+        "condition": "HP > 1.6 × base HP",
+        "selection": "slot 3"
+      },
+      {
+        "condition": "Player attack < 30 and speed < 120, and self HP > base HP",
+        "selection": "slot 2"
+      },
+      {
+        "condition": "Otherwise",
+        "selection": "uniform slots 0–1"
+      }
+    ],
+    "source_line": 1990
+  },
+  {
+    "id": 44,
+    "key": "necromancer",
+    "name": "Necromancer",
+    "type": "Undead",
+    "base_stats": {
+      "attack": 99,
+      "defense": 105,
+      "hp": 100,
+      "speed": 66
+    },
+    "additional_stats": {
+      "evade": 15,
+      "accuracy": 15,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "undead missile",
+      "despair",
+      "plague",
+      "revive"
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1991
+  },
+  {
+    "id": 45,
+    "key": "ogre",
+    "name": "Ogre",
+    "type": "Beast",
+    "base_stats": {
+      "attack": 120,
+      "defense": 97,
+      "hp": 88,
+      "speed": 95
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "tiger claw",
+      "elemental orb",
+      "power up",
+      "judgement"
+    ],
+    "action_rules": [
+      {
+        "condition": "Player type is Undead",
+        "selection": "uniform all slots"
+      },
+      {
+        "condition": "Otherwise",
+        "selection": "uniform slots 0–2"
+      }
+    ],
+    "source_line": 1992
+  },
+  {
+    "id": 46,
+    "key": "queen",
+    "name": "Queen",
+    "type": "Elemental",
+    "base_stats": {
+      "attack": 82,
+      "defense": 109,
+      "hp": 109,
+      "speed": 104
+    },
+    "additional_stats": {
+      "evade": 8,
+      "accuracy": 8,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "kiss",
+      "magic arrow",
+      "meditation",
+      "veilguard"
+    ],
+    "action_rules": [
+      {
+        "condition": "Self has aurora",
+        "selection": "uniform slots 0–2"
+      },
+      {
+        "condition": "Otherwise",
+        "selection": "slot 3"
+      }
+    ],
+    "source_line": 1993
+  },
+  {
+    "id": 47,
+    "key": "superminion",
+    "name": "Superminion",
+    "type": "Elemental",
+    "base_stats": {
+      "attack": 85,
+      "defense": 95,
+      "hp": 87,
+      "speed": 103
+    },
+    "additional_stats": {
+      "evade": 60,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "tornado",
+      "elemental orb",
+      "meditation",
+      "shadowstar"
+    ],
+    "action_rules": [
+      {
+        "condition": "Self accuracy minus player evasion >= 20",
+        "selection": "slot 3"
+      },
+      {
+        "condition": "Self accuracy minus player evasion < 0",
+        "selection": "slot 2"
+      },
+      {
+        "condition": "Otherwise",
+        "selection": "uniform slots 0–1"
+      }
+    ],
+    "source_line": 1994
+  },
+  {
+    "id": 48,
+    "key": "tarrasque",
+    "name": "Tarrasque",
+    "type": "Beast",
+    "base_stats": {
+      "attack": 90,
+      "defense": 150,
+      "hp": 105,
+      "speed": 40
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 15
+    },
+    "skills": [
+      "tiger claw",
+      "pierce",
+      "curse",
+      "acid stone"
+    ],
+    "action_rules": [
+      {
+        "condition": "Player damage reduction > 10",
+        "selection": "slot 3"
+      },
+      {
+        "condition": "Otherwise",
+        "selection": "uniform slots 0–2"
+      }
+    ],
+    "source_line": 1995
+  },
+  {
+    "id": 49,
+    "key": "vampire",
+    "name": "Vampire",
+    "type": "Undead",
+    "base_stats": {
+      "attack": 120,
+      "defense": 76,
+      "hp": 110,
+      "speed": 94
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "undead missile",
+      "flesh explosion",
+      "curse",
+      "blood leech"
+    ],
+    "action_rules": [
+      {
+        "condition": "9 < player defense < player base defense and self HP > base HP",
+        "selection": "slot 2"
+      },
+      {
+        "condition": "Self HP < base HP",
+        "selection": "slot 3"
+      },
+      {
+        "condition": "Otherwise",
+        "selection": "uniform slots 0–1"
+      }
+    ],
+    "source_line": 1996
+  },
+  {
+    "id": 50,
+    "key": "dragon",
+    "name": "Dragon",
+    "type": "Elemental",
+    "base_stats": {
+      "attack": 110,
+      "defense": 150,
+      "hp": 150,
+      "speed": 90
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [
+      "tornado",
+      "recovery",
+      "acceleration",
+      "breath"
+    ],
+    "action_rules": [
+      {
+        "condition": "Self has stun or sleep",
+        "selection": "slot 1"
+      },
+      {
+        "condition": "Self speed equals base speed and 90 < player speed < 112",
+        "selection": "slot 2"
+      },
+      {
+        "condition": "Self HP < base HP",
+        "selection": "slot 3"
+      },
+      {
+        "condition": "Otherwise",
+        "selection": "slot 0"
+      }
+    ],
+    "source_line": 1997
+  },
+  {
+    "id": 51,
+    "key": "ellafirst",
+    "name": "Ella",
+    "type": "Normal",
+    "base_stats": {
+      "attack": 80,
+      "defense": 80,
+      "hp": 80,
+      "speed": 90
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [],
+    "skill_variants": [
+      {
+        "condition": "Initial region is one of Forest, Ruin, Highland",
+        "type": "Normal",
+        "skills": [
+          "thunder",
+          "shooting star",
+          "flesh explosion",
+          "whisker needle",
+          "elemental orb",
+          "drain",
+          "double strike",
+          "fast claw",
+          "soul strike",
+          "pierce",
+          "counter",
+          "kiss",
+          "magic arrow",
+          "power up",
+          "defend",
+          "acceleration",
+          "meditation",
+          "afterimage",
+          "weakness",
+          "curse",
+          "sticky",
+          "distraction",
+          "terror"
+        ],
+        "construction": "Slot 0 is the area starter. Slots 1–2 are indices 2 and 3 of the shuffled chosen attack pool. Slot 3 is index 1 of the shuffled rank pool."
+      },
+      {
+        "condition": "Initial region is one of Party, Spiritland, Temple",
+        "type": "Normal",
+        "skills": [
+          "skull dagger",
+          "shooting star",
+          "flesh explosion",
+          "whisker needle",
+          "elemental orb",
+          "drain",
+          "double strike",
+          "fast claw",
+          "soul strike",
+          "pierce",
+          "counter",
+          "kiss",
+          "magic arrow",
+          "power up",
+          "defend",
+          "acceleration",
+          "meditation",
+          "afterimage",
+          "weakness",
+          "curse",
+          "sticky",
+          "distraction",
+          "terror"
+        ],
+        "construction": "Slot 0 is the area starter. Slots 1–2 are indices 2 and 3 of the shuffled chosen attack pool. Slot 3 is index 1 of the shuffled rank pool."
+      },
+      {
+        "condition": "Initial region is one of Fort, Graveyard, Mansion",
+        "type": "Normal",
+        "skills": [
+          "wolf fang",
+          "shooting star",
+          "flesh explosion",
+          "whisker needle",
+          "elemental orb",
+          "drain",
+          "double strike",
+          "fast claw",
+          "soul strike",
+          "pierce",
+          "counter",
+          "kiss",
+          "magic arrow",
+          "power up",
+          "defend",
+          "acceleration",
+          "meditation",
+          "afterimage",
+          "weakness",
+          "curse",
+          "sticky",
+          "distraction",
+          "terror"
+        ],
+        "construction": "Slot 0 is the area starter. Slots 1–2 are indices 2 and 3 of the shuffled chosen attack pool. Slot 3 is index 1 of the shuffled rank pool."
+      }
+    ],
+    "action_rules": [
+      {
+        "condition": "Always",
+        "selection": "uniform all available skills"
+      }
+    ],
+    "source_line": 1999
+  },
+  {
+    "id": 52,
+    "key": "ellasecond",
+    "name": "Ella",
+    "type": "Normal",
+    "base_stats": {
+      "attack": 99,
+      "defense": 100,
+      "hp": 100,
+      "speed": 101
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "skills": [],
+    "skill_variants": [
+      {
+        "condition": "Forest, Ruin or Highland",
+        "type": "Undead",
+        "skills": [
+          "bone spear",
+          "drain",
+          "soul strike",
+          "flesh explosion"
+        ]
+      },
+      {
+        "condition": "Party, Spiritland or Temple",
+        "type": "Beast",
+        "skills": [
+          "bear hand",
+          "fast claw",
+          "whisker needle",
+          "double strike"
+        ]
+      },
+      {
+        "condition": "Otherwise",
+        "type": "Elemental",
+        "skills": [
+          "wave",
+          "kiss",
+          "shooting star",
+          "magic arrow"
+        ]
+      }
+    ],
+    "action_rules": [
+      {
+        "condition": "Early floor-35 branch: self HP < 0.4 × base HP",
+        "selection": "slot 1 (overwritten)"
+      },
+      {
+        "condition": "Early floor-35 branch: otherwise player accuracy < 0",
+        "selection": "slot 3 (overwritten)"
+      },
+      {
+        "condition": "Early floor-35 branch: otherwise",
+        "selection": "uniform all skills (overwritten, consumes RNG)"
+      },
+      {
+        "condition": "Trailing floor < 75 branch",
+        "selection": "uniform all skills (final choice)"
+      }
+    ],
+    "source_line": 2000
+  },
+  {
+    "id": 53,
+    "key": "ellaa",
+    "name": "Ella",
+    "type": "Normal",
+    "base_stats": {
+      "attack": 100,
+      "defense": 110,
+      "hp": 100,
+      "speed": 105
+    },
+    "additional_stats": {
+      "evade": 10,
+      "accuracy": 10,
+      "damage_reduction": 10
+    },
+    "skills": [],
+    "skill_variants": [
+      {
+        "condition": "Player type is Beast",
+        "type": "Beast",
+        "skills": [
+          "tiger claw",
+          "recovery",
+          "despair",
+          "counter",
+          "plague",
+          "paralyze"
+        ],
+        "construction": "Slots 0–1 are the listed opener and recovery. Slot 2 is despair if player base HP > 100, else counter. Slot 3 is plague if player base HP > player base attack, else paralyze."
+      },
+      {
+        "condition": "Player type is Elemental",
+        "type": "Elemental",
+        "skills": [
+          "tornado",
+          "recovery",
+          "despair",
+          "counter",
+          "plague",
+          "paralyze"
+        ],
+        "construction": "Slots 0–1 are the listed opener and recovery. Slot 2 is despair if player base HP > 100, else counter. Slot 3 is plague if player base HP > player base attack, else paralyze."
+      },
+      {
+        "condition": "Player type is Otherwise",
+        "type": "Undead",
+        "skills": [
+          "undead missile",
+          "recovery",
+          "despair",
+          "counter",
+          "plague",
+          "paralyze"
+        ],
+        "construction": "Slots 0–1 are the listed opener and recovery. Slot 2 is despair if player base HP > 100, else counter. Slot 3 is plague if player base HP > player base attack, else paralyze."
+      }
+    ],
+    "action_rules": [
+      {
+        "condition": "Self has stun, sleep, or poison",
+        "selection": "slot 1"
+      },
+      {
+        "condition": "Self has stun, sleep, or poison (duplicate unreachable branch)",
+        "selection": "slot 2 when self HP > 1.6 × base HP and player HP > player base HP, otherwise slot 0"
+      },
+      {
+        "condition": "Self is at full HP and faster than player",
+        "selection": "slot 3"
+      },
+      {
+        "condition": "Self HP > 1.6 × base HP and player HP > player base HP",
+        "selection": "slot 2"
+      },
+      {
+        "condition": "Otherwise",
+        "selection": "slot 0"
+      }
+    ],
+    "source_line": 2001
+  },
+  {
+    "id": 54,
+    "key": "ellad",
+    "name": "Ella",
+    "type": "Normal",
+    "base_stats": {
+      "attack": 105,
+      "defense": 120,
+      "hp": 100,
+      "speed": 105
+    },
+    "additional_stats": {
+      "evade": 20,
+      "accuracy": 20,
+      "damage_reduction": 20
+    },
+    "skills": [],
+    "skill_variants": [
+      {
+        "condition": "Player type is Beast",
+        "type": "Undead",
+        "skills": [
+          "undead missile",
+          "recovery",
+          "despair",
+          "counter",
+          "plague",
+          "paralyze"
+        ],
+        "construction": "Slots 0–1 are the listed opener and recovery. Slot 2 is despair if player base HP > 100, else counter. Slot 3 is plague if player base HP > player base attack, else paralyze."
+      },
+      {
+        "condition": "Player type is Elemental",
+        "type": "Beast",
+        "skills": [
+          "tiger claw",
+          "recovery",
+          "despair",
+          "counter",
+          "plague",
+          "paralyze"
+        ],
+        "construction": "Slots 0–1 are the listed opener and recovery. Slot 2 is despair if player base HP > 100, else counter. Slot 3 is plague if player base HP > player base attack, else paralyze."
+      },
+      {
+        "condition": "Player type is Otherwise",
+        "type": "Elemental",
+        "skills": [
+          "tornado",
+          "recovery",
+          "despair",
+          "counter",
+          "plague",
+          "paralyze"
+        ],
+        "construction": "Slots 0–1 are the listed opener and recovery. Slot 2 is despair if player base HP > 100, else counter. Slot 3 is plague if player base HP > player base attack, else paralyze."
+      }
+    ],
+    "action_rules": [
+      {
+        "condition": "Self has stun, sleep, or poison",
+        "selection": "slot 1"
+      },
+      {
+        "condition": "Self has stun, sleep, or poison (duplicate unreachable branch)",
+        "selection": "slot 2 when self HP > 1.6 × base HP and player HP > player base HP, otherwise slot 0"
+      },
+      {
+        "condition": "Self is at full HP and faster than player",
+        "selection": "slot 3"
+      },
+      {
+        "condition": "Self HP > 1.6 × base HP and player HP > player base HP",
+        "selection": "slot 2"
+      },
+      {
+        "condition": "Otherwise",
+        "selection": "slot 0"
+      }
+    ],
+    "source_line": 2002
+  },
+  {
+    "id": 55,
+    "key": "ellaf",
+    "name": "Ella",
+    "type": "Normal",
+    "base_stats": {
+      "attack": 110,
+      "defense": 120,
+      "hp": 100,
+      "speed": 110
+    },
+    "additional_stats": {
+      "evade": 25,
+      "accuracy": 25,
+      "damage_reduction": 25
+    },
+    "skills": [],
+    "skill_variants": [
+      {
+        "condition": "Player type is Beast",
+        "type": "Undead",
+        "skills": [
+          "flesh explosion",
+          "recovery",
+          "despair",
+          "counter",
+          "plague",
+          "paralyze"
+        ],
+        "construction": "Slots 0–1 are the listed opener and recovery. Slot 2 is despair if player base HP > 100, else counter. Slot 3 is plague if player base HP > player base attack, else paralyze."
+      },
+      {
+        "condition": "Player type is Elemental and player EVA > 10",
+        "type": "Beast",
+        "skills": [
+          "pierce",
+          "recovery",
+          "despair",
+          "counter",
+          "plague",
+          "paralyze"
+        ],
+        "construction": "Slots 0–1 are the listed opener and recovery. Slot 2 is despair if player base HP > 100, else counter. Slot 3 is plague if player base HP > player base attack, else paralyze."
+      },
+      {
+        "condition": "Player type is Elemental otherwise",
+        "type": "Beast",
+        "skills": [
+          "double strike",
+          "recovery",
+          "despair",
+          "counter",
+          "plague",
+          "paralyze"
+        ],
+        "construction": "Slots 0–1 are the listed opener and recovery. Slot 2 is despair if player base HP > 100, else counter. Slot 3 is plague if player base HP > player base attack, else paralyze."
+      },
+      {
+        "condition": "Player type is Otherwise",
+        "type": "Elemental",
+        "skills": [
+          "magic arrow",
+          "recovery",
+          "despair",
+          "counter",
+          "plague",
+          "paralyze"
+        ],
+        "construction": "Slots 0–1 are the listed opener and recovery. Slot 2 is despair if player base HP > 100, else counter. Slot 3 is plague if player base HP > player base attack, else paralyze."
+      }
+    ],
+    "action_rules": [
+      {
+        "condition": "Self has stun, sleep, or poison",
+        "selection": "slot 1"
+      },
+      {
+        "condition": "Self has stun, sleep, or poison (duplicate unreachable branch)",
+        "selection": "slot 2 when self HP > 1.6 × base HP and player HP > player base HP, otherwise slot 0"
+      },
+      {
+        "condition": "Self is at full HP and faster than player",
+        "selection": "slot 3"
+      },
+      {
+        "condition": "Self HP > 1.6 × base HP and player HP > player base HP",
+        "selection": "slot 2"
+      },
+      {
+        "condition": "Otherwise",
+        "selection": "slot 0"
+      }
+    ],
+    "source_line": 2003
+  }
+]

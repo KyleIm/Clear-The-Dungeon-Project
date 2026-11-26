@@ -1,0 +1,313 @@
+{
+  "source": {
+    "revision": "480dc17d1354055c783cb8a6a0cea9a22028093e",
+    "game_version": "1.00",
+    "files": [
+      "game/script.rpy",
+      "game/custom_screen.rpy",
+      "game/options.rpy"
+    ]
+  },
+  "player": {
+    "base_stats": {
+      "attack": 100,
+      "defense": 100,
+      "hp": 100,
+      "speed": 100
+    },
+    "additional_stats": {
+      "evade": 0,
+      "accuracy": 0,
+      "damage_reduction": 0
+    },
+    "type": "Normal",
+    "max_hp": 200,
+    "starting_gold": 0,
+    "starting_floor": 1,
+    "starting_area": 1,
+    "starting_unallocated_points": 0,
+    "starting_ella_path": 0,
+    "starting_ella_encounter": 0
+  },
+  "mana": {
+    "max": 170,
+    "current_at_construction": 170,
+    "potion_increment": 10,
+    "budget_rule": "Maximum mana minus the sum of per-skill cost times allocated uses."
+  },
+  "slots": {
+    "total": 6,
+    "starting_unlocked": 4,
+    "imitation_uses_per_skill": 5,
+    "locked_marker": "lock",
+    "backup_restore": "Copy uses on leaving the shop. Restore saved uses on entering the next shop."
+  },
+  "initial_skills": {
+    "area_groups": [
+      {
+        "areas": [
+          "Forest",
+          "Ruin",
+          "Highland"
+        ],
+        "player": "skull dagger",
+        "ella": "thunder"
+      },
+      {
+        "areas": [
+          "Party",
+          "Spiritland",
+          "Temple"
+        ],
+        "player": "wolf fang",
+        "ella": "skull dagger"
+      },
+      {
+        "areas": [
+          "Fort",
+          "Graveyard",
+          "Mansion"
+        ],
+        "player": "thunder",
+        "ella": "wolf fang"
+      }
+    ],
+    "attack_pools": [
+      [
+        "shooting star",
+        "flesh explosion",
+        "whisker needle",
+        "elemental orb",
+        "drain",
+        "double strike"
+      ],
+      [
+        "fast claw",
+        "soul strike",
+        "pierce",
+        "counter",
+        "kiss",
+        "magic arrow"
+      ]
+    ],
+    "rank_pool": [
+      "power up",
+      "defend",
+      "acceleration",
+      "meditation",
+      "afterimage",
+      "weakness",
+      "curse",
+      "sticky",
+      "distraction",
+      "terror"
+    ],
+    "player_uses": [
+      20,
+      10,
+      10,
+      10
+    ],
+    "procedure": "Uniformly choose one attack pool and shuffle it. Player takes indices 0–1, Ella takes 2–3. Shuffle rank pool and use indices 0 and 1 for player and Ella respectively. The area starter goes in slot 0."
+  },
+  "combat": {
+    "hp_multiplier": 2,
+    "priority": {
+      "high_categories": [
+        1,
+        52,
+        57
+      ],
+      "low_categories": [
+        5,
+        50
+      ],
+      "default": 0
+    },
+    "matching_type_multiplier": 1.2,
+    "favorable_multiplier": 1.5,
+    "unfavorable_multiplier": {
+      "numerator": 2,
+      "denominator": 3
+    },
+    "type_advantage": [
+      [
+        "Beast",
+        "Elemental"
+      ],
+      [
+        "Elemental",
+        "Undead"
+      ],
+      [
+        "Undead",
+        "Beast"
+      ]
+    ],
+    "judgement_extra_advantage": "Undead",
+    "aurora_damage_divisor": 1.5,
+    "target_hit_threshold": 100,
+    "accuracy_bounds": [
+      -80,
+      80
+    ],
+    "evade_bounds": [
+      -80,
+      80
+    ],
+    "substitute": {
+      "cost_hp": 20,
+      "hp": 20,
+      "base_stats": {
+        "attack": 1,
+        "defense": 1,
+        "hp": 0,
+        "speed": 1
+      },
+      "additional_stats": {
+        "evade": 0,
+        "accuracy": 0,
+        "damage_reduction": 0
+      },
+      "type": "Normal"
+    }
+  },
+  "status": {
+    "registry_values": {
+      "stun": 50,
+      "poison": 8,
+      "sprout": 10,
+      "regeneration": 8,
+      "target": 300,
+      "sleep": 100,
+      "reverse": -1,
+      "aurora": 1.5,
+      "immunity": 0,
+      "imitation": 0,
+      "helmet": 0
+    },
+    "initial_cure_counter": 0,
+    "stun_skip_threshold": 50,
+    "stun_skip_comparator": "<",
+    "cure_counter_steps": {
+      "stun": 16.5,
+      "poison": 16.5,
+      "sprout": 25,
+      "sleep": 20,
+      "target": 100,
+      "reverse": 20,
+      "aurora": 25,
+      "immunity": 20,
+      "helmet": 33
+    },
+    "cure_conditions": {
+      "stun": "roll <= counter",
+      "poison": "roll <= counter",
+      "sprout": "roll <= counter",
+      "sleep": "roll <= counter or wake_up call",
+      "regeneration": "roll equals counter, initialized to 0 then set to 25 after first failed check",
+      "target": "counter == 100",
+      "reverse": "counter == 100",
+      "aurora": "counter == 100",
+      "immunity": "counter == 100",
+      "helmet": "counter == 99",
+      "imitation": "immediate-cure path only"
+    },
+    "regeneration_cure_roll": 25,
+    "minimum_hp_after_poison_or_sprout": 1,
+    "icebolt_stun_percent": 30,
+    "poison_tail_poison_percent": 30
+  },
+  "rewards": {
+    "options": [
+      "Gold",
+      "Potion",
+      "Initialize",
+      "Stat",
+      "Exchange"
+    ],
+    "gold": 1000,
+    "stat_increment": 1,
+    "stat_candidates": [
+      "evade",
+      "accuracy",
+      "damage_reduction"
+    ],
+    "gold_rush_per_floor": 100,
+    "skill_reward": "Uniform from last available enemy skills absent from learned list. Exchange redraws from the same set."
+  },
+  "shop": {
+    "prices": {
+      "blue_key": 1000,
+      "red_key": 2000,
+      "blue_mana_potion": 1000,
+      "elemental_mana_potion": 2000,
+      "undead_mana_potion": 3000,
+      "type_change": 500,
+      "skill_cost_reduction": 1000,
+      "reroll_initial": 100
+    },
+    "mana_potions_in_order": [
+      "blue_mana_potion",
+      "elemental_mana_potion",
+      "undead_mana_potion"
+    ],
+    "type_change_screen": "Current type must be neither Normal nor the requested type. Purchase method separately checks base type is different.",
+    "reroll_multiplier": 2,
+    "reroll_min_points": 1,
+    "reroll_allocation_order": [
+      "evade",
+      "accuracy",
+      "damage_reduction"
+    ],
+    "redistribution_steps": [
+      1,
+      10
+    ],
+    "redistribution_minimum": 1,
+    "skill_cost_reduction_amount": 1,
+    "minimum_reduced_skill_cost": 1,
+    "skill_cost_reduction_limit_per_skill": 1
+  },
+  "enemy_skill_upgrades": [
+    {
+      "minimum_floor": 61,
+      "slot": 0,
+      "substitutions": {
+        "skull dagger": "undead missile",
+        "wolf fang": "tiger claw",
+        "bear hand": "tiger claw",
+        "thunder": "tornado",
+        "wave": "tornado"
+      },
+      "unmatched_source_token": "bonespear"
+    },
+    {
+      "minimum_floor": 31,
+      "slot": 0,
+      "substitutions": {
+        "skull dagger": "bone spear",
+        "wolf fang": "bear hand",
+        "thunder": "wave"
+      }
+    }
+  ],
+  "rng": {
+    "gameplay_api": "renpy.random",
+    "reroll_api": "random",
+    "percentage_roll_inclusive": [
+      1,
+      100
+    ],
+    "area_sampling": "shuffle without replacement",
+    "action_and_reward_sampling": "uniform choice within the eligible list",
+    "explicit_seed_in_inspected_source": null,
+    "engine_seed_and_save_restore": "unverified"
+  },
+  "run": {
+    "rollback_enabled": false,
+    "save_slot": "1-1",
+    "terminal_floor": 100,
+    "simultaneous_knockout": "game_over"
+  }
+}

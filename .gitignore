@@ -20,3 +20,7 @@ dist/
 *.ckpt
 /data/*
 !/data/.gitkeep
+!/data/skills.json
+!/data/monsters.json
+!/data/areas.json
+!/data/game_config.json

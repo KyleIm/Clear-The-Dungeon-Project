@@ -12,12 +12,15 @@ Clear The Dungeon Project studies decision-making in the roguelike game Dungeon 
 
 ## Roadmap and current status
 
-1. **Repository setup** — initial directory layout and project documentation.
-2. **Simulator** — implement the rules and verify transitions against observed game behavior.
-3. **Training** — establish baselines and train PyTorch policies locally.
-4. **Analysis** — record runs in SQLite and analyze results with scikit-learn.
-5. **Steam evaluation** — integrate the macro interface and test whether the real-game clear rate reaches 90%.
+1. **Repository setup** — complete.
+2. **Phase 1 — Static game data and mechanics** — complete. The baseline covers 88 skills, 55 monster variants, and 11 regions.
+3. **Simulator** — implement the rules and verify transitions against observed game behavior.
+4. **Training** — establish baselines and train PyTorch policies locally.
+5. **Analysis** — record runs in SQLite and analyze results with scikit-learn.
+6. **Steam evaluation** — integrate the macro interface and test whether the real-game clear rate reaches 90%.
 
-The project is at the repository setup stage. Simulator, training, analysis, and macro implementation are planned. The 90% target has yet to be measured.
+The current milestone is a static JSON baseline for Dungeon & Rogue 1.00. Simulator, training, experiment storage, and macro integration are planned. The 90% Steam clear-rate target has yet to be measured.
+
+See the [game mechanics](docs/game_mechanics.md) and [known issues](docs/known_issues.md). Validate the datasets with `python tests/validate_game_data.py` using the Python standard library.
 
 The original game source, game assets, and credentials are kept outside this public repository.
