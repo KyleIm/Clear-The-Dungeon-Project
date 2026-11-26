@@ -1,6 +1,6 @@
 # Clear The Dungeon Project
 
-A local research project for Dungeon & Rogue, a roguelike on Steam. The goal is to achieve at least a **90% clear rate in the Steam game**. The latest result is a simulator baseline of **0 clears in 1,000 uniform-random runs**.
+A local research project for Dungeon & Rogue, a roguelike on Steam. The goal is to achieve at least a **90% clear rate in the Steam game**. The latest simulator baseline recorded **0 clears in 1,000,000 uniform-random runs** and reached floor 27.
 
 ## Current status
 
@@ -10,7 +10,7 @@ A local research project for Dungeon & Rogue, a roguelike on Steam. The goal is 
 | Phase 2 · Python simulator | Seeded CLI and headless play through floor 100. The independent source audit found two Imitation reward cases, which were fixed and verified. Steam runtime equivalence is still unverified. | [Simulator guide](docs/simulator.md) · [Fidelity audit](docs/simulator_fidelity.md) |
 | Phase 2.5 · Local feasibility | Completed the CPU worker sweep and CUDA MLP benchmark. The synthetic pipeline reached 52,841 steps/s at 12 workers in repeated runs. | [Hardware and throughput benchmark](docs/hardware_benchmark.md) |
 | Phase 3A · Random baseline | Ran 1,000 games with 16 workers and logged both seeds and episode outcomes in SQLite. No clears, timeouts, or errors. The furthest run reached floor 21. | [Random baseline and plots](docs/baseline_random_1000.md) |
-| Phase 3A · Resumable runner | Added skill and encounter telemetry, batch checkpoints, and automatic reporting. Verified pause and resume across 1,000 games. The one-million-game run is ready for manual launch. | [Large baseline runner](docs/baseline_random_1m.md) |
+| Phase 3A · Million-game baseline | Completed 1,000,000 episodes with skill and encounter telemetry. Recorded 999,913 defeats, 87 action-limit timeouts, and zero clears or execution errors. | [Results and plots](docs/baseline_random_1m_results.md) · [Runner guide](docs/baseline_random_1m.md) |
 
 Greedy and heuristic baselines, reinforcement learning, and Steam integration are upcoming. The hardware benchmark uses synthetic updates, and the 90% target has yet to be evaluated in Steam.
 

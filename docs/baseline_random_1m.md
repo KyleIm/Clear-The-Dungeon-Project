@@ -1,6 +1,6 @@
 # Resumable Uniform Random Policy Baseline
 
-The Windows launcher defaults to **1,000,000 episodes with 16 CPU workers**. The published validation completed **1,000 episodes**. The full run is reserved for manual launch.
+The Windows launcher defaults to **1,000,000 episodes with 16 CPU workers**. The runner validation covered **1,000 episodes**. The manually launched full run is documented in the [million-game results](baseline_random_1m_results.md).
 
 ## Run or resume on Windows
 
