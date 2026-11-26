@@ -42,7 +42,7 @@ def experiment_seeds(games, master_seed):
     return [(index + 1, values[2 * index], values[2 * index + 1]) for index in range(games)]
 
 
-def episode(game, job, action_cap, timeout_s):
+def episode(game, job, action_cap, timeout_s, observer=None):
     game_id, game_seed, policy_seed = job
     policy = random.Random(policy_seed)
     start = perf_counter()
@@ -52,6 +52,8 @@ def episode(game, job, action_cap, timeout_s):
     monster_id, monster = None, None
     try:
         state = game.reset(game_seed)
+        if observer is not None:
+            observer.start(state)
         area, floor = state["area"], state["floor"]
         slots = [name for name in state["player"]["current_skills"] if name != "lock"]
         skills = json.dumps(slots, separators=(",", ":"))
@@ -64,7 +66,11 @@ def episode(game, job, action_cap, timeout_s):
                 break
             choice = policy.choice(game.get_legal_actions())
             actions += 1
-            state = game.step(choice)
+            if observer is None:
+                state = game.step(choice)
+            else:
+                before, state = state, game.step(choice)
+                observer.step(before, state)
             floor = max(floor, state["floor"])
         else:
             outcome = "cleared" if game.is_cleared() else "game_over"
