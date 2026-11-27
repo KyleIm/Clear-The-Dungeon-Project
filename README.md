@@ -13,6 +13,7 @@ A local research project for Dungeon & Rogue, a roguelike on Steam. The goal is 
 | Phase 3A · Million-game baseline | Completed 1,000,000 episodes with skill and encounter telemetry. Recorded 999,913 defeats, 87 action-limit timeouts, and zero clears or execution errors. | [Results and plots](docs/baseline_random_1m_results.md) · [Runner guide](docs/baseline_random_1m.md) |
 | Phase 3A · Timeout investigation | Replayed all 87 timeouts and reproduced the Counter–Mimic combat deadlock with the original Ren’Py combat code. | [Mimic timeout analysis](docs/mimic_timeout_analysis.md) |
 | Simulator combat display and replay check | Added combatant and skill types and explicit condition displays. Replayed 1,000 baseline episodes, including 550 that entered a shop, with complete outcome parity. | [Combat display audit](docs/combat_display_audit.md) · [Seeded replay](docs/random_replay_1000.md) |
+| Random baseline shop exits | Replayed all 14,120 episodes that reached floor 11 or higher and analyzed 14,142 shop exits by allocation, skill loadout, gold and subsequent floor reach. | [Shop exit analysis and plots](docs/shop_exit_replay/report.md) |
 
 Greedy and heuristic baselines, reinforcement learning, and Steam integration are upcoming. The hardware benchmark uses synthetic updates, and the 90% target has yet to be evaluated in Steam.
 
