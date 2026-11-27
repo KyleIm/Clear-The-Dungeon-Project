@@ -16,6 +16,7 @@ A local research project for Dungeon & Rogue, a roguelike on Steam. The goal is 
 | Phase 3C · Local RL implementation | Added a standalone masked PPO learner, nine curriculum stages, resumable checkpoints, paired evaluation and Windows launchers. Validation uses tiny local fixtures. | [Local RL implementation and launch instructions](docs/rl_implementation.md) |
 | Phase 3C · Evaluation performance | Diagnosed the first evaluation stall, added CPU workers and CUDA batch inference, and made evaluation progress and time visible. | [Evaluation investigation and benchmark](docs/rl_evaluation_performance.md) |
 | Phase 3D · Strategic shop policy | Added a transaction-oriented shop interface, curriculum-controlled repeat costs, paired greedy and seeded stochastic evaluation, and decision statistics. | [Shop redesign and validation](docs/shop_policy_redesign.md) |
+| Phase 3D · Completed local run | Finished 1,000,008 steps at Stage 4 with 20,931 completed training episodes. | [Training report](docs/phase3d_1000008/training_report.md) · [Final checkpoint](models/phase3d_1000008.pt) |
 
 Full local training, greedy and heuristic comparisons, and Steam evaluation are upcoming. The 90% target has yet to be evaluated in Steam.
 
