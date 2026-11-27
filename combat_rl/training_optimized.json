@@ -1,0 +1,33 @@
+{
+  "output": "data/combat_reward_rl_optimized",
+  "master_seed": 321092,
+  "episodes": 1000000,
+  "workers": 12,
+  "device": "cuda",
+  "cpu_threads": 2,
+  "action_cap": 10000,
+  "rollout_rounds": 128,
+  "checkpoint_updates": 10,
+  "eval_every_episodes": 25000,
+  "eval_episodes": 128,
+  "hidden_dims": [
+    128,
+    128
+  ],
+  "ppo": {
+    "learning_rate": 0.0003,
+    "gamma": 0.999,
+    "gae_lambda": 0.95,
+    "clip": 0.2,
+    "entropy": 0.01,
+    "minibatch": 256,
+    "epochs": 4
+  },
+  "runtime": {
+    "processes": 6,
+    "inference_device": "cpu",
+    "inference_batch": 12,
+    "reuse_critic": true,
+    "sqlite_batch": 1024
+  }
+}

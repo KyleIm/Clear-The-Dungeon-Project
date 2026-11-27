@@ -16,6 +16,7 @@ A local research project for Dungeon & Rogue, a roguelike on Steam. The goal is 
 | Random baseline shop exits | Replayed all 14,120 episodes that reached floor 11 or higher and analyzed 14,142 shop exits by allocation, skill loadout, gold and subsequent floor reach. | [Shop exit analysis and plots](docs/shop_exit_replay/report.md) |
 | Phase 3B · Combat and Reward RL | Added a standalone 583-input PPO trainer with two masked heads, uniformly random shop and event actions, checkpoint resume, and paired evaluation. | [Local training and validation](docs/combat_reward_rl.md) |
 | Phase 3B · 100,000-episode run | Published the completed portion of the local run. At 100,000 episodes the fixed-seed evaluation averaged floor 10.68 versus 3.51 for paired uniform random. Both policies recorded zero clears on the 128-seed panel. | [Results and plots](docs/combat_rl_100k/training_report.md) |
+| Phase 3B-2 · Training performance | Profiled the PPO runtime and added a separate million-episode launcher with batched CPU inference, CUDA updates, and grouped workers. | [Performance results and launcher](docs/combat_reward_performance.md) |
 
 Full local training, greedy and heuristic baselines, and Steam integration are upcoming. The hardware benchmark uses synthetic updates, and the 90% target has yet to be evaluated in Steam.
 

@@ -36,6 +36,33 @@ class CombatRewardPPOTests(unittest.TestCase):
         values = advantages([first, other_slot, cutoff, next_episode], gamma=0.5, gae_lambda=0.5)
         np.testing.assert_allclose(values, [3.0, -1.0, 2.0, -3.0])
 
+    def test_profile_and_bundled_action_readback_preserve_sampling(self):
+        class Recorder:
+            detailed = True
+
+            def __init__(self):
+                self.values = {}
+
+            def add(self, name, elapsed):
+                self.values[name] = elapsed
+
+        for device in ('cpu', 'cuda') if torch.cuda.is_available() else ('cpu',):
+            with self.subTest(device=device):
+                model = ActorCritic([8]).to(device)
+                inputs = (np.zeros((2, 583), dtype=np.float32), np.array([0, 1]),
+                          np.ones((2, 7), dtype=bool))
+                recorder = Recorder()
+                torch.manual_seed(83)
+                plain = model.act(inputs)
+                torch.manual_seed(83)
+                bundled = model.act(inputs, profile=recorder, bundle=True)
+                for actual, expected in zip(bundled, plain):
+                    np.testing.assert_array_equal(actual, expected)
+                np.testing.assert_array_equal(model.values(inputs, profile=recorder), model.values(inputs))
+                self.assertEqual(set(recorder.values), {'host_to_device', 'device_to_host',
+                                                         'actor_critic_inference', 'critic_inference'})
+                self.assertTrue(all(elapsed >= 0 for elapsed in recorder.values.values()))
+
     def _check_update(self, device):
         torch.manual_seed(19)
         model = ActorCritic([8, 4]).to(device)

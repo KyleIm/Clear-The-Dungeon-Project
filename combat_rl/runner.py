@@ -1,6 +1,8 @@
 """Train, evaluate and resume the local two-head PPO experiment."""
 
 import argparse
+from contextlib import nullcontext
+from copy import deepcopy
 import hashlib
 import json
 from pathlib import Path
@@ -44,6 +46,35 @@ def config(path):
 
 def batch(observations):
     return tuple(np.stack(items) for items in zip(*observations))
+
+
+def runtime_settings(cfg):
+    runtime = dict(processes=cfg['workers'], inference_device=cfg['device'],
+                   inference_batch=cfg['workers'], reuse_critic=False,
+                   bundle_inference=False, sqlite_batch=256)
+    runtime.update(cfg.get('runtime', {}))
+    processes = runtime['processes']
+    if (type(processes) is not int or processes < 1 or cfg['workers'] % processes
+            or any(type(runtime[key]) is not int or runtime[key] < 1
+                   for key in ('inference_batch', 'sqlite_batch'))):
+        raise ValueError('Processes must divide the logical worker count and batch sizes must be positive')
+    return runtime
+
+
+def act_batch(actor, observations, runtime, profile):
+    size = runtime['inference_batch']
+    if len(observations) <= size:
+        return actor.act(batch(observations), profile=profile, bundle=runtime['bundle_inference'])
+    parts = [actor.act(batch(observations[start:start + size]), profile=profile,
+                       bundle=runtime['bundle_inference']) for start in range(0, len(observations), size)]
+    return tuple(np.concatenate(values) for values in zip(*parts))
+
+
+def fill_bootstraps(rollout, pending, values):
+    for slot, value in values.items():
+        if slot in pending:
+            index = pending.pop(slot)
+            rollout[index] = rollout[index]._replace(next_value=float(value))
 
 
 def seeds(cfg, split, index):
@@ -107,10 +138,13 @@ def load(path):
     return checkpoint
 
 
-def train(cfg, directory, *, resume=False, baseline=None):
+def train(cfg, directory, *, resume=False, baseline=None, profile=None, benchmark=False):
     import torch
 
     from .ppo import ActorCritic, Transition, update
+
+    runtime = runtime_settings(cfg)
+    measure = profile.measure if profile is not None else lambda _: nullcontext()
 
     directory.mkdir(parents=True, exist_ok=True)
     checkpoint_path = directory / 'latest.pt'
@@ -125,10 +159,15 @@ def train(cfg, directory, *, resume=False, baseline=None):
             fixed = ('workers', 'device', 'master_seed', 'action_cap', 'hidden_dims', 'eval_episodes')
             if any(old['config'][key] != cfg[key] for key in fixed):
                 raise ValueError('Resume needs matching workers, device, master seed, action cap, model and evaluation panel size')
+            if runtime_settings(old['config']) != runtime:
+                raise ValueError('Resume requires the same runtime profile')
             if cfg['episodes'] < old['state']['started']:
                 raise ValueError('Episode budget cannot be smaller than the number already started')
         torch.set_num_threads(cfg['cpu_threads'])
         device = torch.device(cfg['device'])
+        inference_device = torch.device(runtime['inference_device'])
+        if inference_device != device and inference_device.type != 'cpu':
+            raise ValueError('Inference must use the learner device or CPU')
         if device.type == 'cuda' and not torch.cuda.is_available():
             raise RuntimeError('CUDA is unavailable. Use a CUDA PyTorch wheel or set device to cpu.')
         random.seed(seed(cfg['master_seed'], 'python'))
@@ -139,7 +178,8 @@ def train(cfg, directory, *, resume=False, baseline=None):
         state = dict(steps=0, decisions=0, episodes=0, started=0, updates=0,
                      seconds=0.0, next_eval=cfg['eval_every_episodes'], last_eval=-1)
         active = {}
-        with Store(database) as store, Workers(cfg['workers']) as pool:
+        with (Store(database, batch_size=runtime['sqlite_batch']) as store,
+              Workers(runtime['processes'], cfg['workers'] // runtime['processes'], profile) as pool):
             if old:
                 state.update(old['state'])
                 model.load_state_dict(old['model'])
@@ -154,6 +194,7 @@ def train(cfg, directory, *, resume=False, baseline=None):
                 store.restore(old['marks'])
                 pool.call('restore', old['workers'])
                 active.update(old['observations'])
+            actor = model if inference_device == device else deepcopy(model).to(inference_device)
 
             def refill(slots):
                 requests = {}
@@ -162,24 +203,33 @@ def train(cfg, directory, *, resume=False, baseline=None):
                         break
                     requests[slot] = seeds(cfg, 'training', state['started'])
                     state['started'] += 1
-                active.update(pool.call('reset', requests))
+                if requests:
+                    with measure('worker_reset'):
+                        active.update(pool.call('reset', requests))
 
             def save():
-                payload = dict(version=VERSION, config=cfg, state=state, observations=active,
-                               workers=pool.call('snapshot', dict.fromkeys(active)), marks=store.marks(),
-                               model=model.state_dict(), optimizer=optimizer.state_dict(),
-                               torch_rng=torch.get_rng_state(), python_rng=random.getstate(),
-                               numpy_rng=np.random.get_state(),
-                               cuda_rng=torch.cuda.get_rng_state_all() if device.type == 'cuda' else None)
-                pending = checkpoint_path.with_suffix('.tmp')
-                torch.save(payload, pending)
-                pending.replace(checkpoint_path)
+                with measure('sqlite'):
+                    marks = store.marks()
+                with measure('checkpoint'):
+                    payload = dict(version=VERSION, config=cfg, state=state, observations=active,
+                                   workers=pool.call('snapshot', dict.fromkeys(active)), marks=marks,
+                                   model=model.state_dict(), optimizer=optimizer.state_dict(),
+                                   torch_rng=torch.get_rng_state(), python_rng=random.getstate(),
+                                   numpy_rng=np.random.get_state(),
+                                   cuda_rng=torch.cuda.get_rng_state_all() if device.type == 'cuda' else None)
+                    pending = checkpoint_path.with_suffix('.tmp')
+                    torch.save(payload, pending)
+                    pending.replace(checkpoint_path)
 
             refill(slot for slot in range(cfg['workers']) if slot not in active)
+            if benchmark:
+                with measure('warmup'):
+                    actor.act(batch(active.values()), deterministic=True)
+                    model.values(batch(active.values()))
             save()
             while True:
                 due = state['episodes'] >= state['next_eval'] or not active
-                if due and state['last_eval'] != state['episodes']:
+                if not benchmark and due and state['last_eval'] != state['episodes']:
                     save()
                     evaluate(cfg, model, store, state['episodes'])
                     state['last_eval'] = state['episodes']
@@ -192,13 +242,19 @@ def train(cfg, directory, *, resume=False, baseline=None):
                 starting_steps = state['steps']
                 starting_episodes = state['episodes']
                 rollout = []
+                pending_values = {}
                 for _ in range(cfg['rollout_rounds']):
                     slots = list(active)
                     observations = list(active.values())
-                    selected, log_prob, values = model.act(batch(observations))
+                    selected, log_prob, values = act_batch(actor, observations, runtime, profile)
+                    if pending_values:
+                        fill_bootstraps(rollout, pending_values, dict(zip(slots, values)))
                     results = pool.call('step', dict(zip(slots, map(int, selected))))
-                    ongoing = {slot: result[2] for slot, result in results.items() if result[3] is None}
-                    next_values = dict(zip(ongoing, model.values(batch(ongoing.values())))) if ongoing else {}
+                    next_values = {}
+                    if not runtime['reuse_critic']:
+                        ongoing = {slot: result[2] for slot, result in results.items() if result[3] is None}
+                        if ongoing:
+                            next_values = dict(zip(ongoing, actor.values(batch(ongoing.values()), profile=profile)))
                     finished = []
                     for position, slot in enumerate(slots):
                         reward, steps, observation, result = results[slot]
@@ -210,26 +266,42 @@ def train(cfg, directory, *, resume=False, baseline=None):
                         state['decisions'] += 1
                         if done:
                             state['episodes'] += 1
-                            store.episode('train', state['episodes'], result)
+                            with measure('sqlite'):
+                                store.episode('train', state['episodes'], result)
                             del active[slot]
                             finished.append(slot)
                         else:
                             active[slot] = observation
+                            if runtime['reuse_critic']:
+                                pending_values[slot] = len(rollout) - 1
                     refill(finished)
                     if not active or state['episodes'] >= state['next_eval']:
                         break
-                metrics = update(model, optimizer, rollout, cfg['ppo'])
+                if pending_values:
+                    observations = batch([active[slot] for slot in pending_values])
+                    fill_bootstraps(rollout, pending_values,
+                                    dict(zip(pending_values, actor.values(observations, profile=profile))))
+                metrics = update(model, optimizer, rollout, cfg['ppo'], profile=profile)
+                if actor is not model:
+                    with measure('actor_weight_sync'):
+                        actor.load_state_dict(model.state_dict())
                 duration = perf_counter() - started
                 state['seconds'] += duration
                 state['updates'] += 1
                 rate = (state['steps'] - starting_steps) / duration
                 episode_rate = (state['episodes'] - starting_episodes) / duration
-                store.update(state['episodes'], dict(state, **metrics, steps_per_second=rate,
-                                                    episodes_per_second=episode_rate))
-                print(f'{state["episodes"]:,}/{cfg["episodes"]:,} episodes | {state["steps"]:,} actions | '
-                      f'{rate:,.1f} actions/s | {episode_rate:.1f} episodes/s | {state["seconds"]:.1f}s train', flush=True)
+                with measure('sqlite'):
+                    store.update(state['episodes'], dict(state, **metrics, steps_per_second=rate,
+                                                        episodes_per_second=episode_rate))
+                if not benchmark:
+                    print(f'{state["episodes"]:,}/{cfg["episodes"]:,} episodes | {state["steps"]:,} actions | '
+                          f'{rate:,.1f} actions/s | {episode_rate:.1f} episodes/s | {state["seconds"]:.1f}s train',
+                          flush=True)
                 if state['updates'] % cfg['checkpoint_updates'] == 0:
                     save()
+            if benchmark:
+                save()
+                return state
         return generate_report(database, directory / 'report', baseline)
 
 

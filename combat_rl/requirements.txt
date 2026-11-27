@@ -1,3 +1,4 @@
 # Install a compatible PyTorch wheel separately for CPU or CUDA.
 numpy>=1.26,<3
 matplotlib>=3.8,<4
+psutil>=6,<9
