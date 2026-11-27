@@ -77,6 +77,33 @@ class GameTests(unittest.TestCase):
         self.assertIn(f"Increase skill uses {skill}", output.getvalue())
         self.assertIn(f"Decrease skill uses {skill}", output.getvalue())
 
+    def test_cli_displays_types_conditions_and_depleted_skills(self):
+        game = Game()
+        game.reset(24)
+        game.player.type = "Undead"
+        game.monster.type = "Beast"
+        game.player.status_conditions = [{"Name": "poison"}, {"Name": "helmet"}]
+        game.monster.status_conditions = []
+        skill = game.player.current_skills[0]
+        game.player.memorized_skills[skill] = 0
+        offered = game.get_legal_actions()[0][1]
+        output = StringIO()
+        with (
+            patch.object(cli, "Game", return_value=game),
+            patch.object(game, "reset", return_value=game.get_state()),
+            patch("sys.argv", ["simulator"]),
+            patch("builtins.input", return_value="q"),
+            redirect_stdout(output),
+        ):
+            cli.main()
+        display = output.getvalue()
+        self.assertIn("Type Undead", display)
+        self.assertIn("Type Beast", display)
+        self.assertIn("Rogue conditions: poison, helmet", display)
+        self.assertIn("Opponent conditions: none", display)
+        self.assertIn(f"Depleted skills: {skill} [{game.data.skills[skill]['type']}]", display)
+        self.assertIn(f"skill {offered} [{game.data.skills[offered]['type']}]", display)
+
     def test_death_beats_victory_on_simultaneous_knockout(self):
         game = Game()
         game.reset(1)

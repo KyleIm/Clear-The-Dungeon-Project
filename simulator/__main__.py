@@ -6,22 +6,30 @@ from .game import Game
 ACTION_LABELS = {"memorize": "Increase skill uses", "forget": "Decrease skill uses"}
 
 
-def show_state(state):
+def _conditions(actor):
+    return ", ".join(dict.fromkeys(effect["Name"] for effect in actor["status_conditions"]))
+
+
+def show_state(state, skills):
     player, monster = state["player"], state["monster"]
+    combat = state["phase"] == "combat"
+    player_type = f" | Type {player['type']}" if combat else ""
     print(f"\nFloor {state['floor']} | {state['area']} | {state['phase']} | Gold {state['gold']}")
-    print(f"Rogue HP {player['hp']}/{player['max_hp']} | ATK {player['attack']} | "
+    print(f"Rogue HP {player['hp']}/{player['max_hp']}{player_type} | ATK {player['attack']} | "
           f"DEF {player['defense']} | SPD {player['speed']} | ACC {player['ACC']} | "
           f"EVA {player['EVA']} | DR {player['DR']}")
-    status = ", ".join(effect["Name"] for effect in player["status_conditions"])
-    if status:
-        print(f"Rogue conditions: {status}")
-    if state["phase"] == "combat":
-        print(f"{monster['name']} HP {monster['hp']}/{monster['max_hp']} | ATK {monster['attack']} | "
+    status = _conditions(player)
+    if combat or status:
+        print(f"Rogue conditions: {status or 'none'}")
+    if combat:
+        print(f"{monster['name']} HP {monster['hp']}/{monster['max_hp']} | Type {monster['type']} | ATK {monster['attack']} | "
               f"DEF {monster['defense']} | SPD {monster['speed']} | ACC {monster['ACC']} | "
               f"EVA {monster['EVA']} | DR {monster['DR']}")
-        status = ", ".join(effect["Name"] for effect in monster["status_conditions"])
-        if status:
-            print(f"Opponent conditions: {status}")
+        print(f"Opponent conditions: {_conditions(monster) or 'none'}")
+        depleted = [f"{name} [{skills[name]['type']}]" for name in player["current_skills"]
+                    if name != "lock" and player["memorized_skills"][name] == 0]
+        if depleted:
+            print(f"Depleted skills: {', '.join(depleted)}")
     elif state["phase"] == "reward":
         print(f"Skill offer: {state['reward_skill'] or 'none'}")
     elif state["phase"] == "shop":
@@ -37,12 +45,15 @@ def main():
     game = Game()
     state = game.reset(options.seed)
     while not game.is_terminal():
-        show_state(state)
+        show_state(state, game.data.skills)
         actions = game.get_legal_actions()
         for index, action in enumerate(actions, start=1):
             label = " ".join((ACTION_LABELS.get(action[0], action[0]), *map(str, action[1:])))
-            if action[0] == "skill" and action[1] in state["player"]["memorized_skills"]:
-                label += f" ({state['player']['memorized_skills'][action[1]]} uses)"
+            if action[0] == "skill":
+                name = action[1]
+                label += f" [{game.data.skills[name]['type']}]"
+                if name in state["player"]["memorized_skills"]:
+                    label += f" ({state['player']['memorized_skills'][name]} uses)"
             print(f"{index}. {label}")
         try:
             choice = input("Action number, or q to quit: ").strip()
@@ -58,7 +69,7 @@ def main():
             print("Enter a listed action number.")
             continue
         state = game.step(actions[index])
-    show_state(state)
+    show_state(state, game.data.skills)
     print("Cleared!" if game.is_cleared() else "Game over.")
 
 
