@@ -1,0 +1,25 @@
+{
+  "output": "data/alternating_combat_shop",
+  "master_seed": 290187,
+  "evaluation_seed": 321092,
+  "episodes": 1000000,
+  "segment_episodes": 25000,
+  "eval_episodes": 128,
+  "workers": 12,
+  "processes": 6,
+  "device": "cuda",
+  "action_cap": 10000,
+  "rollout_rounds": 128,
+  "checkpoint_rounds": 10,
+  "shop": {
+    "candidates": 16,
+    "max_edits": 24,
+    "planner": "uniform_menu",
+    "epsilon": 0.15,
+    "hidden_dims": [128, 64],
+    "learning_rate": 0.001,
+    "batch_size": 128,
+    "replay_window": 4096,
+    "warmup_updates": 16
+  }
+}

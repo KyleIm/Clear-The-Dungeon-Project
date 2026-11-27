@@ -18,6 +18,7 @@ A local research project for Dungeon & Rogue, a roguelike on Steam. The goal is 
 | Phase 3B · 100,000-episode run | Published the completed portion of the local run. At 100,000 episodes the fixed-seed evaluation averaged floor 10.68 versus 3.51 for paired uniform random. Both policies recorded zero clears on the 128-seed panel. | [Results and plots](docs/combat_rl_100k/training_report.md) |
 | Phase 3B-2 · Training performance | Profiled the PPO runtime and added a separate million-episode launcher with batched CPU inference, CUDA updates, and grouped workers. | [Performance results and launcher](docs/combat_reward_performance.md) |
 | Phase 3B-2 · Million-episode training run | Completed 1,000,000 training episodes. The final checkpoint averaged floor 11.31 versus 3.51 for paired uniform random on 128 evaluation seeds. Both policies recorded zero clears. | [Results and learning curves](docs/combat_rl_1m/training_report.md) |
+| Phase 3C · Alternating Combat and Shop | Added exact episode-boundary alternation, legal shop candidate scoring, milestone labels, and independent local resume. | [Design, verification and launchers](docs/alternating_combat_shop_rl.md) |
 
 Greedy and heuristic baselines and Steam integration are upcoming. The hardware benchmark uses synthetic updates, and the 90% target has yet to be evaluated in Steam.
 

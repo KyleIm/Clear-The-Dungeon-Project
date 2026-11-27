@@ -25,7 +25,7 @@ def _apply(runs, slot, operation, arg):
     raise ValueError(f'Unknown worker operation {operation}')
 
 
-def serve(pipe, grouped, profiling):
+def serve(pipe, grouped, profiling, apply_handler):
     runs = {}
     with pipe:
         try:
@@ -37,9 +37,9 @@ def serve(pipe, grouped, profiling):
                 if timed:
                     started = perf_counter()
                 if grouped:
-                    result = {slot: _apply(runs, slot, operation, value) for slot, value in arg}
+                    result = {slot: apply_handler(runs, slot, operation, value) for slot, value in arg}
                 else:
-                    result = _apply(runs, 0, operation, arg)
+                    result = apply_handler(runs, 0, operation, arg)
                 if timed:
                     result = result, perf_counter() - started
                 pipe.send((True, result))
@@ -50,12 +50,13 @@ def serve(pipe, grouped, profiling):
 
 
 class Workers:
-    def __init__(self, count, games_per_worker=1, profile=None):
+    def __init__(self, count, games_per_worker=1, profile=None, *, apply_handler=_apply):
         if count < 1 or games_per_worker < 1:
             raise ValueError('Worker count and games per worker must be positive')
         self.count = count
         self.games_per_worker = games_per_worker
         self.profile = profile
+        self.apply_handler = apply_handler
         self.pairs = []
 
     def __enter__(self):
@@ -64,7 +65,8 @@ class Workers:
             for _ in range(self.count):
                 parent, child = context.Pipe()
                 process = context.Process(target=serve,
-                                          args=(child, self.games_per_worker > 1, self.profile is not None),
+                                          args=(child, self.games_per_worker > 1, self.profile is not None,
+                                                self.apply_handler),
                                           daemon=True)
                 try:
                     process.start()
