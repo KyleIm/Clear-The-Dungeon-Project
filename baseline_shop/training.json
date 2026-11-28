@@ -1,0 +1,20 @@
+{
+  "output": "data/baseline_relative_shop",
+  "master_seed": 581307,
+  "evaluation_seed": 321092,
+  "episodes": 1000000,
+  "segment_episodes": 25000,
+  "workers": 12,
+  "processes": 6,
+  "rollout_rounds": 128,
+  "checkpoint_rounds": 10,
+  "eval_episodes": 128,
+  "action_cap": 10000,
+  "comparison_budget": 10000,
+  "candidates": 8,
+  "class_window": 512,
+  "batch_size": 96,
+  "device": "cuda",
+  "shop_lr": 0.001,
+  "probe": true
+}
