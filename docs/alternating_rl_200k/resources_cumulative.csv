@@ -1,0 +1,65 @@
+end,metric,value
+25000,gpu_memory_used_mib_peak,332.0
+25000,gpu_name,NVIDIA GeForce RTX 5070 Laptop GPU
+25000,gpu_util_percent_mean,4.561076604554866
+25000,process_tree_cpu_percent_mean,17.144471809331215
+25000,process_tree_rss_mib_peak,2231.07421875
+25000,samples,483
+25000,system_cpu_percent_mean,28.04792531120332
+25000,system_ram_used_mib_peak,22951.796875
+50000,gpu_memory_used_mib_peak,334.0
+50000,gpu_name,NVIDIA GeForce RTX 5070 Laptop GPU
+50000,gpu_util_percent_mean,1.775609756097561
+50000,process_tree_cpu_percent_mean,14.449281592454998
+50000,process_tree_rss_mib_peak,2458.9453125
+50000,samples,2050
+50000,system_cpu_percent_mean,20.7867252318204
+50000,system_ram_used_mib_peak,22951.796875
+75000,gpu_memory_used_mib_peak,334.0
+75000,gpu_name,NVIDIA GeForce RTX 5070 Laptop GPU
+75000,gpu_util_percent_mean,1.521865889212828
+75000,process_tree_cpu_percent_mean,13.78501573539623
+75000,process_tree_rss_mib_peak,2458.9453125
+75000,samples,4459
+75000,system_cpu_percent_mean,19.34421265141319
+75000,system_ram_used_mib_peak,22951.796875
+100000,gpu_memory_used_mib_peak,334.0
+100000,gpu_name,NVIDIA GeForce RTX 5070 Laptop GPU
+100000,gpu_util_percent_mean,1.4032950060065215
+100000,process_tree_cpu_percent_mean,13.751098967346726
+100000,process_tree_rss_mib_peak,2458.9453125
+100000,samples,5827
+100000,system_cpu_percent_mean,19.148661174047373
+100000,system_ram_used_mib_peak,22951.796875
+125000,gpu_memory_used_mib_peak,334.0
+125000,gpu_name,NVIDIA GeForce RTX 5070 Laptop GPU
+125000,gpu_util_percent_mean,1.6461023433763748
+125000,process_tree_cpu_percent_mean,14.051925403254755
+125000,process_tree_rss_mib_peak,2458.9453125
+125000,samples,6273
+125000,system_cpu_percent_mean,19.859167729591835
+125000,system_ram_used_mib_peak,22951.796875
+150000,gpu_memory_used_mib_peak,334.0
+150000,gpu_name,NVIDIA GeForce RTX 5070 Laptop GPU
+150000,gpu_util_percent_mean,1.305748933303391
+150000,process_tree_cpu_percent_mean,13.809059250765776
+150000,process_tree_rss_mib_peak,2458.9453125
+150000,samples,8910
+150000,system_cpu_percent_mean,19.79197440790212
+150000,system_ram_used_mib_peak,22951.796875
+175000,gpu_memory_used_mib_peak,334.0
+175000,gpu_name,NVIDIA GeForce RTX 5070 Laptop GPU
+175000,gpu_util_percent_mean,1.237115231083119
+175000,process_tree_cpu_percent_mean,13.683388501716282
+175000,process_tree_rss_mib_peak,2458.9453125
+175000,samples,11277
+175000,system_cpu_percent_mean,19.426436679673643
+175000,system_ram_used_mib_peak,23203.5625
+200000,gpu_memory_used_mib_peak,334.0
+200000,gpu_name,NVIDIA GeForce RTX 5070 Laptop GPU
+200000,gpu_util_percent_mean,1.213149111231856
+200000,process_tree_cpu_percent_mean,13.652502504618559
+200000,process_tree_rss_mib_peak,2458.9453125
+200000,samples,12887
+200000,system_cpu_percent_mean,19.120184696569922
+200000,system_ram_used_mib_peak,23203.5625

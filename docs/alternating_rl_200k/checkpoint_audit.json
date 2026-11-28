@@ -1,0 +1,53 @@
+{
+  "state": {
+    "episodes": 200000,
+    "started": 200000,
+    "steps": 29133733,
+    "decisions": 9303142,
+    "rounds": 6215,
+    "version": 3192,
+    "shop_updates": 24200,
+    "shop_decisions": 10287806,
+    "received_replay": 18484179,
+    "learned_replay": 3201272,
+    "replay_reused": 105720,
+    "replay_rejected": 9016,
+    "train_seconds": 12353.473585400876,
+    "wall_seconds": 13017.116560299997,
+    "last_eval": 200000
+  },
+  "marks": {
+    "episodes": 201152,
+    "updates": 6225,
+    "evaluations": 9,
+    "shop_samples": 146280
+  },
+  "replay": [
+    18451412,
+    18484179,
+    32768
+  ],
+  "schedule": {
+    "segment": 9,
+    "cycle": 5,
+    "target": "combat_reward"
+  },
+  "optimizer_parameter_counts": [
+    [
+      "model",
+      10
+    ],
+    [
+      "shop",
+      10
+    ]
+  ],
+  "checkpoint_sha256": "a96736fbd733de9dad3f35387504e836647fb7b2a62e8e331130323886dd96ff",
+  "action_cap": 10000,
+  "historical_eval_seed_pair_overlap": {
+    "combat_reward_rl eval": 128,
+    "combat_reward_rl random": 128,
+    "combat_reward_rl_optimized eval": 128,
+    "combat_reward_rl_optimized random": 128
+  }
+}

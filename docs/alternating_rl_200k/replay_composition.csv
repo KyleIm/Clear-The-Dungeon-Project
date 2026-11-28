@@ -1,0 +1,25 @@
+step,cycle,head,source,transitions,terminals,successes
+25000,1,Gold Expenditure,uniform,2704,0,0
+25000,1,Stat Redistribution,uniform,8478,0,0
+25000,1,Skill Configuration,uniform,21586,2684,77
+50000,1,Gold Expenditure,dqn,199,0,0
+50000,1,Stat Redistribution,dqn,14107,0,0
+50000,1,Skill Configuration,dqn,18462,200,0
+75000,2,Gold Expenditure,dqn,152,0,0
+75000,2,Stat Redistribution,dqn,14700,0,0
+75000,2,Skill Configuration,dqn,17916,148,0
+100000,2,Gold Expenditure,dqn,432,0,0
+100000,2,Stat Redistribution,dqn,24959,0,0
+100000,2,Skill Configuration,dqn,7377,425,20
+125000,3,Gold Expenditure,dqn,8792,0,0
+125000,3,Stat Redistribution,dqn,9561,0,0
+125000,3,Skill Configuration,dqn,14415,8180,329
+150000,3,Gold Expenditure,dqn,193,0,0
+150000,3,Stat Redistribution,dqn,13684,0,0
+150000,3,Skill Configuration,dqn,18891,188,0
+175000,4,Gold Expenditure,dqn,146,0,0
+175000,4,Stat Redistribution,dqn,14497,0,0
+175000,4,Skill Configuration,dqn,18125,145,0
+200000,4,Gold Expenditure,dqn,430,0,0
+200000,4,Stat Redistribution,dqn,26611,0,0
+200000,4,Skill Configuration,dqn,5727,431,0

@@ -1,0 +1,1643 @@
+split,end,kind,action,count,group_total
+eval,0,combat_actions,slot_1,2118,4175
+eval,0,combat_actions,slot_2,1322,4175
+eval,0,combat_actions,slot_3,351,4175
+eval,0,combat_actions,sacrifice,270,4175
+eval,0,combat_actions,slot_4,114,4175
+eval,0,reward_actions,Potion,1143,1320
+eval,0,reward_actions,Initialize,176,1320
+eval,0,reward_actions,Exchange,1,1320
+eval,0,skill_actions,wolf fang,761,4175
+eval,0,skill_actions,skull dagger,741,4175
+eval,0,skill_actions,thunder,616,4175
+eval,0,skill_actions,sacrifice,270,4175
+eval,0,skill_actions,whisker needle,203,4175
+eval,0,skill_actions,pierce,188,4175
+eval,0,skill_actions,elemental orb,179,4175
+eval,0,skill_actions,magic arrow,163,4175
+eval,0,skill_actions,drain,160,4175
+eval,0,skill_actions,double strike,146,4175
+eval,0,skill_actions,kiss,134,4175
+eval,0,skill_actions,shooting star,133,4175
+eval,0,skill_actions,flesh explosion,129,4175
+eval,0,skill_actions,soul strike,114,4175
+eval,0,skill_actions,fast claw,74,4175
+eval,0,skill_actions,afterimage,54,4175
+eval,0,skill_actions,counter,48,4175
+eval,0,skill_actions,power up,31,4175
+eval,0,skill_actions,defend,15,4175
+eval,0,skill_actions,acceleration,5,4175
+eval,0,skill_actions,curse,3,4175
+eval,0,skill_actions,sticky,2,4175
+eval,0,skill_actions,weakness,2,4175
+eval,0,skill_actions,sap screw,1,4175
+eval,0,skill_actions,jiujitsu,1,4175
+eval,0,skill_actions,bonemerang,1,4175
+eval,0,skill_actions,will of wisp,1,4175
+eval,0,skill_casts,skull dagger,722,3965
+eval,0,skill_casts,wolf fang,664,3965
+eval,0,skill_casts,thunder,607,3965
+eval,0,skill_casts,sacrifice,241,3965
+eval,0,skill_casts,whisker needle,191,3965
+eval,0,skill_casts,pierce,186,3965
+eval,0,skill_casts,elemental orb,173,3965
+eval,0,skill_casts,magic arrow,157,3965
+eval,0,skill_casts,drain,151,3965
+eval,0,skill_casts,kiss,133,3965
+eval,0,skill_casts,shooting star,133,3965
+eval,0,skill_casts,double strike,133,3965
+eval,0,skill_casts,flesh explosion,127,3965
+eval,0,skill_casts,soul strike,114,3965
+eval,0,skill_casts,fast claw,74,3965
+eval,0,skill_casts,afterimage,53,3965
+eval,0,skill_casts,counter,47,3965
+eval,0,skill_casts,power up,30,3965
+eval,0,skill_casts,defend,15,3965
+eval,0,skill_casts,acceleration,5,3965
+eval,0,skill_casts,curse,3,3965
+eval,0,skill_casts,sticky,2,3965
+eval,0,skill_casts,weakness,2,3965
+eval,0,skill_casts,sap screw,1,3965
+eval,0,skill_casts,jiujitsu,1,3965
+eval,25000,combat_actions,slot_1,2262,4813
+eval,25000,combat_actions,slot_3,1278,4813
+eval,25000,combat_actions,slot_2,709,4813
+eval,25000,combat_actions,sacrifice,319,4813
+eval,25000,combat_actions,slot_4,245,4813
+eval,25000,reward_actions,Potion,1220,1342
+eval,25000,reward_actions,Initialize,122,1342
+eval,25000,skill_actions,wolf fang,914,4813
+eval,25000,skill_actions,skull dagger,800,4813
+eval,25000,skill_actions,thunder,544,4813
+eval,25000,skill_actions,sacrifice,319,4813
+eval,25000,skill_actions,elemental orb,249,4813
+eval,25000,skill_actions,soul strike,216,4813
+eval,25000,skill_actions,kiss,206,4813
+eval,25000,skill_actions,shooting star,202,4813
+eval,25000,skill_actions,whisker needle,182,4813
+eval,25000,skill_actions,pierce,167,4813
+eval,25000,skill_actions,flesh explosion,159,4813
+eval,25000,skill_actions,magic arrow,150,4813
+eval,25000,skill_actions,drain,147,4813
+eval,25000,skill_actions,double strike,112,4813
+eval,25000,skill_actions,fast claw,110,4813
+eval,25000,skill_actions,counter,81,4813
+eval,25000,skill_actions,power up,44,4813
+eval,25000,skill_actions,distraction,39,4813
+eval,25000,skill_actions,afterimage,38,4813
+eval,25000,skill_actions,defend,33,4813
+eval,25000,skill_actions,meditation,26,4813
+eval,25000,skill_actions,sticky,18,4813
+eval,25000,skill_actions,terror,15,4813
+eval,25000,skill_actions,curse,15,4813
+eval,25000,skill_actions,weakness,14,4813
+eval,25000,skill_actions,acceleration,7,4813
+eval,25000,skill_actions,recovery,1,4813
+eval,25000,skill_actions,jiujitsu,1,4813
+eval,25000,skill_actions,bonemerang,1,4813
+eval,25000,skill_actions,veilguard,1,4813
+eval,25000,skill_actions,icebolt,1,4813
+eval,25000,skill_actions,fracture,1,4813
+eval,25000,skill_casts,wolf fang,845,4565
+eval,25000,skill_casts,skull dagger,787,4565
+eval,25000,skill_casts,thunder,537,4565
+eval,25000,skill_casts,sacrifice,284,4565
+eval,25000,skill_casts,elemental orb,224,4565
+eval,25000,skill_casts,soul strike,209,4565
+eval,25000,skill_casts,kiss,195,4565
+eval,25000,skill_casts,shooting star,190,4565
+eval,25000,skill_casts,whisker needle,180,4565
+eval,25000,skill_casts,flesh explosion,154,4565
+eval,25000,skill_casts,pierce,150,4565
+eval,25000,skill_casts,drain,146,4565
+eval,25000,skill_casts,magic arrow,145,4565
+eval,25000,skill_casts,fast claw,108,4565
+eval,25000,skill_casts,double strike,108,4565
+eval,25000,skill_casts,counter,68,4565
+eval,25000,skill_casts,power up,44,4565
+eval,25000,skill_casts,distraction,39,4565
+eval,25000,skill_casts,afterimage,35,4565
+eval,25000,skill_casts,defend,29,4565
+eval,25000,skill_casts,meditation,19,4565
+eval,25000,skill_casts,sticky,18,4565
+eval,25000,skill_casts,terror,15,4565
+eval,25000,skill_casts,weakness,13,4565
+eval,25000,skill_casts,curse,12,4565
+eval,25000,skill_casts,acceleration,7,4565
+eval,25000,skill_casts,recovery,1,4565
+eval,25000,skill_casts,jiujitsu,1,4565
+eval,25000,skill_casts,veilguard,1,4565
+eval,25000,skill_casts,icebolt,1,4565
+eval,50000,combat_actions,slot_1,1966,3920
+eval,50000,combat_actions,slot_3,991,3920
+eval,50000,combat_actions,slot_2,642,3920
+eval,50000,combat_actions,slot_4,272,3920
+eval,50000,combat_actions,sacrifice,49,3920
+eval,50000,reward_actions,Potion,1068,1167
+eval,50000,reward_actions,Initialize,99,1167
+eval,50000,skill_actions,wolf fang,775,3920
+eval,50000,skill_actions,skull dagger,702,3920
+eval,50000,skill_actions,thunder,489,3920
+eval,50000,skill_actions,elemental orb,198,3920
+eval,50000,skill_actions,soul strike,179,3920
+eval,50000,skill_actions,shooting star,163,3920
+eval,50000,skill_actions,whisker needle,161,3920
+eval,50000,skill_actions,kiss,150,3920
+eval,50000,skill_actions,pierce,142,3920
+eval,50000,skill_actions,magic arrow,135,3920
+eval,50000,skill_actions,drain,116,3920
+eval,50000,skill_actions,flesh explosion,114,3920
+eval,50000,skill_actions,double strike,107,3920
+eval,50000,skill_actions,fast claw,95,3920
+eval,50000,skill_actions,counter,75,3920
+eval,50000,skill_actions,afterimage,53,3920
+eval,50000,skill_actions,sacrifice,49,3920
+eval,50000,skill_actions,distraction,45,3920
+eval,50000,skill_actions,power up,40,3920
+eval,50000,skill_actions,defend,33,3920
+eval,50000,skill_actions,meditation,25,3920
+eval,50000,skill_actions,terror,20,3920
+eval,50000,skill_actions,weakness,18,3920
+eval,50000,skill_actions,curse,16,3920
+eval,50000,skill_actions,sticky,9,3920
+eval,50000,skill_actions,acceleration,8,3920
+eval,50000,skill_actions,paralyze,2,3920
+eval,50000,skill_actions,mimic,1,3920
+eval,50000,skill_casts,wolf fang,717,3735
+eval,50000,skill_casts,skull dagger,695,3735
+eval,50000,skill_casts,thunder,487,3735
+eval,50000,skill_casts,elemental orb,183,3735
+eval,50000,skill_casts,soul strike,175,3735
+eval,50000,skill_casts,whisker needle,158,3735
+eval,50000,skill_casts,shooting star,151,3735
+eval,50000,skill_casts,kiss,138,3735
+eval,50000,skill_casts,magic arrow,130,3735
+eval,50000,skill_casts,pierce,125,3735
+eval,50000,skill_casts,drain,114,3735
+eval,50000,skill_casts,flesh explosion,108,3735
+eval,50000,skill_casts,double strike,102,3735
+eval,50000,skill_casts,fast claw,93,3735
+eval,50000,skill_casts,counter,63,3735
+eval,50000,skill_casts,afterimage,49,3735
+eval,50000,skill_casts,sacrifice,47,3735
+eval,50000,skill_casts,distraction,45,3735
+eval,50000,skill_casts,power up,39,3735
+eval,50000,skill_casts,defend,29,3735
+eval,50000,skill_casts,terror,20,3735
+eval,50000,skill_casts,meditation,19,3735
+eval,50000,skill_casts,weakness,16,3735
+eval,50000,skill_casts,curse,13,3735
+eval,50000,skill_casts,sticky,9,3735
+eval,50000,skill_casts,acceleration,8,3735
+eval,50000,skill_casts,paralyze,2,3735
+eval,75000,combat_actions,slot_1,1583,3780
+eval,75000,combat_actions,slot_3,1000,3780
+eval,75000,combat_actions,slot_2,975,3780
+eval,75000,combat_actions,slot_4,194,3780
+eval,75000,combat_actions,sacrifice,28,3780
+eval,75000,reward_actions,Potion,1017,1121
+eval,75000,reward_actions,Initialize,88,1121
+eval,75000,reward_actions,Exchange,16,1121
+eval,75000,skill_actions,wolf fang,657,3780
+eval,75000,skill_actions,skull dagger,480,3780
+eval,75000,skill_actions,thunder,446,3780
+eval,75000,skill_actions,soul strike,215,3780
+eval,75000,skill_actions,elemental orb,207,3780
+eval,75000,skill_actions,pierce,203,3780
+eval,75000,skill_actions,kiss,187,3780
+eval,75000,skill_actions,whisker needle,183,3780
+eval,75000,skill_actions,drain,166,3780
+eval,75000,skill_actions,flesh explosion,165,3780
+eval,75000,skill_actions,magic arrow,165,3780
+eval,75000,skill_actions,double strike,150,3780
+eval,75000,skill_actions,shooting star,144,3780
+eval,75000,skill_actions,counter,98,3780
+eval,75000,skill_actions,fast claw,95,3780
+eval,75000,skill_actions,terror,43,3780
+eval,75000,skill_actions,sticky,34,3780
+eval,75000,skill_actions,defend,33,3780
+eval,75000,skill_actions,power up,32,3780
+eval,75000,skill_actions,sacrifice,28,3780
+eval,75000,skill_actions,distraction,22,3780
+eval,75000,skill_actions,afterimage,10,3780
+eval,75000,skill_actions,curse,10,3780
+eval,75000,skill_actions,acceleration,3,3780
+eval,75000,skill_actions,mimic,2,3780
+eval,75000,skill_actions,weakness,2,3780
+eval,75000,skill_casts,wolf fang,579,3555
+eval,75000,skill_casts,skull dagger,469,3555
+eval,75000,skill_casts,thunder,445,3555
+eval,75000,skill_casts,elemental orb,205,3555
+eval,75000,skill_casts,soul strike,199,3555
+eval,75000,skill_casts,pierce,184,3555
+eval,75000,skill_casts,kiss,178,3555
+eval,75000,skill_casts,whisker needle,177,3555
+eval,75000,skill_casts,flesh explosion,159,3555
+eval,75000,skill_casts,drain,157,3555
+eval,75000,skill_casts,magic arrow,156,3555
+eval,75000,skill_casts,double strike,141,3555
+eval,75000,skill_casts,shooting star,140,3555
+eval,75000,skill_casts,fast claw,93,3555
+eval,75000,skill_casts,counter,74,3555
+eval,75000,skill_casts,terror,36,3555
+eval,75000,skill_casts,power up,31,3555
+eval,75000,skill_casts,defend,30,3555
+eval,75000,skill_casts,sticky,27,3555
+eval,75000,skill_casts,sacrifice,27,3555
+eval,75000,skill_casts,distraction,21,3555
+eval,75000,skill_casts,afterimage,10,3555
+eval,75000,skill_casts,curse,10,3555
+eval,75000,skill_casts,acceleration,3,3555
+eval,75000,skill_casts,weakness,2,3555
+eval,75000,skill_casts,mimic,1,3555
+eval,75000,skill_casts,meditation,1,3555
+eval,100000,combat_actions,slot_3,11579,15368
+eval,100000,combat_actions,slot_1,2107,15368
+eval,100000,combat_actions,slot_2,1419,15368
+eval,100000,combat_actions,slot_4,202,15368
+eval,100000,combat_actions,sacrifice,61,15368
+eval,100000,reward_actions,Potion,1325,1480
+eval,100000,reward_actions,Initialize,139,1480
+eval,100000,reward_actions,Exchange,16,1480
+eval,100000,skill_actions,counter,10052,15368
+eval,100000,skill_actions,wolf fang,845,15368
+eval,100000,skill_actions,skull dagger,653,15368
+eval,100000,skill_actions,thunder,609,15368
+eval,100000,skill_actions,elemental orb,350,15368
+eval,100000,skill_actions,soul strike,328,15368
+eval,100000,skill_actions,pierce,312,15368
+eval,100000,skill_actions,flesh explosion,300,15368
+eval,100000,skill_actions,drain,292,15368
+eval,100000,skill_actions,whisker needle,274,15368
+eval,100000,skill_actions,kiss,262,15368
+eval,100000,skill_actions,magic arrow,245,15368
+eval,100000,skill_actions,shooting star,240,15368
+eval,100000,skill_actions,double strike,225,15368
+eval,100000,skill_actions,fast claw,118,15368
+eval,100000,skill_actions,sacrifice,61,15368
+eval,100000,skill_actions,distraction,42,15368
+eval,100000,skill_actions,terror,41,15368
+eval,100000,skill_actions,power up,33,15368
+eval,100000,skill_actions,defend,33,15368
+eval,100000,skill_actions,sticky,32,15368
+eval,100000,skill_actions,curse,10,15368
+eval,100000,skill_actions,afterimage,5,15368
+eval,100000,skill_actions,acceleration,4,15368
+eval,100000,skill_actions,meditation,2,15368
+eval,100000,skill_casts,wolf fang,759,5139
+eval,100000,skill_casts,skull dagger,630,5139
+eval,100000,skill_casts,thunder,599,5139
+eval,100000,skill_casts,elemental orb,345,5139
+eval,100000,skill_casts,soul strike,309,5139
+eval,100000,skill_casts,pierce,287,5139
+eval,100000,skill_casts,flesh explosion,281,5139
+eval,100000,skill_casts,drain,280,5139
+eval,100000,skill_casts,whisker needle,267,5139
+eval,100000,skill_casts,kiss,253,5139
+eval,100000,skill_casts,shooting star,235,5139
+eval,100000,skill_casts,magic arrow,233,5139
+eval,100000,skill_casts,double strike,213,5139
+eval,100000,skill_casts,fast claw,116,5139
+eval,100000,skill_casts,counter,97,5139
+eval,100000,skill_casts,sacrifice,56,5139
+eval,100000,skill_casts,distraction,37,5139
+eval,100000,skill_casts,terror,34,5139
+eval,100000,skill_casts,power up,32,5139
+eval,100000,skill_casts,defend,30,5139
+eval,100000,skill_casts,sticky,26,5139
+eval,100000,skill_casts,curse,10,5139
+eval,100000,skill_casts,afterimage,5,5139
+eval,100000,skill_casts,acceleration,3,5139
+eval,100000,skill_casts,meditation,2,5139
+eval,125000,combat_actions,slot_1,3152,5856
+eval,125000,combat_actions,slot_3,1680,5856
+eval,125000,combat_actions,slot_2,607,5856
+eval,125000,combat_actions,slot_4,340,5856
+eval,125000,combat_actions,sacrifice,77,5856
+eval,125000,reward_actions,Potion,1359,1571
+eval,125000,reward_actions,Initialize,205,1571
+eval,125000,reward_actions,Stat,7,1571
+eval,125000,skill_actions,wolf fang,1168,5856
+eval,125000,skill_actions,skull dagger,1120,5856
+eval,125000,skill_actions,thunder,864,5856
+eval,125000,skill_actions,elemental orb,287,5856
+eval,125000,skill_actions,whisker needle,228,5856
+eval,125000,skill_actions,soul strike,226,5856
+eval,125000,skill_actions,pierce,219,5856
+eval,125000,skill_actions,shooting star,215,5856
+eval,125000,skill_actions,flesh explosion,213,5856
+eval,125000,skill_actions,double strike,212,5856
+eval,125000,skill_actions,kiss,191,5856
+eval,125000,skill_actions,magic arrow,176,5856
+eval,125000,skill_actions,drain,140,5856
+eval,125000,skill_actions,fast claw,101,5856
+eval,125000,skill_actions,counter,79,5856
+eval,125000,skill_actions,sacrifice,77,5856
+eval,125000,skill_actions,afterimage,59,5856
+eval,125000,skill_actions,power up,49,5856
+eval,125000,skill_actions,distraction,47,5856
+eval,125000,skill_actions,terror,43,5856
+eval,125000,skill_actions,curse,32,5856
+eval,125000,skill_actions,meditation,31,5856
+eval,125000,skill_actions,defend,26,5856
+eval,125000,skill_actions,acceleration,23,5856
+eval,125000,skill_actions,sticky,16,5856
+eval,125000,skill_actions,weakness,14,5856
+eval,125000,skill_casts,wolf fang,1088,5551
+eval,125000,skill_casts,skull dagger,1080,5551
+eval,125000,skill_casts,thunder,836,5551
+eval,125000,skill_casts,elemental orb,275,5551
+eval,125000,skill_casts,whisker needle,219,5551
+eval,125000,skill_casts,pierce,210,5551
+eval,125000,skill_casts,soul strike,209,5551
+eval,125000,skill_casts,shooting star,206,5551
+eval,125000,skill_casts,double strike,202,5551
+eval,125000,skill_casts,flesh explosion,201,5551
+eval,125000,skill_casts,kiss,186,5551
+eval,125000,skill_casts,magic arrow,161,5551
+eval,125000,skill_casts,drain,132,5551
+eval,125000,skill_casts,fast claw,96,5551
+eval,125000,skill_casts,counter,70,5551
+eval,125000,skill_casts,sacrifice,62,5551
+eval,125000,skill_casts,afterimage,59,5551
+eval,125000,skill_casts,power up,48,5551
+eval,125000,skill_casts,distraction,43,5551
+eval,125000,skill_casts,terror,37,5551
+eval,125000,skill_casts,meditation,31,5551
+eval,125000,skill_casts,curse,28,5551
+eval,125000,skill_casts,defend,25,5551
+eval,125000,skill_casts,acceleration,18,5551
+eval,125000,skill_casts,sticky,16,5551
+eval,125000,skill_casts,weakness,13,5551
+eval,150000,combat_actions,slot_1,1999,3947
+eval,150000,combat_actions,slot_3,1041,3947
+eval,150000,combat_actions,slot_2,491,3947
+eval,150000,combat_actions,slot_4,295,3947
+eval,150000,combat_actions,sacrifice,121,3947
+eval,150000,reward_actions,Potion,1020,1132
+eval,150000,reward_actions,Initialize,105,1132
+eval,150000,reward_actions,Stat,7,1132
+eval,150000,skill_actions,wolf fang,813,3947
+eval,150000,skill_actions,skull dagger,612,3947
+eval,150000,skill_actions,thunder,574,3947
+eval,150000,skill_actions,soul strike,187,3947
+eval,150000,skill_actions,elemental orb,180,3947
+eval,150000,skill_actions,whisker needle,170,3947
+eval,150000,skill_actions,kiss,147,3947
+eval,150000,skill_actions,shooting star,135,3947
+eval,150000,skill_actions,pierce,131,3947
+eval,150000,skill_actions,double strike,126,3947
+eval,150000,skill_actions,magic arrow,125,3947
+eval,150000,skill_actions,sacrifice,121,3947
+eval,150000,skill_actions,flesh explosion,111,3947
+eval,150000,skill_actions,drain,91,3947
+eval,150000,skill_actions,fast claw,68,3947
+eval,150000,skill_actions,counter,61,3947
+eval,150000,skill_actions,afterimage,48,3947
+eval,150000,skill_actions,distraction,38,3947
+eval,150000,skill_actions,meditation,36,3947
+eval,150000,skill_actions,curse,32,3947
+eval,150000,skill_actions,power up,31,3947
+eval,150000,skill_actions,terror,28,3947
+eval,150000,skill_actions,acceleration,26,3947
+eval,150000,skill_actions,defend,26,3947
+eval,150000,skill_actions,sticky,16,3947
+eval,150000,skill_actions,weakness,14,3947
+eval,150000,skill_casts,wolf fang,749,3728
+eval,150000,skill_casts,skull dagger,605,3728
+eval,150000,skill_casts,thunder,567,3728
+eval,150000,skill_casts,soul strike,173,3728
+eval,150000,skill_casts,elemental orb,168,3728
+eval,150000,skill_casts,whisker needle,164,3728
+eval,150000,skill_casts,kiss,142,3728
+eval,150000,skill_casts,shooting star,129,3728
+eval,150000,skill_casts,pierce,122,3728
+eval,150000,skill_casts,double strike,117,3728
+eval,150000,skill_casts,magic arrow,112,3728
+eval,150000,skill_casts,flesh explosion,110,3728
+eval,150000,skill_casts,sacrifice,91,3728
+eval,150000,skill_casts,drain,85,3728
+eval,150000,skill_casts,fast claw,63,3728
+eval,150000,skill_casts,counter,56,3728
+eval,150000,skill_casts,afterimage,48,3728
+eval,150000,skill_casts,meditation,36,3728
+eval,150000,skill_casts,distraction,34,3728
+eval,150000,skill_casts,power up,30,3728
+eval,150000,skill_casts,curse,28,3728
+eval,150000,skill_casts,terror,28,3728
+eval,150000,skill_casts,defend,25,3728
+eval,150000,skill_casts,acceleration,19,3728
+eval,150000,skill_casts,sticky,14,3728
+eval,150000,skill_casts,weakness,13,3728
+eval,175000,combat_actions,slot_1,2024,3624
+eval,175000,combat_actions,slot_3,804,3624
+eval,175000,combat_actions,slot_2,589,3624
+eval,175000,combat_actions,slot_4,134,3624
+eval,175000,combat_actions,sacrifice,73,3624
+eval,175000,reward_actions,Potion,969,1123
+eval,175000,reward_actions,Initialize,140,1123
+eval,175000,reward_actions,Exchange,12,1123
+eval,175000,reward_actions,Stat,2,1123
+eval,175000,skill_actions,wolf fang,729,3624
+eval,175000,skill_actions,thunder,688,3624
+eval,175000,skill_actions,skull dagger,607,3624
+eval,175000,skill_actions,soul strike,173,3624
+eval,175000,skill_actions,whisker needle,162,3624
+eval,175000,skill_actions,elemental orb,139,3624
+eval,175000,skill_actions,shooting star,137,3624
+eval,175000,skill_actions,pierce,125,3624
+eval,175000,skill_actions,kiss,112,3624
+eval,175000,skill_actions,double strike,104,3624
+eval,175000,skill_actions,drain,101,3624
+eval,175000,skill_actions,magic arrow,96,3624
+eval,175000,skill_actions,flesh explosion,90,3624
+eval,175000,skill_actions,fast claw,89,3624
+eval,175000,skill_actions,sacrifice,73,3624
+eval,175000,skill_actions,counter,65,3624
+eval,175000,skill_actions,afterimage,37,3624
+eval,175000,skill_actions,defend,23,3624
+eval,175000,skill_actions,power up,21,3624
+eval,175000,skill_actions,sticky,15,3624
+eval,175000,skill_actions,weakness,13,3624
+eval,175000,skill_actions,meditation,13,3624
+eval,175000,skill_actions,curse,9,3624
+eval,175000,skill_actions,distraction,2,3624
+eval,175000,skill_actions,terror,1,3624
+eval,175000,skill_casts,thunder,683,3435
+eval,175000,skill_casts,wolf fang,664,3435
+eval,175000,skill_casts,skull dagger,602,3435
+eval,175000,skill_casts,soul strike,164,3435
+eval,175000,skill_casts,whisker needle,158,3435
+eval,175000,skill_casts,shooting star,133,3435
+eval,175000,skill_casts,elemental orb,126,3435
+eval,175000,skill_casts,pierce,115,3435
+eval,175000,skill_casts,kiss,106,3435
+eval,175000,skill_casts,double strike,103,3435
+eval,175000,skill_casts,drain,98,3435
+eval,175000,skill_casts,magic arrow,93,3435
+eval,175000,skill_casts,fast claw,86,3435
+eval,175000,skill_casts,flesh explosion,82,3435
+eval,175000,skill_casts,sacrifice,53,3435
+eval,175000,skill_casts,counter,48,3435
+eval,175000,skill_casts,afterimage,36,3435
+eval,175000,skill_casts,defend,20,3435
+eval,175000,skill_casts,power up,19,3435
+eval,175000,skill_casts,sticky,14,3435
+eval,175000,skill_casts,weakness,12,3435
+eval,175000,skill_casts,meditation,12,3435
+eval,175000,skill_casts,curse,7,3435
+eval,175000,skill_casts,distraction,1,3435
+eval,200000,combat_actions,slot_1,2539,4875
+eval,200000,combat_actions,slot_3,944,4875
+eval,200000,combat_actions,slot_2,702,4875
+eval,200000,combat_actions,sacrifice,510,4875
+eval,200000,combat_actions,slot_4,180,4875
+eval,200000,reward_actions,Potion,1258,1423
+eval,200000,reward_actions,Initialize,151,1423
+eval,200000,reward_actions,Exchange,12,1423
+eval,200000,reward_actions,Stat,2,1423
+eval,200000,skill_actions,wolf fang,963,4875
+eval,200000,skill_actions,thunder,792,4875
+eval,200000,skill_actions,skull dagger,784,4875
+eval,200000,skill_actions,sacrifice,510,4875
+eval,200000,skill_actions,elemental orb,187,4875
+eval,200000,skill_actions,whisker needle,179,4875
+eval,200000,skill_actions,soul strike,174,4875
+eval,200000,skill_actions,flesh explosion,167,4875
+eval,200000,skill_actions,shooting star,158,4875
+eval,200000,skill_actions,kiss,141,4875
+eval,200000,skill_actions,pierce,138,4875
+eval,200000,skill_actions,drain,120,4875
+eval,200000,skill_actions,fast claw,108,4875
+eval,200000,skill_actions,magic arrow,107,4875
+eval,200000,skill_actions,double strike,102,4875
+eval,200000,skill_actions,counter,65,4875
+eval,200000,skill_actions,power up,39,4875
+eval,200000,skill_actions,afterimage,33,4875
+eval,200000,skill_actions,defend,23,4875
+eval,200000,skill_actions,acceleration,20,4875
+eval,200000,skill_actions,meditation,19,4875
+eval,200000,skill_actions,sticky,14,4875
+eval,200000,skill_actions,curse,12,4875
+eval,200000,skill_actions,weakness,10,4875
+eval,200000,skill_actions,distraction,10,4875
+eval,200000,skill_casts,wolf fang,873,4632
+eval,200000,skill_casts,thunder,778,4632
+eval,200000,skill_casts,skull dagger,764,4632
+eval,200000,skill_casts,sacrifice,482,4632
+eval,200000,skill_casts,elemental orb,178,4632
+eval,200000,skill_casts,whisker needle,176,4632
+eval,200000,skill_casts,soul strike,164,4632
+eval,200000,skill_casts,flesh explosion,154,4632
+eval,200000,skill_casts,shooting star,154,4632
+eval,200000,skill_casts,pierce,132,4632
+eval,200000,skill_casts,kiss,131,4632
+eval,200000,skill_casts,drain,118,4632
+eval,200000,skill_casts,fast claw,105,4632
+eval,200000,skill_casts,magic arrow,103,4632
+eval,200000,skill_casts,double strike,100,4632
+eval,200000,skill_casts,counter,49,4632
+eval,200000,skill_casts,power up,38,4632
+eval,200000,skill_casts,afterimage,32,4632
+eval,200000,skill_casts,acceleration,20,4632
+eval,200000,skill_casts,defend,20,4632
+eval,200000,skill_casts,meditation,17,4632
+eval,200000,skill_casts,sticky,14,4632
+eval,200000,skill_casts,weakness,10,4632
+eval,200000,skill_casts,distraction,10,4632
+eval,200000,skill_casts,curse,10,4632
+train,25000,combat_actions,slot_1,391710,937814
+train,25000,combat_actions,slot_2,229654,937814
+train,25000,combat_actions,slot_3,206923,937814
+train,25000,combat_actions,slot_4,56189,937814
+train,25000,combat_actions,sacrifice,53338,937814
+train,25000,reward_actions,Potion,227017,253411
+train,25000,reward_actions,Initialize,25638,253411
+train,25000,reward_actions,Stat,536,253411
+train,25000,reward_actions,Exchange,204,253411
+train,25000,reward_actions,Gold,16,253411
+train,25000,skill_actions,wolf fang,138187,937814
+train,25000,skill_actions,skull dagger,129773,937814
+train,25000,skill_actions,thunder,123484,937814
+train,25000,skill_actions,sacrifice,53338,937814
+train,25000,skill_actions,counter,50072,937814
+train,25000,skill_actions,whisker needle,39945,937814
+train,25000,skill_actions,elemental orb,38607,937814
+train,25000,skill_actions,soul strike,37627,937814
+train,25000,skill_actions,drain,35853,937814
+train,25000,skill_actions,shooting star,35460,937814
+train,25000,skill_actions,fast claw,35246,937814
+train,25000,skill_actions,magic arrow,34206,937814
+train,25000,skill_actions,double strike,34026,937814
+train,25000,skill_actions,kiss,33971,937814
+train,25000,skill_actions,flesh explosion,31920,937814
+train,25000,skill_actions,pierce,29068,937814
+train,25000,skill_actions,power up,12413,937814
+train,25000,skill_actions,afterimage,10534,937814
+train,25000,skill_actions,defend,8517,937814
+train,25000,skill_actions,meditation,5028,937814
+train,25000,skill_actions,acceleration,3568,937814
+train,25000,skill_actions,terror,3342,937814
+train,25000,skill_actions,curse,3279,937814
+train,25000,skill_actions,weakness,3269,937814
+train,25000,skill_actions,sticky,3152,937814
+train,25000,skill_actions,distraction,3094,937814
+train,25000,skill_actions,despair,47,937814
+train,25000,skill_actions,recovery,44,937814
+train,25000,skill_actions,plague,40,937814
+train,25000,skill_actions,paralyze,35,937814
+train,25000,skill_actions,release,33,937814
+train,25000,skill_actions,bonemerang,27,937814
+train,25000,skill_actions,firebird,24,937814
+train,25000,skill_actions,heal,24,937814
+train,25000,skill_actions,tie up,24,937814
+train,25000,skill_actions,fracture,24,937814
+train,25000,skill_actions,molt,23,937814
+train,25000,skill_actions,undead missile,22,937814
+train,25000,skill_actions,fog,19,937814
+train,25000,skill_actions,regenerate,18,937814
+train,25000,skill_actions,jiujitsu,18,937814
+train,25000,skill_actions,tiger claw,18,937814
+train,25000,skill_actions,battojutsu,17,937814
+train,25000,skill_actions,spider web,16,937814
+train,25000,skill_actions,icebolt,16,937814
+train,25000,skill_actions,typereverse,16,937814
+train,25000,skill_actions,mimic,16,937814
+train,25000,skill_actions,flash beak,16,937814
+train,25000,skill_actions,tornado,14,937814
+train,25000,skill_actions,bullseye,14,937814
+train,25000,skill_actions,immune,14,937814
+train,25000,skill_actions,fireball,13,937814
+train,25000,skill_actions,acid stone,12,937814
+train,25000,skill_actions,sturdy kick,12,937814
+train,25000,skill_actions,rigid,12,937814
+train,25000,skill_actions,dinolize,11,937814
+train,25000,skill_actions,will of wisp,11,937814
+train,25000,skill_actions,discharge,11,937814
+train,25000,skill_actions,poison tail,10,937814
+train,25000,skill_actions,hybrid attack,10,937814
+train,25000,skill_actions,sap screw,10,937814
+train,25000,skill_actions,deathscythe,10,937814
+train,25000,skill_actions,recoilless,9,937814
+train,25000,skill_actions,blessed horn,9,937814
+train,25000,skill_actions,magician hat,9,937814
+train,25000,skill_actions,sing,9,937814
+train,25000,skill_actions,judgement,8,937814
+train,25000,skill_actions,stinger,8,937814
+train,25000,skill_actions,blindfist,8,937814
+train,25000,skill_actions,shadowstar,7,937814
+train,25000,skill_actions,heart of lion,7,937814
+train,25000,skill_actions,pumpkin seed,7,937814
+train,25000,skill_actions,veilguard,7,937814
+train,25000,skill_actions,flame wheel,6,937814
+train,25000,skill_actions,rage,6,937814
+train,25000,skill_actions,shield slam,6,937814
+train,25000,skill_actions,gold rush,5,937814
+train,25000,skill_actions,blood leech,5,937814
+train,25000,skill_actions,earth castle,4,937814
+train,25000,skill_actions,revive,4,937814
+train,25000,skill_actions,aim,4,937814
+train,25000,skill_actions,trick or treat,4,937814
+train,25000,skill_actions,imitation,2,937814
+train,25000,skill_casts,wolf fang,126569,874617
+train,25000,skill_casts,skull dagger,125989,874617
+train,25000,skill_casts,thunder,120669,874617
+train,25000,skill_casts,sacrifice,47026,874617
+train,25000,skill_casts,whisker needle,38798,874617
+train,25000,skill_casts,elemental orb,37497,874617
+train,25000,skill_casts,soul strike,36364,874617
+train,25000,skill_casts,drain,34594,874617
+train,25000,skill_casts,shooting star,34548,874617
+train,25000,skill_casts,fast claw,34406,874617
+train,25000,skill_casts,magic arrow,33074,874617
+train,25000,skill_casts,double strike,32960,874617
+train,25000,skill_casts,kiss,32771,874617
+train,25000,skill_casts,flesh explosion,30809,874617
+train,25000,skill_casts,pierce,28126,874617
+train,25000,skill_casts,counter,27135,874617
+train,25000,skill_casts,power up,11853,874617
+train,25000,skill_casts,afterimage,10203,874617
+train,25000,skill_casts,defend,8104,874617
+train,25000,skill_casts,meditation,4626,874617
+train,25000,skill_casts,acceleration,3275,874617
+train,25000,skill_casts,terror,2999,874617
+train,25000,skill_casts,weakness,2964,874617
+train,25000,skill_casts,curse,2952,874617
+train,25000,skill_casts,sticky,2865,874617
+train,25000,skill_casts,distraction,2812,874617
+train,25000,skill_casts,recovery,35,874617
+train,25000,skill_casts,plague,32,874617
+train,25000,skill_casts,despair,31,874617
+train,25000,skill_casts,release,26,874617
+train,25000,skill_casts,paralyze,26,874617
+train,25000,skill_casts,bonemerang,22,874617
+train,25000,skill_casts,molt,20,874617
+train,25000,skill_casts,undead missile,20,874617
+train,25000,skill_casts,regenerate,18,874617
+train,25000,skill_casts,firebird,17,874617
+train,25000,skill_casts,tie up,17,874617
+train,25000,skill_casts,flash beak,16,874617
+train,25000,skill_casts,heal,16,874617
+train,25000,skill_casts,tiger claw,16,874617
+train,25000,skill_casts,typereverse,15,874617
+train,25000,skill_casts,fracture,14,874617
+train,25000,skill_casts,icebolt,13,874617
+train,25000,skill_casts,jiujitsu,13,874617
+train,25000,skill_casts,battojutsu,13,874617
+train,25000,skill_casts,tornado,12,874617
+train,25000,skill_casts,spider web,12,874617
+train,25000,skill_casts,sturdy kick,10,874617
+train,25000,skill_casts,bullseye,10,874617
+train,25000,skill_casts,fog,10,874617
+train,25000,skill_casts,poison tail,9,874617
+train,25000,skill_casts,dinolize,9,874617
+train,25000,skill_casts,will of wisp,9,874617
+train,25000,skill_casts,hybrid attack,9,874617
+train,25000,skill_casts,immune,9,874617
+train,25000,skill_casts,discharge,9,874617
+train,25000,skill_casts,recoilless,8,874617
+train,25000,skill_casts,blessed horn,8,874617
+train,25000,skill_casts,fireball,8,874617
+train,25000,skill_casts,judgement,7,874617
+train,25000,skill_casts,shadowstar,7,874617
+train,25000,skill_casts,rigid,7,874617
+train,25000,skill_casts,deathscythe,7,874617
+train,25000,skill_casts,stinger,7,874617
+train,25000,skill_casts,veilguard,7,874617
+train,25000,skill_casts,acid stone,6,874617
+train,25000,skill_casts,pumpkin seed,6,874617
+train,25000,skill_casts,mimic,6,874617
+train,25000,skill_casts,shield slam,6,874617
+train,25000,skill_casts,sap screw,5,874617
+train,25000,skill_casts,blindfist,5,874617
+train,25000,skill_casts,sing,5,874617
+train,25000,skill_casts,rage,5,874617
+train,25000,skill_casts,flame wheel,4,874617
+train,25000,skill_casts,earth castle,4,874617
+train,25000,skill_casts,heart of lion,4,874617
+train,25000,skill_casts,gold rush,4,874617
+train,25000,skill_casts,magician hat,4,874617
+train,25000,skill_casts,revive,3,874617
+train,25000,skill_casts,trick or treat,3,874617
+train,25000,skill_casts,imitation,2,874617
+train,25000,skill_casts,aim,2,874617
+train,25000,skill_casts,blood leech,1,874617
+train,50000,combat_actions,slot_1,378053,872984
+train,50000,combat_actions,slot_3,192677,872984
+train,50000,combat_actions,slot_2,163846,872984
+train,50000,combat_actions,slot_4,72898,872984
+train,50000,combat_actions,sacrifice,65507,872984
+train,50000,combat_actions,slot_5,3,872984
+train,50000,reward_actions,Potion,218336,237464
+train,50000,reward_actions,Initialize,18668,237464
+train,50000,reward_actions,Stat,433,237464
+train,50000,reward_actions,Gold,21,237464
+train,50000,reward_actions,Exchange,6,237464
+train,50000,skill_actions,wolf fang,133240,872984
+train,50000,skill_actions,skull dagger,132150,872984
+train,50000,skill_actions,thunder,109636,872984
+train,50000,skill_actions,sacrifice,65507,872984
+train,50000,skill_actions,counter,62790,872984
+train,50000,skill_actions,soul strike,31113,872984
+train,50000,skill_actions,whisker needle,30536,872984
+train,50000,skill_actions,elemental orb,27946,872984
+train,50000,skill_actions,kiss,27721,872984
+train,50000,skill_actions,drain,27332,872984
+train,50000,skill_actions,shooting star,26835,872984
+train,50000,skill_actions,fast claw,25709,872984
+train,50000,skill_actions,magic arrow,25387,872984
+train,50000,skill_actions,flesh explosion,23859,872984
+train,50000,skill_actions,double strike,23722,872984
+train,50000,skill_actions,pierce,21716,872984
+train,50000,skill_actions,power up,15648,872984
+train,50000,skill_actions,defend,14115,872984
+train,50000,skill_actions,afterimage,12341,872984
+train,50000,skill_actions,meditation,6995,872984
+train,50000,skill_actions,acceleration,5450,872984
+train,50000,skill_actions,weakness,4427,872984
+train,50000,skill_actions,sticky,3874,872984
+train,50000,skill_actions,curse,3649,872984
+train,50000,skill_actions,terror,3452,872984
+train,50000,skill_actions,distraction,3406,872984
+train,50000,skill_actions,mimic,239,872984
+train,50000,skill_actions,plague,218,872984
+train,50000,skill_actions,recovery,192,872984
+train,50000,skill_actions,heal,189,872984
+train,50000,skill_actions,bonemerang,165,872984
+train,50000,skill_actions,jiujitsu,162,872984
+train,50000,skill_actions,fog,159,872984
+train,50000,skill_actions,undead missile,153,872984
+train,50000,skill_actions,tiger claw,149,872984
+train,50000,skill_actions,icebolt,137,872984
+train,50000,skill_actions,molt,135,872984
+train,50000,skill_actions,sturdy kick,134,872984
+train,50000,skill_actions,rigid,130,872984
+train,50000,skill_actions,despair,126,872984
+train,50000,skill_actions,paralyze,123,872984
+train,50000,skill_actions,sing,83,872984
+train,50000,skill_actions,blood leech,82,872984
+train,50000,skill_actions,dinolize,82,872984
+train,50000,skill_actions,regenerate,81,872984
+train,50000,skill_actions,release,80,872984
+train,50000,skill_actions,blessed horn,80,872984
+train,50000,skill_actions,fireball,75,872984
+train,50000,skill_actions,sap screw,74,872984
+train,50000,skill_actions,flash beak,66,872984
+train,50000,skill_actions,will of wisp,65,872984
+train,50000,skill_actions,battojutsu,64,872984
+train,50000,skill_actions,acid stone,61,872984
+train,50000,skill_actions,deathscythe,60,872984
+train,50000,skill_actions,stinger,60,872984
+train,50000,skill_actions,tie up,58,872984
+train,50000,skill_actions,pumpkin seed,57,872984
+train,50000,skill_actions,rage,57,872984
+train,50000,skill_actions,shield slam,55,872984
+train,50000,skill_actions,recoilless,50,872984
+train,50000,skill_actions,discharge,50,872984
+train,50000,skill_actions,poison tail,49,872984
+train,50000,skill_actions,hybrid attack,43,872984
+train,50000,skill_actions,tornado,43,872984
+train,50000,skill_actions,spider web,43,872984
+train,50000,skill_actions,typereverse,42,872984
+train,50000,skill_actions,fracture,41,872984
+train,50000,skill_actions,revive,38,872984
+train,50000,skill_actions,bullseye,38,872984
+train,50000,skill_actions,magician hat,37,872984
+train,50000,skill_actions,gold rush,34,872984
+train,50000,skill_actions,veilguard,33,872984
+train,50000,skill_actions,judgement,33,872984
+train,50000,skill_actions,firebird,32,872984
+train,50000,skill_actions,aim,27,872984
+train,50000,skill_actions,heart of lion,26,872984
+train,50000,skill_actions,flame wheel,23,872984
+train,50000,skill_actions,shadowstar,23,872984
+train,50000,skill_actions,trick or treat,23,872984
+train,50000,skill_actions,immune,22,872984
+train,50000,skill_actions,blindfist,16,872984
+train,50000,skill_actions,earth castle,9,872984
+train,50000,skill_actions,imitation,2,872984
+train,50000,skill_casts,skull dagger,130031,792989
+train,50000,skill_casts,wolf fang,123727,792989
+train,50000,skill_casts,thunder,108106,792989
+train,50000,skill_casts,sacrifice,57008,792989
+train,50000,skill_casts,soul strike,29934,792989
+train,50000,skill_casts,whisker needle,29480,792989
+train,50000,skill_casts,elemental orb,26877,792989
+train,50000,skill_casts,kiss,26566,792989
+train,50000,skill_casts,drain,26204,792989
+train,50000,skill_casts,shooting star,25979,792989
+train,50000,skill_casts,fast claw,24903,792989
+train,50000,skill_casts,magic arrow,24335,792989
+train,50000,skill_casts,flesh explosion,22840,792989
+train,50000,skill_casts,double strike,22784,792989
+train,50000,skill_casts,pierce,20827,792989
+train,50000,skill_casts,counter,20481,792989
+train,50000,skill_casts,power up,15074,792989
+train,50000,skill_casts,defend,13453,792989
+train,50000,skill_casts,afterimage,11929,792989
+train,50000,skill_casts,meditation,6439,792989
+train,50000,skill_casts,acceleration,5022,792989
+train,50000,skill_casts,weakness,4047,792989
+train,50000,skill_casts,sticky,3550,792989
+train,50000,skill_casts,curse,3314,792989
+train,50000,skill_casts,distraction,3135,792989
+train,50000,skill_casts,terror,3129,792989
+train,50000,skill_casts,mimic,211,792989
+train,50000,skill_casts,plague,189,792989
+train,50000,skill_casts,recovery,174,792989
+train,50000,skill_casts,heal,161,792989
+train,50000,skill_casts,bonemerang,153,792989
+train,50000,skill_casts,jiujitsu,149,792989
+train,50000,skill_casts,fog,143,792989
+train,50000,skill_casts,undead missile,135,792989
+train,50000,skill_casts,tiger claw,131,792989
+train,50000,skill_casts,icebolt,124,792989
+train,50000,skill_casts,rigid,118,792989
+train,50000,skill_casts,sturdy kick,117,792989
+train,50000,skill_casts,despair,110,792989
+train,50000,skill_casts,paralyze,110,792989
+train,50000,skill_casts,molt,105,792989
+train,50000,skill_casts,sing,74,792989
+train,50000,skill_casts,blessed horn,72,792989
+train,50000,skill_casts,dinolize,71,792989
+train,50000,skill_casts,release,69,792989
+train,50000,skill_casts,flash beak,69,792989
+train,50000,skill_casts,blood leech,68,792989
+train,50000,skill_casts,regenerate,67,792989
+train,50000,skill_casts,fireball,63,792989
+train,50000,skill_casts,sap screw,60,792989
+train,50000,skill_casts,tie up,55,792989
+train,50000,skill_casts,battojutsu,54,792989
+train,50000,skill_casts,deathscythe,51,792989
+train,50000,skill_casts,shield slam,50,792989
+train,50000,skill_casts,rage,50,792989
+train,50000,skill_casts,acid stone,49,792989
+train,50000,skill_casts,pumpkin seed,48,792989
+train,50000,skill_casts,stinger,48,792989
+train,50000,skill_casts,will of wisp,48,792989
+train,50000,skill_casts,hybrid attack,41,792989
+train,50000,skill_casts,poison tail,40,792989
+train,50000,skill_casts,typereverse,38,792989
+train,50000,skill_casts,spider web,36,792989
+train,50000,skill_casts,revive,35,792989
+train,50000,skill_casts,tornado,34,792989
+train,50000,skill_casts,discharge,33,792989
+train,50000,skill_casts,fracture,33,792989
+train,50000,skill_casts,recoilless,31,792989
+train,50000,skill_casts,gold rush,31,792989
+train,50000,skill_casts,judgement,28,792989
+train,50000,skill_casts,bullseye,28,792989
+train,50000,skill_casts,magician hat,27,792989
+train,50000,skill_casts,firebird,25,792989
+train,50000,skill_casts,veilguard,22,792989
+train,50000,skill_casts,heart of lion,21,792989
+train,50000,skill_casts,trick or treat,21,792989
+train,50000,skill_casts,aim,20,792989
+train,50000,skill_casts,immune,18,792989
+train,50000,skill_casts,flame wheel,18,792989
+train,50000,skill_casts,shadowstar,17,792989
+train,50000,skill_casts,blindfist,15,792989
+train,50000,skill_casts,earth castle,5,792989
+train,50000,skill_casts,imitation,2,792989
+train,75000,combat_actions,slot_1,357510,925132
+train,75000,combat_actions,sacrifice,194837,925132
+train,75000,combat_actions,slot_3,169995,925132
+train,75000,combat_actions,slot_2,151177,925132
+train,75000,combat_actions,slot_4,51613,925132
+train,75000,reward_actions,Potion,200753,223478
+train,75000,reward_actions,Initialize,19647,223478
+train,75000,reward_actions,Stat,1962,223478
+train,75000,reward_actions,Exchange,726,223478
+train,75000,reward_actions,Gold,390,223478
+train,75000,skill_actions,sacrifice,194837,925132
+train,75000,skill_actions,wolf fang,127475,925132
+train,75000,skill_actions,skull dagger,116233,925132
+train,75000,skill_actions,thunder,113809,925132
+train,75000,skill_actions,soul strike,30969,925132
+train,75000,skill_actions,whisker needle,30783,925132
+train,75000,skill_actions,fast claw,28533,925132
+train,75000,skill_actions,elemental orb,27901,925132
+train,75000,skill_actions,kiss,27093,925132
+train,75000,skill_actions,drain,26810,925132
+train,75000,skill_actions,magic arrow,26677,925132
+train,75000,skill_actions,shooting star,26335,925132
+train,75000,skill_actions,double strike,25928,925132
+train,75000,skill_actions,flesh explosion,24911,925132
+train,75000,skill_actions,pierce,23654,925132
+train,75000,skill_actions,counter,22492,925132
+train,75000,skill_actions,power up,11651,925132
+train,75000,skill_actions,afterimage,8029,925132
+train,75000,skill_actions,defend,7872,925132
+train,75000,skill_actions,meditation,4093,925132
+train,75000,skill_actions,acceleration,3393,925132
+train,75000,skill_actions,weakness,3206,925132
+train,75000,skill_actions,curse,3167,925132
+train,75000,skill_actions,sticky,2854,925132
+train,75000,skill_actions,terror,2733,925132
+train,75000,skill_actions,distraction,2732,925132
+train,75000,skill_actions,paralyze,376,925132
+train,75000,skill_actions,recovery,186,925132
+train,75000,skill_actions,gold rush,115,925132
+train,75000,skill_actions,mimic,81,925132
+train,75000,skill_actions,sturdy kick,78,925132
+train,75000,skill_actions,shadowstar,46,925132
+train,75000,skill_actions,typereverse,31,925132
+train,75000,skill_actions,fracture,23,925132
+train,75000,skill_actions,magician hat,10,925132
+train,75000,skill_actions,earth castle,9,925132
+train,75000,skill_actions,rage,4,925132
+train,75000,skill_actions,recoilless,3,925132
+train,75000,skill_casts,sacrifice,169351,871493
+train,75000,skill_casts,wolf fang,117583,871493
+train,75000,skill_casts,skull dagger,114695,871493
+train,75000,skill_casts,thunder,112914,871493
+train,75000,skill_casts,soul strike,29905,871493
+train,75000,skill_casts,whisker needle,29657,871493
+train,75000,skill_casts,fast claw,27597,871493
+train,75000,skill_casts,elemental orb,26962,871493
+train,75000,skill_casts,kiss,26182,871493
+train,75000,skill_casts,drain,25814,871493
+train,75000,skill_casts,magic arrow,25638,871493
+train,75000,skill_casts,shooting star,25439,871493
+train,75000,skill_casts,double strike,25014,871493
+train,75000,skill_casts,flesh explosion,24085,871493
+train,75000,skill_casts,pierce,22935,871493
+train,75000,skill_casts,counter,19765,871493
+train,75000,skill_casts,power up,11289,871493
+train,75000,skill_casts,afterimage,7741,871493
+train,75000,skill_casts,defend,7541,871493
+train,75000,skill_casts,meditation,3769,871493
+train,75000,skill_casts,acceleration,3173,871493
+train,75000,skill_casts,weakness,2947,871493
+train,75000,skill_casts,curse,2912,871493
+train,75000,skill_casts,sticky,2647,871493
+train,75000,skill_casts,distraction,2556,871493
+train,75000,skill_casts,terror,2499,871493
+train,75000,skill_casts,paralyze,371,871493
+train,75000,skill_casts,recovery,178,871493
+train,75000,skill_casts,gold rush,101,871493
+train,75000,skill_casts,sturdy kick,72,871493
+train,75000,skill_casts,shadowstar,39,871493
+train,75000,skill_casts,typereverse,37,871493
+train,75000,skill_casts,mimic,34,871493
+train,75000,skill_casts,fracture,23,871493
+train,75000,skill_casts,magician hat,9,871493
+train,75000,skill_casts,earth castle,9,871493
+train,75000,skill_casts,rage,4,871493
+train,75000,skill_casts,recoilless,3,871493
+train,75000,skill_casts,bonemerang,1,871493
+train,75000,skill_casts,jiujitsu,1,871493
+train,75000,skill_casts,molt,1,871493
+train,100000,combat_actions,slot_1,343461,866520
+train,100000,combat_actions,slot_3,208517,866520
+train,100000,combat_actions,slot_2,197304,866520
+train,100000,combat_actions,slot_4,69816,866520
+train,100000,combat_actions,sacrifice,47383,866520
+train,100000,combat_actions,slot_5,39,866520
+train,100000,reward_actions,Potion,210611,236563
+train,100000,reward_actions,Initialize,20934,236563
+train,100000,reward_actions,Exchange,4339,236563
+train,100000,reward_actions,Stat,529,236563
+train,100000,reward_actions,Gold,150,236563
+train,100000,skill_actions,wolf fang,125350,866520
+train,100000,skill_actions,thunder,109301,866520
+train,100000,skill_actions,skull dagger,108212,866520
+train,100000,skill_actions,sacrifice,47383,866520
+train,100000,skill_actions,soul strike,37296,866520
+train,100000,skill_actions,whisker needle,36511,866520
+train,100000,skill_actions,kiss,35347,866520
+train,100000,skill_actions,drain,34415,866520
+train,100000,skill_actions,elemental orb,34333,866520
+train,100000,skill_actions,magic arrow,34136,866520
+train,100000,skill_actions,counter,33697,866520
+train,100000,skill_actions,fast claw,32796,866520
+train,100000,skill_actions,flesh explosion,32151,866520
+train,100000,skill_actions,double strike,31911,866520
+train,100000,skill_actions,shooting star,31611,866520
+train,100000,skill_actions,pierce,31522,866520
+train,100000,skill_actions,power up,15356,866520
+train,100000,skill_actions,defend,12915,866520
+train,100000,skill_actions,afterimage,8512,866520
+train,100000,skill_actions,meditation,5328,866520
+train,100000,skill_actions,acceleration,5045,866520
+train,100000,skill_actions,weakness,4901,866520
+train,100000,skill_actions,terror,4287,866520
+train,100000,skill_actions,sticky,4088,866520
+train,100000,skill_actions,curse,4060,866520
+train,100000,skill_actions,distraction,3745,866520
+train,100000,skill_actions,recovery,158,866520
+train,100000,skill_actions,plague,138,866520
+train,100000,skill_actions,paralyze,102,866520
+train,100000,skill_actions,tornado,95,866520
+train,100000,skill_actions,despair,90,866520
+train,100000,skill_actions,heal,89,866520
+train,100000,skill_actions,undead missile,87,866520
+train,100000,skill_actions,dinolize,87,866520
+train,100000,skill_actions,sap screw,82,866520
+train,100000,skill_actions,bonemerang,75,866520
+train,100000,skill_actions,firebird,68,866520
+train,100000,skill_actions,hybrid attack,65,866520
+train,100000,skill_actions,blessed horn,64,866520
+train,100000,skill_actions,molt,60,866520
+train,100000,skill_actions,discharge,56,866520
+train,100000,skill_actions,typereverse,49,866520
+train,100000,skill_actions,release,48,866520
+train,100000,skill_actions,icebolt,48,866520
+train,100000,skill_actions,recoilless,48,866520
+train,100000,skill_actions,tie up,47,866520
+train,100000,skill_actions,fog,44,866520
+train,100000,skill_actions,mimic,43,866520
+train,100000,skill_actions,jiujitsu,42,866520
+train,100000,skill_actions,rigid,36,866520
+train,100000,skill_actions,stinger,33,866520
+train,100000,skill_actions,veilguard,32,866520
+train,100000,skill_actions,poison tail,31,866520
+train,100000,skill_actions,fracture,29,866520
+train,100000,skill_actions,battojutsu,27,866520
+train,100000,skill_actions,acid stone,27,866520
+train,100000,skill_actions,gold rush,27,866520
+train,100000,skill_actions,heart of lion,26,866520
+train,100000,skill_actions,sturdy kick,25,866520
+train,100000,skill_actions,revive,25,866520
+train,100000,skill_actions,fireball,25,866520
+train,100000,skill_actions,judgement,25,866520
+train,100000,skill_actions,will of wisp,24,866520
+train,100000,skill_actions,deathscythe,24,866520
+train,100000,skill_actions,spider web,23,866520
+train,100000,skill_actions,immune,22,866520
+train,100000,skill_actions,flash beak,18,866520
+train,100000,skill_actions,tiger claw,17,866520
+train,100000,skill_actions,flame wheel,15,866520
+train,100000,skill_actions,blindfist,15,866520
+train,100000,skill_actions,regenerate,15,866520
+train,100000,skill_actions,blood leech,15,866520
+train,100000,skill_actions,rage,10,866520
+train,100000,skill_actions,aim,10,866520
+train,100000,skill_actions,shadowstar,9,866520
+train,100000,skill_actions,magician hat,9,866520
+train,100000,skill_actions,pumpkin seed,8,866520
+train,100000,skill_actions,sing,8,866520
+train,100000,skill_actions,shield slam,6,866520
+train,100000,skill_actions,bullseye,5,866520
+train,100000,skill_actions,imitation,2,866520
+train,100000,skill_actions,earth castle,2,866520
+train,100000,skill_actions,trick or treat,1,866520
+train,100000,skill_casts,wolf fang,115177,820813
+train,100000,skill_casts,thunder,106912,820813
+train,100000,skill_casts,skull dagger,105051,820813
+train,100000,skill_casts,sacrifice,39198,820813
+train,100000,skill_casts,soul strike,35940,820813
+train,100000,skill_casts,whisker needle,35361,820813
+train,100000,skill_casts,kiss,34050,820813
+train,100000,skill_casts,elemental orb,33201,820813
+train,100000,skill_casts,drain,33091,820813
+train,100000,skill_casts,magic arrow,32859,820813
+train,100000,skill_casts,fast claw,31694,820813
+train,100000,skill_casts,flesh explosion,30859,820813
+train,100000,skill_casts,double strike,30828,820813
+train,100000,skill_casts,shooting star,30533,820813
+train,100000,skill_casts,pierce,30429,820813
+train,100000,skill_casts,counter,29978,820813
+train,100000,skill_casts,power up,14737,820813
+train,100000,skill_casts,defend,12175,820813
+train,100000,skill_casts,afterimage,8115,820813
+train,100000,skill_casts,meditation,4904,820813
+train,100000,skill_casts,acceleration,4665,820813
+train,100000,skill_casts,weakness,4507,820813
+train,100000,skill_casts,terror,3882,820813
+train,100000,skill_casts,sticky,3705,820813
+train,100000,skill_casts,curse,3649,820813
+train,100000,skill_casts,distraction,3447,820813
+train,100000,skill_casts,recovery,134,820813
+train,100000,skill_casts,plague,119,820813
+train,100000,skill_casts,paralyze,88,820813
+train,100000,skill_casts,dinolize,83,820813
+train,100000,skill_casts,tornado,82,820813
+train,100000,skill_casts,undead missile,74,820813
+train,100000,skill_casts,heal,74,820813
+train,100000,skill_casts,sap screw,69,820813
+train,100000,skill_casts,despair,68,820813
+train,100000,skill_casts,hybrid attack,63,820813
+train,100000,skill_casts,bonemerang,56,820813
+train,100000,skill_casts,firebird,55,820813
+train,100000,skill_casts,blessed horn,53,820813
+train,100000,skill_casts,molt,52,820813
+train,100000,skill_casts,discharge,49,820813
+train,100000,skill_casts,typereverse,41,820813
+train,100000,skill_casts,recoilless,39,820813
+train,100000,skill_casts,tie up,37,820813
+train,100000,skill_casts,fog,36,820813
+train,100000,skill_casts,jiujitsu,36,820813
+train,100000,skill_casts,release,35,820813
+train,100000,skill_casts,icebolt,35,820813
+train,100000,skill_casts,stinger,28,820813
+train,100000,skill_casts,rigid,27,820813
+train,100000,skill_casts,mimic,26,820813
+train,100000,skill_casts,veilguard,26,820813
+train,100000,skill_casts,battojutsu,23,820813
+train,100000,skill_casts,acid stone,23,820813
+train,100000,skill_casts,fracture,23,820813
+train,100000,skill_casts,gold rush,23,820813
+train,100000,skill_casts,revive,22,820813
+train,100000,skill_casts,sturdy kick,20,820813
+train,100000,skill_casts,poison tail,20,820813
+train,100000,skill_casts,immune,19,820813
+train,100000,skill_casts,fireball,19,820813
+train,100000,skill_casts,heart of lion,18,820813
+train,100000,skill_casts,spider web,18,820813
+train,100000,skill_casts,deathscythe,16,820813
+train,100000,skill_casts,flash beak,15,820813
+train,100000,skill_casts,judgement,15,820813
+train,100000,skill_casts,will of wisp,13,820813
+train,100000,skill_casts,blood leech,13,820813
+train,100000,skill_casts,blindfist,11,820813
+train,100000,skill_casts,tiger claw,10,820813
+train,100000,skill_casts,flame wheel,10,820813
+train,100000,skill_casts,aim,9,820813
+train,100000,skill_casts,regenerate,9,820813
+train,100000,skill_casts,rage,8,820813
+train,100000,skill_casts,magician hat,5,820813
+train,100000,skill_casts,pumpkin seed,5,820813
+train,100000,skill_casts,sing,4,820813
+train,100000,skill_casts,shadowstar,3,820813
+train,100000,skill_casts,bullseye,3,820813
+train,100000,skill_casts,shield slam,2,820813
+train,100000,skill_casts,imitation,1,820813
+train,100000,skill_casts,earth castle,1,820813
+train,125000,combat_actions,slot_1,550915,1162713
+train,125000,combat_actions,slot_3,269903,1162713
+train,125000,combat_actions,slot_2,244920,1162713
+train,125000,combat_actions,slot_4,81064,1162713
+train,125000,combat_actions,sacrifice,15911,1162713
+train,125000,reward_actions,Potion,266620,303487
+train,125000,reward_actions,Initialize,35090,303487
+train,125000,reward_actions,Gold,745,303487
+train,125000,reward_actions,Stat,740,303487
+train,125000,reward_actions,Exchange,292,303487
+train,125000,skill_actions,skull dagger,191664,1162713
+train,125000,skill_actions,thunder,183710,1162713
+train,125000,skill_actions,wolf fang,175541,1162713
+train,125000,skill_actions,counter,59043,1162713
+train,125000,skill_actions,whisker needle,48477,1162713
+train,125000,skill_actions,soul strike,48281,1162713
+train,125000,skill_actions,elemental orb,45292,1162713
+train,125000,skill_actions,kiss,40937,1162713
+train,125000,skill_actions,fast claw,40734,1162713
+train,125000,skill_actions,double strike,40293,1162713
+train,125000,skill_actions,magic arrow,40128,1162713
+train,125000,skill_actions,shooting star,39229,1162713
+train,125000,skill_actions,drain,39024,1162713
+train,125000,skill_actions,pierce,36793,1162713
+train,125000,skill_actions,flesh explosion,36592,1162713
+train,125000,skill_actions,power up,16281,1162713
+train,125000,skill_actions,sacrifice,15911,1162713
+train,125000,skill_actions,defend,15292,1162713
+train,125000,skill_actions,afterimage,14337,1162713
+train,125000,skill_actions,acceleration,6008,1162713
+train,125000,skill_actions,meditation,5983,1162713
+train,125000,skill_actions,weakness,5080,1162713
+train,125000,skill_actions,terror,4621,1162713
+train,125000,skill_actions,curse,4610,1162713
+train,125000,skill_actions,distraction,4508,1162713
+train,125000,skill_actions,sticky,4344,1162713
+train,125000,skill_casts,skull dagger,185855,1090007
+train,125000,skill_casts,thunder,178673,1090007
+train,125000,skill_casts,wolf fang,164601,1090007
+train,125000,skill_casts,whisker needle,46629,1090007
+train,125000,skill_casts,soul strike,46110,1090007
+train,125000,skill_casts,elemental orb,43555,1090007
+train,125000,skill_casts,fast claw,39217,1090007
+train,125000,skill_casts,kiss,39015,1090007
+train,125000,skill_casts,double strike,38699,1090007
+train,125000,skill_casts,magic arrow,38449,1090007
+train,125000,skill_casts,shooting star,37611,1090007
+train,125000,skill_casts,drain,37156,1090007
+train,125000,skill_casts,pierce,35374,1090007
+train,125000,skill_casts,flesh explosion,34828,1090007
+train,125000,skill_casts,counter,34277,1090007
+train,125000,skill_casts,power up,15495,1090007
+train,125000,skill_casts,defend,14384,1090007
+train,125000,skill_casts,sacrifice,14250,1090007
+train,125000,skill_casts,afterimage,13926,1090007
+train,125000,skill_casts,acceleration,5467,1090007
+train,125000,skill_casts,meditation,5457,1090007
+train,125000,skill_casts,weakness,4620,1090007
+train,125000,skill_casts,curse,4200,1090007
+train,125000,skill_casts,terror,4111,1090007
+train,125000,skill_casts,distraction,4107,1090007
+train,125000,skill_casts,sticky,3941,1090007
+train,150000,combat_actions,slot_1,388729,907103
+train,150000,combat_actions,slot_3,206640,907103
+train,150000,combat_actions,slot_2,157425,907103
+train,150000,combat_actions,sacrifice,85467,907103
+train,150000,combat_actions,slot_4,68835,907103
+train,150000,combat_actions,slot_5,7,907103
+train,150000,reward_actions,Potion,218396,240908
+train,150000,reward_actions,Initialize,19416,240908
+train,150000,reward_actions,Stat,2680,240908
+train,150000,reward_actions,Gold,405,240908
+train,150000,reward_actions,Exchange,11,240908
+train,150000,skill_actions,wolf fang,140552,907103
+train,150000,skill_actions,skull dagger,123856,907103
+train,150000,skill_actions,thunder,123451,907103
+train,150000,skill_actions,sacrifice,85467,907103
+train,150000,skill_actions,counter,73376,907103
+train,150000,skill_actions,whisker needle,32512,907103
+train,150000,skill_actions,soul strike,30500,907103
+train,150000,skill_actions,elemental orb,29048,907103
+train,150000,skill_actions,double strike,25850,907103
+train,150000,skill_actions,fast claw,25535,907103
+train,150000,skill_actions,magic arrow,25488,907103
+train,150000,skill_actions,shooting star,25084,907103
+train,150000,skill_actions,flesh explosion,23705,907103
+train,150000,skill_actions,drain,22837,907103
+train,150000,skill_actions,pierce,22740,907103
+train,150000,skill_actions,kiss,22198,907103
+train,150000,skill_actions,afterimage,14895,907103
+train,150000,skill_actions,defend,14252,907103
+train,150000,skill_actions,power up,12034,907103
+train,150000,skill_actions,meditation,4765,907103
+train,150000,skill_actions,weakness,4560,907103
+train,150000,skill_actions,curse,4415,907103
+train,150000,skill_actions,acceleration,4338,907103
+train,150000,skill_actions,terror,3729,907103
+train,150000,skill_actions,sticky,3662,907103
+train,150000,skill_actions,distraction,3608,907103
+train,150000,skill_actions,recovery,246,907103
+train,150000,skill_actions,sap screw,234,907103
+train,150000,skill_actions,sturdy kick,228,907103
+train,150000,skill_actions,plague,205,907103
+train,150000,skill_actions,paralyze,198,907103
+train,150000,skill_actions,undead missile,195,907103
+train,150000,skill_actions,heal,180,907103
+train,150000,skill_actions,despair,155,907103
+train,150000,skill_actions,tie up,151,907103
+train,150000,skill_actions,regenerate,150,907103
+train,150000,skill_actions,fog,148,907103
+train,150000,skill_actions,tiger claw,145,907103
+train,150000,skill_actions,dinolize,115,907103
+train,150000,skill_actions,release,114,907103
+train,150000,skill_actions,poison tail,114,907103
+train,150000,skill_actions,bonemerang,113,907103
+train,150000,skill_actions,jiujitsu,105,907103
+train,150000,skill_actions,tornado,103,907103
+train,150000,skill_actions,blessed horn,99,907103
+train,150000,skill_actions,icebolt,97,907103
+train,150000,skill_actions,acid stone,95,907103
+train,150000,skill_actions,fracture,94,907103
+train,150000,skill_actions,molt,90,907103
+train,150000,skill_actions,mimic,83,907103
+train,150000,skill_actions,will of wisp,78,907103
+train,150000,skill_actions,flash beak,68,907103
+train,150000,skill_actions,battojutsu,66,907103
+train,150000,skill_actions,rigid,66,907103
+train,150000,skill_actions,shadowstar,66,907103
+train,150000,skill_actions,shield slam,66,907103
+train,150000,skill_actions,revive,65,907103
+train,150000,skill_actions,blood leech,56,907103
+train,150000,skill_actions,typereverse,56,907103
+train,150000,skill_actions,earth castle,54,907103
+train,150000,skill_actions,recoilless,51,907103
+train,150000,skill_actions,discharge,51,907103
+train,150000,skill_actions,pumpkin seed,40,907103
+train,150000,skill_actions,bullseye,39,907103
+train,150000,skill_actions,fireball,34,907103
+train,150000,skill_actions,stinger,34,907103
+train,150000,skill_actions,firebird,33,907103
+train,150000,skill_actions,immune,31,907103
+train,150000,skill_actions,aim,31,907103
+train,150000,skill_actions,deathscythe,28,907103
+train,150000,skill_actions,gold rush,28,907103
+train,150000,skill_actions,heart of lion,24,907103
+train,150000,skill_actions,sing,22,907103
+train,150000,skill_actions,flame wheel,22,907103
+train,150000,skill_actions,rage,17,907103
+train,150000,skill_actions,veilguard,15,907103
+train,150000,skill_actions,spider web,10,907103
+train,150000,skill_actions,hybrid attack,10,907103
+train,150000,skill_actions,magician hat,9,907103
+train,150000,skill_actions,judgement,9,907103
+train,150000,skill_actions,blindfist,6,907103
+train,150000,skill_actions,imitation,2,907103
+train,150000,skill_actions,trick or treat,2,907103
+train,150000,skill_casts,wolf fang,130906,815616
+train,150000,skill_casts,thunder,121798,815616
+train,150000,skill_casts,skull dagger,121615,815616
+train,150000,skill_casts,sacrifice,74843,815616
+train,150000,skill_casts,whisker needle,31455,815616
+train,150000,skill_casts,soul strike,29404,815616
+train,150000,skill_casts,elemental orb,28043,815616
+train,150000,skill_casts,double strike,24843,815616
+train,150000,skill_casts,fast claw,24738,815616
+train,150000,skill_casts,magic arrow,24462,815616
+train,150000,skill_casts,shooting star,24214,815616
+train,150000,skill_casts,flesh explosion,22642,815616
+train,150000,skill_casts,pierce,21906,815616
+train,150000,skill_casts,drain,21830,815616
+train,150000,skill_casts,counter,21394,815616
+train,150000,skill_casts,kiss,21187,815616
+train,150000,skill_casts,afterimage,14670,815616
+train,150000,skill_casts,defend,13525,815616
+train,150000,skill_casts,power up,11469,815616
+train,150000,skill_casts,meditation,4264,815616
+train,150000,skill_casts,weakness,4219,815616
+train,150000,skill_casts,curse,4075,815616
+train,150000,skill_casts,acceleration,3930,815616
+train,150000,skill_casts,terror,3353,815616
+train,150000,skill_casts,sticky,3316,815616
+train,150000,skill_casts,distraction,3311,815616
+train,150000,skill_casts,recovery,224,815616
+train,150000,skill_casts,sap screw,221,815616
+train,150000,skill_casts,sturdy kick,212,815616
+train,150000,skill_casts,plague,185,815616
+train,150000,skill_casts,paralyze,176,815616
+train,150000,skill_casts,undead missile,172,815616
+train,150000,skill_casts,heal,170,815616
+train,150000,skill_casts,regenerate,139,815616
+train,150000,skill_casts,despair,139,815616
+train,150000,skill_casts,fog,136,815616
+train,150000,skill_casts,tie up,132,815616
+train,150000,skill_casts,tiger claw,129,815616
+train,150000,skill_casts,dinolize,110,815616
+train,150000,skill_casts,bonemerang,104,815616
+train,150000,skill_casts,release,101,815616
+train,150000,skill_casts,poison tail,101,815616
+train,150000,skill_casts,jiujitsu,100,815616
+train,150000,skill_casts,tornado,94,815616
+train,150000,skill_casts,acid stone,90,815616
+train,150000,skill_casts,blessed horn,89,815616
+train,150000,skill_casts,icebolt,89,815616
+train,150000,skill_casts,fracture,88,815616
+train,150000,skill_casts,molt,75,815616
+train,150000,skill_casts,will of wisp,74,815616
+train,150000,skill_casts,flash beak,67,815616
+train,150000,skill_casts,revive,65,815616
+train,150000,skill_casts,rigid,64,815616
+train,150000,skill_casts,mimic,63,815616
+train,150000,skill_casts,battojutsu,58,815616
+train,150000,skill_casts,shadowstar,56,815616
+train,150000,skill_casts,shield slam,56,815616
+train,150000,skill_casts,typereverse,52,815616
+train,150000,skill_casts,blood leech,51,815616
+train,150000,skill_casts,earth castle,51,815616
+train,150000,skill_casts,discharge,48,815616
+train,150000,skill_casts,recoilless,46,815616
+train,150000,skill_casts,pumpkin seed,33,815616
+train,150000,skill_casts,bullseye,33,815616
+train,150000,skill_casts,fireball,31,815616
+train,150000,skill_casts,stinger,29,815616
+train,150000,skill_casts,firebird,28,815616
+train,150000,skill_casts,gold rush,27,815616
+train,150000,skill_casts,deathscythe,26,815616
+train,150000,skill_casts,aim,26,815616
+train,150000,skill_casts,immune,25,815616
+train,150000,skill_casts,flame wheel,19,815616
+train,150000,skill_casts,sing,17,815616
+train,150000,skill_casts,heart of lion,16,815616
+train,150000,skill_casts,rage,14,815616
+train,150000,skill_casts,veilguard,12,815616
+train,150000,skill_casts,hybrid attack,10,815616
+train,150000,skill_casts,magician hat,8,815616
+train,150000,skill_casts,spider web,7,815616
+train,150000,skill_casts,judgement,7,815616
+train,150000,skill_casts,blindfist,4,815616
+train,150000,skill_casts,trick or treat,3,815616
+train,150000,skill_casts,imitation,2,815616
+train,175000,combat_actions,slot_1,355439,809733
+train,175000,combat_actions,slot_3,196499,809733
+train,175000,combat_actions,slot_2,179257,809733
+train,175000,combat_actions,slot_4,54345,809733
+train,175000,combat_actions,sacrifice,24193,809733
+train,175000,reward_actions,Potion,197951,221149
+train,175000,reward_actions,Initialize,21168,221149
+train,175000,reward_actions,Stat,1597,221149
+train,175000,reward_actions,Exchange,266,221149
+train,175000,reward_actions,Gold,167,221149
+train,175000,skill_actions,wolf fang,123076,809733
+train,175000,skill_actions,thunder,122361,809733
+train,175000,skill_actions,skull dagger,110002,809733
+train,175000,skill_actions,counter,72668,809733
+train,175000,skill_actions,whisker needle,33409,809733
+train,175000,skill_actions,soul strike,32611,809733
+train,175000,skill_actions,elemental orb,28933,809733
+train,175000,skill_actions,fast claw,28228,809733
+train,175000,skill_actions,double strike,27049,809733
+train,175000,skill_actions,shooting star,26740,809733
+train,175000,skill_actions,magic arrow,26247,809733
+train,175000,skill_actions,kiss,25337,809733
+train,175000,skill_actions,pierce,25332,809733
+train,175000,skill_actions,drain,25026,809733
+train,175000,skill_actions,sacrifice,24193,809733
+train,175000,skill_actions,flesh explosion,24174,809733
+train,175000,skill_actions,power up,12583,809733
+train,175000,skill_actions,afterimage,12104,809733
+train,175000,skill_actions,defend,8943,809733
+train,175000,skill_actions,weakness,3464,809733
+train,175000,skill_actions,meditation,3443,809733
+train,175000,skill_actions,curse,2928,809733
+train,175000,skill_actions,acceleration,2807,809733
+train,175000,skill_actions,distraction,2803,809733
+train,175000,skill_actions,terror,2731,809733
+train,175000,skill_actions,sticky,2540,809733
+train,175000,skill_actions,recovery,1,809733
+train,175000,skill_casts,thunder,119952,723695
+train,175000,skill_casts,wolf fang,113747,723695
+train,175000,skill_casts,skull dagger,108217,723695
+train,175000,skill_casts,whisker needle,32234,723695
+train,175000,skill_casts,soul strike,31314,723695
+train,175000,skill_casts,elemental orb,27780,723695
+train,175000,skill_casts,fast claw,27519,723695
+train,175000,skill_casts,shooting star,26022,723695
+train,175000,skill_casts,double strike,25874,723695
+train,175000,skill_casts,magic arrow,24988,723695
+train,175000,skill_casts,pierce,24321,723695
+train,175000,skill_casts,kiss,24111,723695
+train,175000,skill_casts,drain,23811,723695
+train,175000,skill_casts,flesh explosion,22955,723695
+train,175000,skill_casts,counter,20748,723695
+train,175000,skill_casts,sacrifice,19981,723695
+train,175000,skill_casts,power up,12020,723695
+train,175000,skill_casts,afterimage,11747,723695
+train,175000,skill_casts,defend,8388,723695
+train,175000,skill_casts,meditation,3037,723695
+train,175000,skill_casts,weakness,3034,723695
+train,175000,skill_casts,curse,2525,723695
+train,175000,skill_casts,acceleration,2442,723695
+train,175000,skill_casts,distraction,2441,723695
+train,175000,skill_casts,terror,2322,723695
+train,175000,skill_casts,sticky,2165,723695
+train,200000,combat_actions,slot_1,412834,863399
+train,200000,combat_actions,slot_3,179156,863399
+train,200000,combat_actions,slot_2,148279,863399
+train,200000,combat_actions,sacrifice,70949,863399
+train,200000,combat_actions,slot_4,52180,863399
+train,200000,combat_actions,slot_5,1,863399
+train,200000,reward_actions,Potion,210606,241284
+train,200000,reward_actions,Initialize,25949,241284
+train,200000,reward_actions,Exchange,3846,241284
+train,200000,reward_actions,Stat,883,241284
+train,200000,skill_actions,thunder,142071,863399
+train,200000,skill_actions,wolf fang,139618,863399
+train,200000,skill_actions,skull dagger,131109,863399
+train,200000,skill_actions,sacrifice,70949,863399
+train,200000,skill_actions,counter,60429,863399
+train,200000,skill_actions,whisker needle,32118,863399
+train,200000,skill_actions,soul strike,29113,863399
+train,200000,skill_actions,fast claw,25207,863399
+train,200000,skill_actions,double strike,24180,863399
+train,200000,skill_actions,elemental orb,23713,863399
+train,200000,skill_actions,drain,23548,863399
+train,200000,skill_actions,kiss,22272,863399
+train,200000,skill_actions,pierce,21971,863399
+train,200000,skill_actions,shooting star,21254,863399
+train,200000,skill_actions,magic arrow,21252,863399
+train,200000,skill_actions,flesh explosion,20791,863399
+train,200000,skill_actions,afterimage,12577,863399
+train,200000,skill_actions,power up,11577,863399
+train,200000,skill_actions,defend,9393,863399
+train,200000,skill_actions,weakness,3045,863399
+train,200000,skill_actions,meditation,3008,863399
+train,200000,skill_actions,acceleration,2466,863399
+train,200000,skill_actions,curse,2369,863399
+train,200000,skill_actions,sticky,2289,863399
+train,200000,skill_actions,terror,2193,863399
+train,200000,skill_actions,distraction,2091,863399
+train,200000,skill_actions,paralyze,175,863399
+train,200000,skill_actions,plague,153,863399
+train,200000,skill_actions,heal,131,863399
+train,200000,skill_actions,mimic,108,863399
+train,200000,skill_actions,jiujitsu,103,863399
+train,200000,skill_actions,molt,102,863399
+train,200000,skill_actions,sap screw,101,863399
+train,200000,skill_actions,bonemerang,95,863399
+train,200000,skill_actions,despair,94,863399
+train,200000,skill_actions,blessed horn,88,863399
+train,200000,skill_actions,rigid,81,863399
+train,200000,skill_actions,release,81,863399
+train,200000,skill_actions,tiger claw,75,863399
+train,200000,skill_actions,tie up,75,863399
+train,200000,skill_actions,fog,72,863399
+train,200000,skill_actions,fracture,63,863399
+train,200000,skill_actions,sturdy kick,54,863399
+train,200000,skill_actions,recovery,53,863399
+train,200000,skill_actions,acid stone,53,863399
+train,200000,skill_actions,tornado,52,863399
+train,200000,skill_actions,typereverse,51,863399
+train,200000,skill_actions,dinolize,49,863399
+train,200000,skill_actions,will of wisp,48,863399
+train,200000,skill_actions,undead missile,47,863399
+train,200000,skill_actions,blood leech,46,863399
+train,200000,skill_actions,flash beak,45,863399
+train,200000,skill_actions,recoilless,45,863399
+train,200000,skill_actions,hybrid attack,41,863399
+train,200000,skill_actions,firebird,39,863399
+train,200000,skill_actions,judgement,38,863399
+train,200000,skill_actions,regenerate,37,863399
+train,200000,skill_actions,immune,33,863399
+train,200000,skill_actions,bullseye,31,863399
+train,200000,skill_actions,sing,31,863399
+train,200000,skill_actions,battojutsu,30,863399
+train,200000,skill_actions,magician hat,29,863399
+train,200000,skill_actions,icebolt,28,863399
+train,200000,skill_actions,trick or treat,27,863399
+train,200000,skill_actions,veilguard,26,863399
+train,200000,skill_actions,spider web,25,863399
+train,200000,skill_actions,aim,22,863399
+train,200000,skill_actions,pumpkin seed,21,863399
+train,200000,skill_actions,blindfist,21,863399
+train,200000,skill_actions,poison tail,20,863399
+train,200000,skill_actions,discharge,19,863399
+train,200000,skill_actions,heart of lion,19,863399
+train,200000,skill_actions,rage,18,863399
+train,200000,skill_actions,shield slam,15,863399
+train,200000,skill_actions,deathscythe,14,863399
+train,200000,skill_actions,stinger,12,863399
+train,200000,skill_actions,flame wheel,12,863399
+train,200000,skill_actions,shadowstar,11,863399
+train,200000,skill_actions,revive,11,863399
+train,200000,skill_actions,gold rush,9,863399
+train,200000,skill_actions,fireball,9,863399
+train,200000,skill_actions,earth castle,6,863399
+train,200000,skill_actions,imitation,2,863399
+train,200000,skill_casts,thunder,140696,783091
+train,200000,skill_casts,wolf fang,129226,783091
+train,200000,skill_casts,skull dagger,128920,783091
+train,200000,skill_casts,sacrifice,60008,783091
+train,200000,skill_casts,whisker needle,31089,783091
+train,200000,skill_casts,soul strike,28108,783091
+train,200000,skill_casts,fast claw,24434,783091
+train,200000,skill_casts,double strike,23307,783091
+train,200000,skill_casts,elemental orb,22873,783091
+train,200000,skill_casts,drain,22596,783091
+train,200000,skill_casts,kiss,21333,783091
+train,200000,skill_casts,pierce,21133,783091
+train,200000,skill_casts,shooting star,20612,783091
+train,200000,skill_casts,magic arrow,20380,783091
+train,200000,skill_casts,flesh explosion,19857,783091
+train,200000,skill_casts,counter,18306,783091
+train,200000,skill_casts,afterimage,12395,783091
+train,200000,skill_casts,power up,11118,783091
+train,200000,skill_casts,defend,8881,783091
+train,200000,skill_casts,meditation,2726,783091
+train,200000,skill_casts,weakness,2688,783091
+train,200000,skill_casts,acceleration,2162,783091
+train,200000,skill_casts,curse,2090,783091
+train,200000,skill_casts,sticky,2019,783091
+train,200000,skill_casts,terror,1958,783091
+train,200000,skill_casts,distraction,1905,783091
+train,200000,skill_casts,paralyze,155,783091
+train,200000,skill_casts,heal,123,783091
+train,200000,skill_casts,plague,117,783091
+train,200000,skill_casts,jiujitsu,86,783091
+train,200000,skill_casts,molt,81,783091
+train,200000,skill_casts,sap screw,81,783091
+train,200000,skill_casts,bonemerang,75,783091
+train,200000,skill_casts,blessed horn,74,783091
+train,200000,skill_casts,rigid,72,783091
+train,200000,skill_casts,mimic,71,783091
+train,200000,skill_casts,despair,70,783091
+train,200000,skill_casts,release,68,783091
+train,200000,skill_casts,tie up,64,783091
+train,200000,skill_casts,tiger claw,57,783091
+train,200000,skill_casts,fog,53,783091
+train,200000,skill_casts,fracture,51,783091
+train,200000,skill_casts,acid stone,49,783091
+train,200000,skill_casts,sturdy kick,49,783091
+train,200000,skill_casts,tornado,46,783091
+train,200000,skill_casts,dinolize,46,783091
+train,200000,skill_casts,flash beak,45,783091
+train,200000,skill_casts,blood leech,44,783091
+train,200000,skill_casts,will of wisp,43,783091
+train,200000,skill_casts,typereverse,41,783091
+train,200000,skill_casts,hybrid attack,40,783091
+train,200000,skill_casts,recoilless,39,783091
+train,200000,skill_casts,recovery,38,783091
+train,200000,skill_casts,judgement,34,783091
+train,200000,skill_casts,undead missile,32,783091
+train,200000,skill_casts,regenerate,29,783091
+train,200000,skill_casts,immune,28,783091
+train,200000,skill_casts,firebird,27,783091
+train,200000,skill_casts,sing,26,783091
+train,200000,skill_casts,trick or treat,25,783091
+train,200000,skill_casts,magician hat,25,783091
+train,200000,skill_casts,bullseye,21,783091
+train,200000,skill_casts,icebolt,21,783091
+train,200000,skill_casts,spider web,21,783091
+train,200000,skill_casts,battojutsu,18,783091
+train,200000,skill_casts,aim,17,783091
+train,200000,skill_casts,veilguard,17,783091
+train,200000,skill_casts,poison tail,15,783091
+train,200000,skill_casts,pumpkin seed,15,783091
+train,200000,skill_casts,discharge,15,783091
+train,200000,skill_casts,blindfist,15,783091
+train,200000,skill_casts,heart of lion,14,783091
+train,200000,skill_casts,shield slam,13,783091
+train,200000,skill_casts,rage,13,783091
+train,200000,skill_casts,deathscythe,12,783091
+train,200000,skill_casts,stinger,8,783091
+train,200000,skill_casts,flame wheel,8,783091
+train,200000,skill_casts,revive,8,783091
+train,200000,skill_casts,shadowstar,6,783091
+train,200000,skill_casts,gold rush,4,783091
+train,200000,skill_casts,earth castle,3,783091
+train,200000,skill_casts,fireball,3,783091

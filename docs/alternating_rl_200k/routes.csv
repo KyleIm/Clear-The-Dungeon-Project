@@ -1,0 +1,11 @@
+split,end,route,episodes,mean_floor,max_floor,shop99_entered,shop99_exited,clears
+eval,200000,B,2,55.5,70,0,0,0
+train,50000,A,2,41.0,41,0,0,0
+train,50000,B,2,45.5,51,0,0,0
+train,100000,A,1,41.0,41,False,False,False
+train,100000,B,2,40.5,41,0,0,0
+train,125000,A,2,42.0,43,0,0,0
+train,150000,A,8,45.625,59,0,0,0
+train,150000,B,9,45.333333333333336,60,0,0,0
+train,200000,A,14,44.92857142857143,70,0,0,0
+train,200000,B,9,48.666666666666664,80,0,0,0
