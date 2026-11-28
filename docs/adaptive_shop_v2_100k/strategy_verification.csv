@@ -1,0 +1,47 @@
+checkpoint,resource,edit,before,after,observations,censored,mean_prediction,resolved,wins,ties,losses,mean_floor_delta
+0,mana,forget curse,0,3,1,False,,1,0,1,0,0.0
+0,mana,forget defend,0,3,1,False,,1,0,1,0,0.0
+0,mana,forget distraction,0,3,1,False,,1,0,1,0,0.0
+0,mana,forget meditation,0,3,1,False,,1,0,1,0,0.0
+0,mana,forget power up,0,3,1,False,,1,0,0,1,-5.0
+0,mana,forget skull dagger,0,3,4,0,,4,0,3,1,-0.75
+0,mana,forget sticky,0,3,1,False,,1,0,1,0,0.0
+0,mana,forget thunder,0,3,1,False,,1,0,1,0,0.0
+0,mana,forget weakness,0,3,1,False,,1,0,1,0,0.0
+0,mana,forget wolf fang,0,3,2,0,,2,0,2,0,0.0
+0,stat_points,adjust_stat attack -1,0,1,7,0,,7,0,6,1,-0.7142857142857143
+0,stat_points,adjust_stat defense -1,0,1,7,0,,7,0,5,2,-1.1428571428571428
+25000,mana,forget curse,0,3,1,False,,1,0,1,0,0.0
+25000,mana,forget meditation,0,3,1,False,,1,0,1,0,0.0
+25000,mana,forget sticky,0,3,1,False,,1,0,1,0,0.0
+25000,mana,forget thunder,0,3,2,0,,2,0,2,0,0.0
+25000,mana,forget wolf fang,0,3,1,False,,1,0,1,0,0.0
+25000,stat_points,adjust_stat attack -1,0,1,3,0,,3,0,3,0,0.0
+25000,stat_points,adjust_stat defense -1,0,1,3,0,,3,0,3,0,0.0
+50000,mana,forget afterimage,0,3,3,0,0.16721647884696722,3,0,3,0,0.0
+50000,mana,forget distraction,0,3,1,False,0.20404700934886932,1,0,1,0,0.0
+50000,mana,forget meditation,0,3,1,False,0.07930729538202286,1,0,1,0,0.0
+50000,mana,forget skull dagger,0,3,3,0,0.2873235394557317,3,0,3,0,0.0
+50000,mana,forget thunder,0,3,2,0,0.13363613188266754,2,0,2,0,0.0
+50000,mana,forget weakness,0,3,1,False,0.35631975531578064,1,0,1,0,0.0
+50000,mana,forget wolf fang,0,3,1,False,0.008736374787986279,1,0,1,0,0.0
+50000,stat_points,adjust_stat attack -1,0,1,6,0,0.22098162521918616,6,0,6,0,0.0
+50000,stat_points,adjust_stat defense -1,0,1,6,0,0.22286737834413847,6,0,6,0,0.0
+75000,mana,forget curse,0,3,1,False,0.1673145443201065,1,0,1,0,0.0
+75000,mana,forget distraction,0,3,2,0,0.2630837485194206,2,0,2,0,0.0
+75000,mana,forget power up,0,3,1,False,0.032778460532426834,1,0,1,0,0.0
+75000,mana,forget skull dagger,0,3,3,0,0.23135452965895334,3,0,3,0,0.0
+75000,mana,forget sticky,0,3,2,0,0.18105602875584736,2,0,1,1,-1.5
+75000,mana,forget thunder,0,3,2,0,0.01464705727994442,2,0,2,0,0.0
+75000,mana,forget wolf fang,0,3,1,False,0.364421010017395,1,1,0,0,1.0
+75000,stat_points,adjust_stat attack -1,0,1,6,0,0.15335126717885336,6,0,5,1,-0.3333333333333333
+75000,stat_points,adjust_stat defense -1,0,1,6,0,0.15606390746931234,6,1,4,1,-1.0
+100000,mana,forget afterimage,0,3,1,False,0.0886276364326477,1,0,1,0,0.0
+100000,mana,forget distraction,0,3,1,False,0.43928244709968567,1,0,1,0,0.0
+100000,mana,forget power up,0,3,1,False,-0.10854627192020416,1,0,1,0,0.0
+100000,mana,forget skull dagger,0,3,1,False,-0.11283862590789795,1,0,1,0,0.0
+100000,mana,forget sticky,0,3,2,0,0.15036918222904205,2,0,0,2,-4.0
+100000,mana,forget thunder,0,3,2,0,0.148875892162323,2,0,1,1,-2.0
+100000,mana,forget wolf fang,0,3,2,0,0.26166603341698647,2,0,2,0,0.0
+100000,stat_points,adjust_stat attack -1,0,1,5,0,0.14005865752696992,5,0,3,2,-1.6
+100000,stat_points,adjust_stat defense -1,0,1,5,0,0.1420815408229828,5,0,3,2,-1.6

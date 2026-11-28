@@ -1,0 +1,494 @@
+{
+  "0": {
+    "baseline_before": 0,
+    "baseline_after": 0,
+    "profile": {
+      "cpu_simulation": {
+        "seconds": 1.0289156999715487,
+        "calls": 1840
+      },
+      "cpu_simulation_total": {
+        "seconds": 4.640013499992165,
+        "calls": 1840
+      },
+      "ppo_inference": {
+        "seconds": 0.687968599972919,
+        "calls": 1840
+      },
+      "shop_execution": {
+        "seconds": 0.7316094999941924,
+        "calls": 286
+      },
+      "worker_ipc_sync": {
+        "seconds": 0.6921340000626515,
+        "calls": 1840
+      },
+      "worker_round": {
+        "seconds": 1.7210497000342002,
+        "calls": 1840
+      }
+    },
+    "resources": {
+      "samples": 5,
+      "process_tree_cpu_percent_mean": 16.5531576512521,
+      "process_tree_rss_mib_peak": 974.94921875,
+      "system_cpu_percent_mean": 28.7,
+      "system_ram_used_mib_peak": 16749.32421875,
+      "gpu_name": "NVIDIA GeForce RTX 5070 Laptop GPU",
+      "gpu_util_percent_mean": 0.0,
+      "gpu_memory_used_mib_peak": 122.0
+    }
+  },
+  "25000": {
+    "baseline_before": 0,
+    "baseline_after": 0,
+    "profile": {
+      "cpu_simulation": {
+        "seconds": 1.0901289000139514,
+        "calls": 1928
+      },
+      "cpu_simulation_total": {
+        "seconds": 4.841294000034395,
+        "calls": 1928
+      },
+      "ppo_inference": {
+        "seconds": 0.5053963000136719,
+        "calls": 1928
+      },
+      "shop_execution": {
+        "seconds": 0.48249769999711134,
+        "calls": 259
+      },
+      "worker_ipc_sync": {
+        "seconds": 0.4884011999783979,
+        "calls": 1928
+      },
+      "worker_round": {
+        "seconds": 1.5785300999923493,
+        "calls": 1928
+      }
+    },
+    "resources": {
+      "samples": 323,
+      "process_tree_cpu_percent_mean": 18.554407473710818,
+      "process_tree_rss_mib_peak": 2235.8828125,
+      "system_cpu_percent_mean": 27.577639751552795,
+      "system_ram_used_mib_peak": 18499.73828125,
+      "gpu_name": "NVIDIA GeForce RTX 5070 Laptop GPU",
+      "gpu_util_percent_mean": 5.6006191950464395,
+      "gpu_memory_used_mib_peak": 336.0
+    }
+  },
+  "50000": {
+    "baseline_before": 0,
+    "promotion": {
+      "promoted": false,
+      "development": {
+        "pairs": 128,
+        "lower": -1.8515625,
+        "mean_floor_change": -0.84375,
+        "mean_utility_change": -0.84375,
+        "wins": 30,
+        "ties": 50,
+        "losses": 48,
+        "incumbent_clears": 0,
+        "candidate_clears": 0,
+        "incumbent_timeouts": 0,
+        "candidate_timeouts": 0,
+        "passed": false
+      },
+      "heldout": {
+        "pairs": 256,
+        "lower": -1.09375,
+        "mean_floor_change": -0.3671875,
+        "mean_utility_change": -0.3671875,
+        "wins": 56,
+        "ties": 111,
+        "losses": 89,
+        "incumbent_clears": 0,
+        "candidate_clears": 0,
+        "incumbent_timeouts": 2,
+        "candidate_timeouts": 1,
+        "passed": false
+      },
+      "alpha": 0.0025,
+      "minimum_pairs": 128,
+      "promotion_seconds": 15.484700700000758,
+      "gold": {
+        "pairs": 128,
+        "lower": 0.0,
+        "mean_floor_change": 0.0,
+        "mean_utility_change": 0.0,
+        "wins": 0,
+        "ties": 128,
+        "losses": 0,
+        "incumbent_clears": 0,
+        "candidate_clears": 0,
+        "incumbent_timeouts": 0,
+        "candidate_timeouts": 0,
+        "passed": false
+      },
+      "stats": {
+        "pairs": 128,
+        "lower": -1.5078125,
+        "mean_floor_change": -0.53125,
+        "mean_utility_change": -0.53125,
+        "wins": 20,
+        "ties": 72,
+        "losses": 36,
+        "incumbent_clears": 0,
+        "candidate_clears": 0,
+        "incumbent_timeouts": 0,
+        "candidate_timeouts": 0,
+        "passed": false
+      },
+      "skills": {
+        "pairs": 128,
+        "lower": -0.8359375,
+        "mean_floor_change": -0.0703125,
+        "mean_utility_change": -0.0703125,
+        "wins": 32,
+        "ties": 64,
+        "losses": 32,
+        "incumbent_clears": 0,
+        "candidate_clears": 0,
+        "incumbent_timeouts": 0,
+        "candidate_timeouts": 0,
+        "passed": false
+      }
+    },
+    "transfer": {
+      "training_rows": 23400,
+      "heldout_rows": 5857,
+      "forced_training_counts": {
+        "Gold": 3276,
+        "Potion": 3276,
+        "Initialize": 3276,
+        "Stat": 3276,
+        "Exchange": 3276
+      },
+      "shop_version": 0,
+      "policy_shift": false,
+      "applied": true,
+      "q_loss": 0.1903747007034827,
+      "q_seconds": 0.3254378000001452,
+      "heldout_rmse_floor": 4.096010491994889,
+      "q_distribution": {
+        "Gold": {
+          "n": 5857,
+          "quantiles": [
+            3.460171699523926,
+            6.113595485687256,
+            8.002814865112304
+          ]
+        },
+        "Potion": {
+          "n": 5857,
+          "quantiles": [
+            5.338253498077393,
+            8.1840238571167,
+            9.95696792602539
+          ]
+        },
+        "Initialize": {
+          "n": 5857,
+          "quantiles": [
+            2.6013271808624268,
+            5.914702415466309,
+            8.661723709106447
+          ]
+        },
+        "Stat": {
+          "n": 5857,
+          "quantiles": [
+            4.0632044792175295,
+            6.905778884887695,
+            8.858724403381348
+          ]
+        },
+        "Exchange": {
+          "n": 5857,
+          "quantiles": [
+            4.067571353912354,
+            6.613406181335449,
+            8.485636520385743
+          ]
+        }
+      },
+      "kl": 0.003572355257347226,
+      "probability_changes": [
+        6.178273179102689e-05,
+        -0.007584334816783667,
+        7.332437235163525e-05,
+        0.007361105643212795,
+        8.812167652649805e-05
+      ],
+      "gold_probability_change": 6.178273179102689e-05,
+      "aux_seconds": 0.039051300000210176,
+      "total_seconds": 1.2699054000004253
+    },
+    "baseline_after": 0,
+    "profile": {
+      "cpu_simulation": {
+        "seconds": 7.593424800099456,
+        "calls": 26767
+      },
+      "cpu_simulation_total": {
+        "seconds": 25.5239078999748,
+        "calls": 26767
+      },
+      "ppo_inference": {
+        "seconds": 5.130931899873758,
+        "calls": 26767
+      },
+      "shop_execution": {
+        "seconds": 4.4129732999990665,
+        "calls": 1060
+      },
+      "worker_ipc_sync": {
+        "seconds": 4.038251799887803,
+        "calls": 26767
+      },
+      "worker_round": {
+        "seconds": 11.631676599987259,
+        "calls": 26767
+      }
+    },
+    "resources": {
+      "samples": 939,
+      "process_tree_cpu_percent_mean": 17.276391028561328,
+      "process_tree_rss_mib_peak": 2360.89453125,
+      "system_cpu_percent_mean": 23.79125799573561,
+      "system_ram_used_mib_peak": 18505.83203125,
+      "gpu_name": "NVIDIA GeForce RTX 5070 Laptop GPU",
+      "gpu_util_percent_mean": 2.1224707135250265,
+      "gpu_memory_used_mib_peak": 372.0
+    }
+  },
+  "75000": {
+    "baseline_before": 0,
+    "baseline_after": 0,
+    "profile": {
+      "cpu_simulation": {
+        "seconds": 0.7268276999620866,
+        "calls": 1376
+      },
+      "cpu_simulation_total": {
+        "seconds": 3.2237333999382827,
+        "calls": 1376
+      },
+      "ppo_inference": {
+        "seconds": 0.3489470999702462,
+        "calls": 1376
+      },
+      "shop_execution": {
+        "seconds": 0.25006499999472,
+        "calls": 175
+      },
+      "worker_ipc_sync": {
+        "seconds": 0.3364295000665152,
+        "calls": 1376
+      },
+      "worker_round": {
+        "seconds": 1.0632572000286018,
+        "calls": 1376
+      }
+    },
+    "resources": {
+      "samples": 1209,
+      "process_tree_cpu_percent_mean": 17.92423671558752,
+      "process_tree_rss_mib_peak": 2377.15625,
+      "system_cpu_percent_mean": 25.414900662251657,
+      "system_ram_used_mib_peak": 18505.83203125,
+      "gpu_name": "NVIDIA GeForce RTX 5070 Laptop GPU",
+      "gpu_util_percent_mean": 3.2158808933002483,
+      "gpu_memory_used_mib_peak": 372.0
+    }
+  },
+  "100000": {
+    "baseline_before": 0,
+    "promotion": {
+      "promoted": false,
+      "development": {
+        "pairs": 128,
+        "lower": -2.27345703125,
+        "mean_floor_change": -1.2421875,
+        "mean_utility_change": -1.2421875,
+        "wins": 20,
+        "ties": 56,
+        "losses": 52,
+        "incumbent_clears": 0,
+        "candidate_clears": 0,
+        "incumbent_timeouts": 0,
+        "candidate_timeouts": 1,
+        "passed": false
+      },
+      "heldout": {
+        "pairs": 256,
+        "lower": -1.921884765625,
+        "mean_floor_change": -1.20703125,
+        "mean_utility_change": -1.20703125,
+        "wins": 45,
+        "ties": 106,
+        "losses": 105,
+        "incumbent_clears": 0,
+        "candidate_clears": 0,
+        "incumbent_timeouts": 1,
+        "candidate_timeouts": 1,
+        "passed": false
+      },
+      "alpha": 0.0025,
+      "minimum_pairs": 128,
+      "promotion_seconds": 21.809692100001485,
+      "gold": {
+        "pairs": 128,
+        "lower": 0.0,
+        "mean_floor_change": 0.0390625,
+        "mean_utility_change": 0.0390625,
+        "wins": 1,
+        "ties": 127,
+        "losses": 0,
+        "incumbent_clears": 0,
+        "candidate_clears": 0,
+        "incumbent_timeouts": 0,
+        "candidate_timeouts": 0,
+        "passed": false
+      },
+      "stats": {
+        "pairs": 128,
+        "lower": -2.1953125,
+        "mean_floor_change": -1.078125,
+        "mean_utility_change": -1.078125,
+        "wins": 21,
+        "ties": 57,
+        "losses": 50,
+        "incumbent_clears": 0,
+        "candidate_clears": 0,
+        "incumbent_timeouts": 0,
+        "candidate_timeouts": 0,
+        "passed": false
+      },
+      "skills": {
+        "pairs": 128,
+        "lower": -0.78908203125,
+        "mean_floor_change": -0.0546875,
+        "mean_utility_change": -0.0546875,
+        "wins": 25,
+        "ties": 72,
+        "losses": 31,
+        "incumbent_clears": 0,
+        "candidate_clears": 0,
+        "incumbent_timeouts": 0,
+        "candidate_timeouts": 0,
+        "passed": false
+      }
+    },
+    "transfer": {
+      "training_rows": 23104,
+      "heldout_rows": 5787,
+      "forced_training_counts": {
+        "Gold": 3276,
+        "Potion": 3276,
+        "Initialize": 3276,
+        "Stat": 3276,
+        "Exchange": 3276
+      },
+      "shop_version": 0,
+      "policy_shift": false,
+      "applied": true,
+      "q_loss": 0.18735937916097187,
+      "q_seconds": 0.32990869999957795,
+      "heldout_rmse_floor": 4.115462943161513,
+      "q_distribution": {
+        "Gold": {
+          "n": 5787,
+          "quantiles": [
+            2.806643486022949,
+            5.259770393371582,
+            7.270137310028076
+          ]
+        },
+        "Potion": {
+          "n": 5787,
+          "quantiles": [
+            4.650072765350342,
+            7.138421058654785,
+            8.989686965942383
+          ]
+        },
+        "Initialize": {
+          "n": 5787,
+          "quantiles": [
+            2.6483482360839847,
+            5.470376014709473,
+            7.850390529632569
+          ]
+        },
+        "Stat": {
+          "n": 5787,
+          "quantiles": [
+            4.220335960388184,
+            6.8288493156433105,
+            8.958868217468263
+          ]
+        },
+        "Exchange": {
+          "n": 5787,
+          "quantiles": [
+            3.1817275047302247,
+            5.811160087585449,
+            7.895387649536135
+          ]
+        }
+      },
+      "kl": 0.003857402363792062,
+      "probability_changes": [
+        0.0003012095985468477,
+        -0.003249544184654951,
+        -0.0018861336866393685,
+        0.002884236630052328,
+        0.001950232544913888
+      ],
+      "gold_probability_change": 0.0003012095985468477,
+      "aux_seconds": 0.005906200000026729,
+      "total_seconds": 1.0622626999993372
+    },
+    "baseline_after": 0,
+    "profile": {
+      "cpu_simulation": {
+        "seconds": 8.937026199855609,
+        "calls": 34762
+      },
+      "cpu_simulation_total": {
+        "seconds": 25.954653199911263,
+        "calls": 34762
+      },
+      "ppo_inference": {
+        "seconds": 7.016669199922035,
+        "calls": 34762
+      },
+      "shop_execution": {
+        "seconds": 5.727390300015031,
+        "calls": 1019
+      },
+      "worker_ipc_sync": {
+        "seconds": 5.143691000132094,
+        "calls": 34762
+      },
+      "worker_round": {
+        "seconds": 14.080717199987703,
+        "calls": 34762
+      }
+    },
+    "resources": {
+      "samples": 1849,
+      "process_tree_cpu_percent_mean": 17.464893135268614,
+      "process_tree_rss_mib_peak": 2377.20703125,
+      "system_cpu_percent_mean": 24.327002164502165,
+      "system_ram_used_mib_peak": 18505.83203125,
+      "gpu_name": "NVIDIA GeForce RTX 5070 Laptop GPU",
+      "gpu_util_percent_mean": 2.1855056787452676,
+      "gpu_memory_used_mib_peak": 372.0
+    }
+  }
+}

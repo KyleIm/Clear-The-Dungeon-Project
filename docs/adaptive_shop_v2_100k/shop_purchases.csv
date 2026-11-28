@@ -1,0 +1,80 @@
+split,checkpoint_or_segment,shop_floor,action,count
+eval_candidate,50000,10,reduce_skill_cost tiger claw,1
+eval_gold,50000,10,reduce_skill_cost tiger claw,1
+eval_gold,100000,20,reduce_skill_cost gold rush,1
+eval_gold,100000,20,reduce_skill_cost jiujitsu,1
+eval_gold,100000,20,reduce_skill_cost whisker needle,1
+eval_heldout_candidate,50000,20,buy blue_mana_potion,1
+eval_heldout_candidate,50000,20,reduce_skill_cost magician hat,1
+eval_heldout_candidate,50000,20,reduce_skill_cost spider web,1
+train,25000,10,buy blue_key,61
+train,25000,10,buy blue_mana_potion,61
+train,25000,10,reduce_skill_cost acceleration,4
+train,25000,10,reduce_skill_cost blindfist,1
+train,25000,10,reduce_skill_cost counter,4
+train,25000,10,reduce_skill_cost curse,4
+train,25000,10,reduce_skill_cost defend,4
+train,25000,10,reduce_skill_cost dinolize,1
+train,25000,10,reduce_skill_cost distraction,1
+train,25000,10,reduce_skill_cost double strike,1
+train,25000,10,reduce_skill_cost drain,1
+train,25000,10,reduce_skill_cost elemental orb,4
+train,25000,10,reduce_skill_cost fast claw,9
+train,25000,10,reduce_skill_cost flesh explosion,6
+train,25000,10,reduce_skill_cost fog,1
+train,25000,10,reduce_skill_cost gold rush,5
+train,25000,10,reduce_skill_cost heal,3
+train,25000,10,reduce_skill_cost jiujitsu,3
+train,25000,10,reduce_skill_cost judgement,5
+train,25000,10,reduce_skill_cost kiss,3
+train,25000,10,reduce_skill_cost magic arrow,1
+train,25000,10,reduce_skill_cost meditation,6
+train,25000,10,reduce_skill_cost molt,1
+train,25000,10,reduce_skill_cost pierce,5
+train,25000,10,reduce_skill_cost plague,2
+train,25000,10,reduce_skill_cost power up,11
+train,25000,10,reduce_skill_cost recoilless,1
+train,25000,10,reduce_skill_cost recovery,6
+train,25000,10,reduce_skill_cost shooting star,1
+train,25000,10,reduce_skill_cost skull dagger,8
+train,25000,10,reduce_skill_cost soul strike,4
+train,25000,10,reduce_skill_cost spider web,5
+train,25000,10,reduce_skill_cost sticky,5
+train,25000,10,reduce_skill_cost terror,4
+train,25000,10,reduce_skill_cost thunder,5
+train,25000,10,reduce_skill_cost tiger claw,5
+train,25000,10,reduce_skill_cost trick or treat,2
+train,25000,10,reduce_skill_cost typereverse,1
+train,25000,10,reduce_skill_cost undead missile,1
+train,25000,10,reduce_skill_cost veilguard,1
+train,25000,10,reduce_skill_cost weakness,3
+train,25000,10,reduce_skill_cost whisker needle,5
+train,25000,10,reduce_skill_cost wolf fang,15
+train,25000,10,reroll,16
+train,25000,20,buy blue_key,6
+train,25000,20,buy blue_mana_potion,5
+train,25000,20,buy elemental_mana_potion,1
+train,25000,20,reduce_skill_cost defend,1
+train,25000,20,reduce_skill_cost distraction,2
+train,25000,20,reduce_skill_cost double strike,2
+train,25000,20,reduce_skill_cost drain,1
+train,25000,20,reduce_skill_cost elemental orb,1
+train,25000,20,reduce_skill_cost gold rush,1
+train,25000,20,reduce_skill_cost heart of lion,1
+train,25000,20,reduce_skill_cost kiss,1
+train,25000,20,reduce_skill_cost meditation,1
+train,25000,20,reduce_skill_cost paralyze,1
+train,25000,20,reduce_skill_cost power up,2
+train,25000,20,reduce_skill_cost recovery,1
+train,25000,20,reduce_skill_cost regenerate,1
+train,25000,20,reduce_skill_cost skull dagger,3
+train,25000,20,reduce_skill_cost spider web,2
+train,25000,20,reduce_skill_cost sticky,1
+train,25000,20,reduce_skill_cost thunder,3
+train,25000,20,reduce_skill_cost weakness,1
+train,25000,20,reduce_skill_cost whisker needle,1
+train,25000,20,reduce_skill_cost wolf fang,1
+train,25000,20,reroll,1
+train,25000,30,buy blue_key,1
+train,25000,30,buy blue_mana_potion,1
+train,25000,30,buy red_key,1

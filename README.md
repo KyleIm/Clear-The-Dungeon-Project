@@ -23,6 +23,7 @@ A local research project for Dungeon & Rogue, a roguelike on Steam. The goal is 
 | Phase 3C · Baseline-relative Shop redesign | Compares legal completed configurations against immediate shop exit. Alternates a fresh Shop learner with the pretrained Combat and Reward PPO. | [Design, verification and Windows launchers](docs/baseline_relative_shop.md) |
 | Phase 3C · Preliminary baseline-relative Shop at 100,000 episodes | The combined policy averaged floor 11.84 against 12.46 for no-edit shops. Final performance comparisons exclude this run. | [Results, tables and plot](docs/baseline_relative_shop_100k/README.md) |
 | Phase 3C · Adaptive Shop V2 | Promotes Shop policies on paired validation and transfers Reward exploration through a separate Q estimator. The first local run stops at 100,000 episodes. | [Design, validation and launchers](docs/adaptive_shop_v2.md) |
+| Phase 3C · Adaptive Shop V2 at 100,000 episodes | The incumbent remained at no-edit shops. After Reward transfer it averaged floor 12.74 on the matched 128-seed panel. | [Results, tables and plot](docs/adaptive_shop_v2_100k/README.md) |
 
 Greedy and heuristic baselines and Steam integration are upcoming. The hardware benchmark uses synthetic updates, and the 90% target has yet to be evaluated in Steam.
 
