@@ -21,6 +21,7 @@ A local research project for Dungeon & Rogue, a roguelike on Steam. The goal is 
 | Phase 3C · Alternating Masked PPO and DQN | Replaced randomized shop exits with three ordered, masked DQN heads, milestone targets, and versioned replay. The new run uses a separate output directory. | [Design, verification and launchers](docs/alternating_combat_shop_rl.md) |
 | Phase 3C · Archived 200,000-episode DQN experiment | Classified as a failed experiment and excluded from final performance comparisons. The original code, checkpoints and analysis are preserved. | [Interim report, tables and figures](docs/alternating_rl_200k/README.md) |
 | Phase 3C · Baseline-relative Shop redesign | Compares legal completed configurations against immediate shop exit. Alternates a fresh Shop learner with the pretrained Combat and Reward PPO. | [Design, verification and Windows launchers](docs/baseline_relative_shop.md) |
+| Phase 3C · Baseline-relative Shop at 100,000 episodes | The combined policy averaged floor 11.84 against 12.46 for no-edit shops on the matched 128-seed panel. The combined maximum was floor 33. | [Results, tables and plot](docs/baseline_relative_shop_100k/README.md) |
 
 Greedy and heuristic baselines and Steam integration are upcoming. The hardware benchmark uses synthetic updates, and the 90% target has yet to be evaluated in Steam.
 
