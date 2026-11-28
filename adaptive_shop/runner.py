@@ -49,6 +49,8 @@ def arrays(model):
 
 
 class Experiment(V1):
+    checkpoint_version = VERSION
+
     def __init__(self,cfg,initial,old,store,directory,resources):
         from .reward import RewardValue
 
@@ -77,7 +79,7 @@ class Experiment(V1):
         self.state['wall_seconds'] = self.prior_wall+perf_counter()-self.started
         workers = pool.call('snapshot',dict.fromkeys(self.active))
         with self.profile.measure('checkpoint'):
-            payload = dict(version=VERSION, run_id=self.run_id, config=self.cfg, ppo_config=self.ppo_config,
+            payload = dict(version=self.checkpoint_version, run_id=self.run_id, config=self.cfg, ppo_config=self.ppo_config,
                            state=self.state,active=self.active,workers=workers,marks=self.store.marks(),
                            model=self.ppo.state_dict(),ppo_opt=self.ppo_opt.state_dict(),
                            shop=self.shop.state_dict(),shop_opt=self.shop_opt.state_dict(),baseline=self.baseline,
@@ -196,9 +198,11 @@ class Experiment(V1):
             result['q_distribution'] = {name:dict(n=int(legal[:,i].sum()),
                 quantiles=np.quantile(q[legal[:,i],i],(.1,.5,.9)).tolist())
                 for i,name in enumerate(REWARD_CHOICES) if legal[:,i].any()}
+            result.update(self.q_diagnostics(heldout,legal,q))
         support = np.asarray(forced)>=self.cfg['reward_support']
         guide_start = perf_counter()
-        outcome = guide(self.ppo,x,legal,q,strength=.025 if promoted else .10,supported=support)
+        settings = self.guidance_settings(promoted)
+        outcome = guide(self.ppo,x,legal,q,supported=support,**settings)
         result.update(outcome,aux_seconds=perf_counter()-guide_start,total_seconds=perf_counter()-started)
         if outcome['applied']:
             for p in self.ppo.reward_head.parameters():
@@ -207,6 +211,12 @@ class Experiment(V1):
                 self.actor.load_state_dict(self.ppo.state_dict())
             self.state['version'] += 1
         return result
+
+    def guidance_settings(self,promoted):
+        return dict(strength=.025 if promoted else .10)
+
+    def q_diagnostics(self,rows,legal,q):
+        return {}
 
     def boundary(self,pool,step,adapt):
         profile = self.profile
@@ -283,7 +293,7 @@ class Experiment(V1):
                     self.save(pool)
 
 
-def train(cfg,directory,initial_path,*,resume=False,stop=None):
+def train(cfg,directory,initial_path,*,resume=False,stop=None,experiment_class=Experiment):
     import torch
 
     require_isolated_output(directory,initial_path)
@@ -302,8 +312,8 @@ def train(cfg,directory,initial_path,*,resume=False,stop=None):
             if not path.is_file() or not database.is_file():
                 raise ValueError('Resume requires latest.pt and its SQLite database')
             old = torch.load(path,map_location='cpu',weights_only=False)
-            if old.get('version')!=VERSION or old['config']!=cfg:
-                raise ValueError('Resume requires matching V2 checkpoint and settings')
+            if old.get('version')!=experiment_class.checkpoint_version or old['config']!=cfg:
+                raise ValueError('Resume requires a matching checkpoint version and settings')
             if old['state']['started']>stop:
                 raise ValueError('Resume target precedes existing started episodes')
             initial = None
@@ -314,7 +324,7 @@ def train(cfg,directory,initial_path,*,resume=False,stop=None):
             if initial['state']['episodes']!=1_000_000 or initial['config']['hidden_dims']!=[128,128]:
                 raise ValueError('Use the final Phase 3B-2 Combat and Reward PPO checkpoint')
         with Store(database,batch_size=1024) as store, Resources() as resources:
-            Experiment(cfg,initial,old,store,directory,resources).run(stop)
+            experiment_class(cfg,initial,old,store,directory,resources).run(stop)
 
 
 def main():

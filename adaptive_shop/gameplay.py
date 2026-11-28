@@ -95,13 +95,14 @@ class Run(OldRun):
     def select_action(self, selected):
         action, source = super().select_action(selected)
         if self.phase == 'reward' and self.mode == 'paired':
-            from baseline_shop.environment import hp_bucket
+            from baseline_shop.environment import hp_bucket, next_shop_distance
             p = self.state['player']
             obs, _, mask = self.observation()
             name = REWARD_CHOICES[action]
             probability = float(self.latest_probability[action])
             meta = dict(action=name, source=source, floor=self.floor, hp=p['hp'], max_hp=p['max_hp'],
                         hp_bucket=hp_bucket(p['hp'],p['max_hp']),
+                        shop_distance=next_shop_distance(self.state),
                         gold=self.state['gold'], shop_version=self.shop_version, ppo_version=self.version,
                         probability=probability, behavior_probability=.8*probability+.2/int(mask.sum()),
                         current_stats={k:p[k] for k in ('attack','defense','speed','ACC','EVA','DR')},
@@ -201,7 +202,7 @@ def compare(run, snapshot, count, budget, base_plan):
     return rows
 
 
-def probes(run, snapshot, path, budget, value_policy):
+def probes(run, snapshot, path, budget, value_policy, *, predict=None):
     """Probe an incremental allocation or refund, with a spare equal-spend alternative."""
     ppo, _ = snapshot
     final = replay(run.game,path)
@@ -240,7 +241,9 @@ def probes(run, snapshot, path, budget, value_policy):
     records = []
     for (head,resource,move,before,after,feature,_),observed in zip(picked,result[1:]):
         change = None
-        if trained[head]:
+        if predict is not None:
+            change = predict(head,feature,unchanged)
+        elif trained[head]:
             changed, prior = scores(head,[feature,unchanged],weights)
             change = float(changed if anchor else changed-prior)
         records.append(dict(resource=resource,action=move,before=before,after=after,score=change,

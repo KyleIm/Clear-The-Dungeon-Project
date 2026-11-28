@@ -42,7 +42,8 @@ def fit(model, rows, device, rng, epochs):
     return float(np.mean(average))
 
 
-def guide(model, observations, masks, q_values, strength, supported=None, learning_rate=.003):
+def guide(model, observations, masks, q_values, strength, supported=None, learning_rate=.003,
+          *, updates=4, kl_limit=.005, temperature=2.):
     """Distill an anchored soft target with a legal mask and an empirical KL limit."""
     device = model.device
     x = torch.as_tensor(observations, dtype=torch.float32, device=device)
@@ -64,10 +65,10 @@ def guide(model, observations, masks, q_values, strength, supported=None, learni
         hidden = model.encoder(x)
         prior = policy(hidden)
         probs = prior.exp()
-        teacher = (q / 2).masked_fill(~allowed, -1e9).softmax(1)
+        teacher = (q / temperature).masked_fill(~allowed, -1e9).softmax(1)
         target = (1-strength)*probs + strength*teacher
     optimizer = torch.optim.Adam(head.parameters(), lr=learning_rate)
-    for _ in range(4):
+    for _ in range(updates):
         loss = -(target * policy(hidden)).sum(1).mean()
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
@@ -79,8 +80,11 @@ def guide(model, observations, masks, q_values, strength, supported=None, learni
                 current.copy_(before.lerp(after, fraction))
             updated = policy(hidden)
             kl = float((probs*(prior-updated)).sum(1).mean())
-            if kl <= .005:
+            if kl <= kl_limit:
                 change = (updated.exp()-probs).mean(0).tolist()
                 return dict(kl=kl, probability_changes=change, gold_probability_change=change[0],
-                            applied=fraction > 0)
+                            applied=fraction > 0, probability_before=probs.mean(0).tolist(),
+                            probability_after=updated.exp().mean(0).tolist(),
+                            mean_total_variation=float((updated.exp()-probs).abs().sum(1).mean()/2),
+                            accepted_step_fraction=fraction)
     return empty
