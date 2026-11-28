@@ -9,7 +9,7 @@ class AlternatingEnvironmentTests(unittest.TestCase):
     def make_run(self, *, cap=100, random_shop=True):
         from alternating_rl.environment import Run
 
-        return Run(24, 32, cap, 4, 3, 5, random_shop=random_shop)
+        return Run(24, 32, cap, 3, 5, random_shop=random_shop)
 
     def show_reward(self, run, floor):
         run.game.floor = run.floor = floor
@@ -30,7 +30,7 @@ class AlternatingEnvironmentTests(unittest.TestCase):
     def test_bootstrap_random_shop_matches_historical_replay(self):
         from alternating_rl.environment import Run
 
-        run = Run(2538817474026044487, 3909549678122254972, 100, 4, 3, 5, random_shop=True)
+        run = Run(2538817474026044487, 3909549678122254972, 100, 3, 5, random_shop=True)
         while not run.done:
             if run.phase == 'shop':
                 run.choose_random_shop()
@@ -46,7 +46,7 @@ class AlternatingEnvironmentTests(unittest.TestCase):
         sample, = run.drain_samples()
         self.assertEqual((sample['target'], sample['reason'], sample['version'], sample['cycle']),
                          (0, 'game_over', 5, 3))
-        self.assertEqual(sample['features'].shape, (671,))
+        self.assertNotIn('features', sample)
         self.assertFalse(run.drain_samples())
 
     def test_label_is_emitted_when_the_next_shop_opens(self):
@@ -91,32 +91,61 @@ class AlternatingEnvironmentTests(unittest.TestCase):
         sample, = run.drain_samples()
         self.assertEqual((sample['target'], sample['reason']), (1, 'milestone'))
 
-    def test_candidate_choice_applies_only_the_selected_plan_and_keeps_exact_features(self):
-        import numpy as np
-
+    def test_ordered_shop_keeps_terminal_transition_pending_until_milestone(self):
         run = self.make_run(random_shop=False)
         self.show_reward(run, 10)
         run.step(0)
         rng = run.game.rng.getstate()
-        baseline = run.game.get_state()
-        candidates = run.generate_candidates()
-        self.assertEqual(len(candidates), 4)
-        self.assertEqual(run.game.rng.getstate(), rng)
-        self.assertEqual(run.game.get_state(), baseline)
-        self.assertEqual(run.choose_shop(0, .25, True), 1)
-        self.assertEqual(run.shop_exits[-1]['prediction'], .25)
-        self.assertTrue(run.shop_exits[-1]['explored'])
-        exit_row = run.shop_exits[-1]
-        self.assertEqual(run.shop_actions[exit_row['action_start']:exit_row['action_stop']],
-                         [{'floor': 10, 'action': ['leave_shop']}])
-        np.testing.assert_array_equal(candidates[0], run._pending[0][0])
+        for expected_head in range(3):
+            features, head, mask = run.shop_observation()
+            self.assertEqual(features.shape, (688,))
+            self.assertEqual(head, expected_head)
+            reward = run.choose_shop(len(mask) - 1, .25, False)
+            self.assertEqual(reward, 1.0 if head == 2 else 0.0)
+        self.assertNotEqual(run.game.rng.getstate(), rng)  # Entering the next floor consumes RNG.
+        rows = run.drain_transitions()
+        self.assertEqual([row['next_state'][1] for row in rows], [1, 2])
+        self.assertFalse(run.drain_samples())
+        run.game.floor = run.floor = 20
+        run.state = run.game.get_state()
+        self.defeat_enemy(run)
+        run.step(0)
+        terminal, = run.drain_transitions()
+        self.assertTrue(terminal['terminal'])
+        self.assertEqual(terminal['reward'], 1.0)
+        self.assertIsNone(terminal['next_state'])
+        self.assertEqual(run.drain_samples()[0]['exit_q'], .25)
+
+    def test_uniform_immediate_leave_produces_compatible_ordered_edges(self):
+        from alternating_rl.environment import Run
+
+        run = Run(24, 32, 100, 1, 0, random_shop=True, collect_uniform=True)
+        self.show_reward(run, 10)
+        run.step(0)
+        self.leave_random_shop(run)
+        self.assertTrue(run.shop_exits[-1]['uniform_replay_compatible'])
+        rows = run.drain_transitions()
+        self.assertEqual([row['state'][1] for row in rows], [0, 1])
+        self.assertTrue(all(row['source'] == 'uniform' for row in rows))
+
+    def test_uniform_trace_with_stage_regression_is_rejected(self):
+        from alternating_rl.bootstrap import compatible_trace, shadow_shop
+        from alternating_rl.shop import BUDGETS
+
+        run = self.make_run()
+        self.show_reward(run, 10)
+        run.step(0)
+        before = run.game.get_state()
+        raw = [('shop_menu', 'skills'), ('shop_back',), ('shop_menu', 'stats'), ('shop_back',)]
+        self.assertIsNone(compatible_trace(shadow_shop(run.game), run.game, raw, 'Forest', None, BUDGETS))
+        self.assertEqual(run.game.get_state(), before)
 
     def test_checkpoint_preserves_pending_label_and_random_stream(self):
         import pickle
 
         from alternating_rl.environment import Run
 
-        run = Run(2538817474026044487, 3909549678122254972, 100, 4, 3, 5, random_shop=True)
+        run = Run(2538817474026044487, 3909549678122254972, 100, 3, 5, random_shop=True)
         while run.phase != 'shop':
             run.step(run.random_action())
         run.choose_random_shop()

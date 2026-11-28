@@ -1,23 +1,22 @@
-"""Measure candidate planning and batched scoring from one recorded floor-10 visit."""
+"""Measure ordered DQN shop decisions from one recorded floor-10 visit."""
 
+from copy import deepcopy
 import json
 from random import Random
-from statistics import median, mean
+from statistics import median
 from time import perf_counter
 
-import numpy as np
 import torch
 
 from simulator.game import Game
-from .candidates import generate
-from .runner import DEFAULT, read_config
-from .shop_value import ShopValue
+from .dqn import ShopDQN
+from .shop import FEATURE_COUNT, HEAD_SIZES, Shop
 
 
 def main():
-    cfg = read_config(DEFAULT)['shop']
+    torch.manual_seed(314159)
     torch.set_num_threads(2)
-    model = ShopValue(cfg['hidden_dims'])
+    model = ShopDQN(FEATURE_COUNT, HEAD_SIZES, [128, 128]).eval()
     game = Game()
     state = game.reset(2538817474026044487)
     policy = Random(3909549678122254972)
@@ -25,19 +24,29 @@ def main():
         previous_area = state['area']
         state = game.step(policy.choice(game.get_legal_actions()))
     assert state['phase'] == 'shop' and state['floor'] == 10
-    for count in (8, 16, 24):
-        planning, scoring, generated = [], [], []
-        for repeat in range(30):
-            started = perf_counter()
-            plans = generate(game, count, Random(repeat), previous_area=previous_area, max_edits=cfg['max_edits'])
-            planned = perf_counter()
-            with torch.inference_mode():
-                model(np.stack([plan.features for plan in plans])).numpy()
-            planning.append(planned - started)
-            scoring.append(perf_counter() - planned)
-            generated.append(len(plans))
-        print(json.dumps(dict(requested=count, average_candidates=mean(generated),
-                              planning_ms=median(planning) * 1000, scoring_ms=median(scoring) * 1000)))
+    observation = Shop(game, previous_area, None).observation()
+    model.act([observation], Random(0), 0)
+    encoding, scoring, visits, decisions = [], [], [], []
+    for repeat in range(30):
+        started = perf_counter()
+        observation = Shop(game, previous_area, None).observation()
+        encoded = perf_counter()
+        model.act([observation], Random(repeat), 0)
+        encoding.append(encoded - started)
+        scoring.append(perf_counter() - encoded)
+        shadow = deepcopy(game, {id(game.data): game.data})
+        shop = Shop(shadow, previous_area, None)
+        rng = Random(repeat)
+        steps = 0
+        started = perf_counter()
+        while not shop.done:
+            action, _, _ = model.act([shop.observation()], rng, .15)[0]
+            shop.step(action, shadow.step)
+            steps += 1
+        visits.append(perf_counter() - started)
+        decisions.append(steps)
+    print(json.dumps(dict(initial_encoding_ms=median(encoding) * 1000, one_head_scoring_ms=median(scoring) * 1000,
+                          complete_visit_ms=median(visits) * 1000, decisions_per_visit=median(decisions))))
 
 
 if __name__ == '__main__':

@@ -2,8 +2,9 @@
 
 from collections import Counter, defaultdict
 from contextlib import closing
+import csv
 import json
-from math import sqrt
+from math import isfinite, sqrt
 from pathlib import Path
 import sqlite3
 
@@ -27,6 +28,7 @@ CREATE INDEX IF NOT EXISTS shop_sample_training_window ON shop_samples(split, ve
 SHOP_TABLES = (*TABLES, 'shop_samples')
 REWARDS = ('Potion', 'Initialize', 'Gold', 'Stat', 'Exchange')
 ROOT = Path(__file__).resolve().parents[1]
+HEADS = ('Gold Expenditure', 'Stat Redistribution', 'Skill Configuration')
 
 
 class Store(CombatStore):
@@ -43,9 +45,10 @@ class Store(CombatStore):
 
     def sample(self, split, step, row):
         data = dict(row)
-        features = np.asarray(data.pop('features'), dtype='<f4')
-        if features.shape != (671,) or not np.isfinite(features).all():
-            raise ValueError('Shop samples require 671 finite features')
+        values = data.pop('features', None)
+        features = np.asarray(values, dtype='<f4') if values is not None else None
+        if features is not None and (features.shape != (671,) or not np.isfinite(features).all()):
+            raise ValueError('Legacy shop samples require 671 finite features')
         target = data.pop('target')
         if target is not None and target not in (0, 1):
             raise ValueError('Shop sample target must be binary or censored')
@@ -54,14 +57,15 @@ class Store(CombatStore):
                            target, prediction, features, payload) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
                     (split, step, int(data.pop('shop_floor')), int(data.pop('version')),
                      int(data.pop('cycle')), None if target is None else int(target),
-                     None if prediction is None else float(prediction), features.tobytes(), _encode(data)))
+                     None if prediction is None else float(prediction),
+                     features.tobytes() if features is not None else b'', _encode(data)))
 
     def recent_samples(self, limit, current_version):
         if type(limit) is not int or limit < 1:
             raise ValueError('Shop replay window must be a positive integer')
         rows = self.db.execute('''SELECT step, shop_floor, version, cycle, target, prediction, features, payload
                                   FROM shop_samples
-                                  WHERE split = 'train' AND target IS NOT NULL AND version <= ?
+                                  WHERE split = 'train' AND target IS NOT NULL AND length(features) > 0 AND version <= ?
                                   ORDER BY version DESC, id DESC LIMIT ?''', (current_version, limit))
         return [dict(json.loads(payload), step=step, shop_floor=floor, version=version, cycle=cycle,
                      target=target, prediction=prediction,
@@ -127,6 +131,10 @@ class ShopStats:
         self.loadouts = Counter()
         self.purchases = Counter()
         self.calibration = defaultdict(Counter)
+        self.heads = defaultdict(Counter)
+        self.head_actions = defaultdict(Counter)
+        self.head_q = defaultdict(Counter)
+        self.reroll = defaultdict(Counter)
 
     def add_snapshot(self, label, snapshot):
         if not isinstance(snapshot, dict):
@@ -139,7 +147,18 @@ class ShopStats:
         slots = snapshot.get('slots', ())
         if label != 'exit':
             return
+        allocations = [snapshot.get(stat) for stat in ('attack', 'defense', 'hp', 'speed')]
+        if all(isinstance(value, (int, float)) for value in allocations):
+            discretionary = [max(0, value - 1) for value in allocations]
+            self.counts['stat_exits'] += 1
+            if sum(discretionary) and max(discretionary) > sum(discretionary) / 2:
+                self.counts['concentrated_stats'] += 1
         loadout = []
+        stats = [snapshot.get(stat, snapshot.get('stats', {}).get(stat))
+                 for stat in ('attack', 'defense', 'hp', 'speed')]
+        if all(isinstance(stat, (int, float)) for stat in stats) and sum(stats) > 0:
+            self.counts['known_stat_allocations'] += 1
+            self.counts['concentrated_stat_allocations'] += max(stats) / sum(stats) >= .5
         for slot in slots:
             if isinstance(slot, dict):
                 name = slot.get('name', slot.get('skill'))
@@ -163,6 +182,7 @@ class ShopStats:
         self.counts['explored'] += bool(visit.get('explored'))
         self.counts['candidate_visits'] += bool(visit.get('candidates'))
         self.counts['candidates'] += int(visit.get('candidates') or 0)
+        self.add_dqn(visit.get('dqn_actions', ()))
         for action in visit.get('actions', ()):
             if isinstance(action, dict):
                 action = action['action']
@@ -175,13 +195,78 @@ class ShopStats:
             if 'gold' in before and 'gold' in after:
                 self.fields[('exit', 'gold_spent')][before['gold'] - after['gold']] += 1
 
-    def add_target(self, target, prediction):
+    def add_dqn(self, actions):
+        previous = {}
+        for row in actions:
+            head = HEADS[row['head']]
+            action = tuple(row['action'])
+            name = ' '.join(map(str, action))
+            self.head_actions[head][name] += 1
+            counts = self.heads[head]
+            counts['selections'] += 1
+            counts['explored'] += bool(row.get('explored'))
+            end = row.get('end_reason')
+            if end in ('early', 'cap'):
+                counts[end] += 1
+                counts['finished_modifications'] += row['modifications']
+            if action[0] != 'finish' and not row.get('interrupted'):
+                counts['modifications'] += 1
+                prior = previous.get(head)
+                if prior is not None:
+                    counts['adjacent_modifications'] += 1
+                    counts['repeat'] += prior['action'] == row['action']
+                    counts['inverse'] += _inverse(prior, row)
+                previous[head] = row
+            q = row.get('q', row.get('q_value'))
+            if q is not None and isfinite(q):
+                self.head_q[head][_q_band(q)] += 1
+            reroll = row.get('reroll')
+            if reroll:
+                self.add_reroll(reroll)
+
+    def add_reroll(self, reroll):
+        self.reroll['Cost'][reroll['cost']] += 1
+        for label in ('before', 'after'):
+            snapshot = reroll[label]
+            for key in ('ACC', 'EVA', 'DR'):
+                for kind, field in (('base', f'base_{key}'), ('current', key)):
+                    if field in snapshot:
+                        self.reroll[f'{label} {kind} {key}'][snapshot[field]] += 1
+
+    def add_target(self, target, prediction, raw_q=None):
         key = 'censored' if target is None else 'success' if target else 'failure'
         self.counts[key] += 1
-        if target is None or prediction is None:
+        value = raw_q if raw_q is not None else prediction
+        if target is None or value is None or not isfinite(value):
             return
-        group = self.calibration[min(9, int(prediction * 10))]
-        group.update(n=1, success=target, predictions=prediction, squared_error=(target - prediction) ** 2)
+        group = self.calibration[_q_band(value)]
+        group.update(n=1, success=target, predictions=value, squared_error=(target - value) ** 2)
+
+
+def _inverse(prior, row):
+    first, second = tuple(prior['action']), tuple(row['action'])
+    if first[0] == second[0] == 'adjust_stat':
+        return first[1] == second[1] and first[2] == -second[2]
+    if {first[0], second[0]} == {'memorize', 'forget'}:
+        return first[1:] == second[1:]
+    if first[0] == second[0] == 'replace_skill':
+        first_engine = prior.get('engine_action')
+        second_engine = row.get('engine_action')
+        return (first[1] == second[1] and first_engine is not None and second_engine is not None
+                and first_engine[1] == second[2] and second_engine[1] == first[2])
+    return False
+
+
+def _q_band(value):
+    return -1 if value < 0 else 10 if value > 1 else min(9, int(value * 10))
+
+
+def _q_band_label(band):
+    if band == -1:
+        return '<0'
+    if band == 10:
+        return '>1'
+    return f'{band / 10:.1f}–{(band + 1) / 10:.1f}'
 
 
 def _median(values):
@@ -202,6 +287,39 @@ def _cohort_row(label, stats):
     return (label, f'{stats.episodes:,}', _fmt(result['mean_floor'], '.2f'),
             _fmt(result['median_floor'], 'g'), _fmt(result['max_floor'], 'd'),
             _fmt(result['clear_rate'], '.2%'), _fmt(result['timeout_rate'], '.2%'))
+
+
+def _dqn_lines(stats):
+    if not stats.heads:
+        return []
+    lines = ['#### Masked DQN behavior', '',
+             'Early and cap shares use completed heads as the denominator. Counts include DQN visits that '
+             'timed out within the shop. Repeated and inverse edits are adjacent modifications in the same '
+             'head and visit.', '']
+    rows = []
+    for head, counts in sorted(stats.heads.items()):
+        completed = counts['early'] + counts['cap']
+        rows.append((head, counts['selections'], counts['modifications'], completed,
+                     _fmt(_ratio(counts['finished_modifications'], completed), '.2f'),
+                     _percent(counts['early'], completed), _percent(counts['cap'], completed),
+                     _percent(counts['explored'], counts['selections']), counts['repeat'], counts['inverse']))
+    lines.extend(_markdown_table(('Head', 'Selections', 'Applied edits', 'Completed', 'Mean edits per completion',
+                                  'Early exits', 'Cap exits', 'Exploration', 'Repeated edits', 'Inverse edits'), rows))
+    lines.extend(_markdown_table(('Head', 'Selected action', 'Count', 'Share within head'),
+        [(head, action, n, _percent(n, sum(counts.values())))
+         for head, counts in sorted(stats.head_actions.items()) for action, n in counts.most_common()]))
+    lines.extend(_markdown_table(('Head', 'Selected raw Q-value band', 'Count'),
+        [(head, _q_band_label(band), n) for head, counts in sorted(stats.head_q.items())
+         for band, n in sorted(counts.items())]))
+    if stats.reroll:
+        rolls = stats.reroll['Cost']
+        lines += [f'Rerolls recorded {sum(rolls.values()):,}. Total reroll cost '
+                  f'{sum(value * count for value, count in rolls.items()):,} gold.', '']
+        lines.extend(_markdown_table(('Reroll metric', 'Records', 'Min', 'Median', 'Mean', 'Max'),
+            [(name, sum(counts.values()), min(counts), _fmt(_median(counts), '.2f'),
+              _fmt(_ratio(sum(value * n for value, n in counts.items()), sum(counts.values())), '.2f'), max(counts))
+             for name, counts in sorted(stats.reroll.items()) if counts]))
+    return lines
 
 
 def _read_run(db):
@@ -253,10 +371,14 @@ def _read_run(db):
                 if exit_state is not None and 'action_start' in exit_state:
                     visit['actions'] = row.get('shop_actions', ())[exit_state['action_start']:exit_state['action_stop']]
                 visits[(split, floor)].add_visit(visit)
-    for split, step, floor, target, prediction in db.execute(
-            'SELECT split,step,shop_floor,target,prediction FROM shop_samples ORDER BY id'):
+            unfinished = row.get('unfinished_shop')
+            if unfinished:
+                visits[(split, unfinished['floor'])].add_dqn(unfinished.get('dqn_actions', ()))
+    for split, step, floor, target, prediction, payload in db.execute(
+            'SELECT split,step,shop_floor,target,prediction,payload FROM shop_samples ORDER BY id'):
         if split == 'train' or step == latest.get(split):
-            visits[(split, floor)].add_target(target, prediction)
+            sample = json.loads(payload)
+            visits[(split, floor)].add_target(target, prediction, sample.get('exit_q', sample.get('q_value')))
     return cohorts, segments, branch, branch_99, branch_99_exit, visits, skills, casts, latest, shop_trend
 
 
@@ -275,7 +397,7 @@ def _plot(output, cohorts, latest, updates, samples, shop_trend):
             depth.plot(*zip(*sorted(series)), marker='.', label=split)
     losses = axes[0, 1]
     for key, label in (('policy_loss', 'PPO policy'), ('value_loss', 'PPO value'),
-                       ('shop_loss', 'Shop BCE'), ('bce_loss', 'Shop BCE')):
+                       ('dqn_loss', 'Shop DQN'), ('shop_loss', 'Shop BCE'), ('bce_loss', 'Shop BCE')):
         series = [(step, row[key]) for step, row in updates if row.get(key) is not None]
         if series:
             losses.plot(*zip(*series), label=label)
@@ -298,7 +420,7 @@ def _plot(output, cohorts, latest, updates, samples, shop_trend):
     for ax, title, x, y in [(depth, 'Checkpoint evaluation', 'Completed episodes', 'Mean furthest floor'),
                             (losses, 'Optimization', 'Completed episodes', 'Loss'),
                             (survival, 'Floor reach', 'Floor', 'Fraction reaching floor'),
-                            (calibration, 'Shop calibration', 'Mean prediction', 'Observed success rate')]:
+                            (calibration, 'Shop calibration', 'Mean exit score', 'Observed success rate')]:
         ax.set(title=title, xlabel=x, ylabel=y)
         ax.grid(alpha=.25)
         if ax.lines:
@@ -346,13 +468,24 @@ def generate_report(db_path, output_dir, baseline_db=None):
         version_balance = db.execute('''SELECT cycle,version,shop_floor,target,COUNT(*) FROM shop_samples
                                         WHERE split = 'train' GROUP BY cycle,version,shop_floor,target
                                         ORDER BY cycle,version,shop_floor,target''').fetchall()
+        revised = db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='shop_replay'").fetchone()
+        revised = revised or any(stats.heads for stats in visits.values())
     _plot(output, cohorts, latest, updates, visits, shop_trend)
+    model = 'Masked Shop DQN' if revised else 'Shop Value Network'
     lines = ['# Phase 3C alternating training results', '',
-             'Combat and Reward PPO alternates with a separate Shop Value Network. Timeouts before the shop '
+             f'Combat and Reward PPO alternates with a separate {model}. Timeouts before the shop '
              'milestone are censored and excluded from the binary target. Checkpoint panels use fixed independent '
              'seeds. Earlier runs provide context and may use a different policy or panel.', '',
              '![Progress, losses, floor reach and calibration](progress.png)', '',
              '![Reward and shop resource trends](decision_trends.png)', '', '## Floor and outcome summary', '']
+    if any(stats.reroll for stats in visits.values()):
+        with (output / 'reroll_distributions.csv').open('w', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            writer.writerow(('split', 'shop_floor', 'metric', 'value', 'count'))
+            writer.writerows((split, floor, key, value, count)
+                             for (split, floor), stats in sorted(visits.items())
+                             for key, values in sorted(stats.reroll.items())
+                             for value, count in sorted(values.items()))
     rows = [_cohort_row('All training', cohorts['train']),
             _cohort_row('Historical random 1M', _baseline(baseline_db))]
     for folder, label in [('combat_rl_100k', 'Historical PPO 100K evaluation'),
@@ -388,6 +521,11 @@ def generate_report(db_path, output_dir, baseline_db=None):
             lines.extend(_markdown_table(('Label', 'Count', 'Share'), [(name, f'{count:,}',
                             _percent(count, sum(counts.values()))) for name, count in counts.most_common()]))
     lines += ['## Shop exits and observed milestones', '']
+    if revised:
+        lines += ['Exit calibration uses the raw Q-value of the selected transition. A raw value can fall outside '
+                  '[0, 1], and only resolved targets are compared with Q-values.', '']
+    if any(stats.reroll for stats in visits.values()):
+        lines += ['[Exact reroll cost and before/after stat histograms](reroll_distributions.csv)', '']
     lines.extend(_markdown_table(('Split', 'Segment or checkpoint', 'Exits', 'Unused stats', 'Unused mana',
                                   'Mean remaining points', 'Mean remaining mana'),
         [(split, step, row['exits'], _percent(row['unused_stats'], row['exits']),
@@ -401,8 +539,13 @@ def generate_report(db_path, output_dir, baseline_db=None):
                   f"Entries {counts['entries']:,}. Exits {counts['exits']:,}. Success/failure/censored "
                   f"{counts['success']:,}/{counts['failure']:,}/{counts['censored']:,}. "
                   f"Observed success {_percent(counts['success'], labeled)}. New slots {counts['keys']:,}. "
-                  f"Mean candidates {_fmt(_ratio(counts['candidates'], counts['candidate_visits']), '.2f')}. "
-                  f"Exploration {_percent(counts['explored'], counts['candidate_visits'])}.", '']
+                  f"At least 50% of the four base stats in one stat at "
+                  f"{_percent(counts['concentrated_stat_allocations'], counts['known_stat_allocations'])} of exits.", '']
+        if counts['candidate_visits']:
+            lines += [f"Mean candidates {_fmt(_ratio(counts['candidates'], counts['candidate_visits']), '.2f')}. "
+                      f"Candidate exploration {_percent(counts['explored'], counts['candidate_visits'])}.", '']
+        lines += [f"Stat concentration at exit {_percent(counts['concentrated_stats'], counts['stat_exits'])}. "
+                  'Concentration means one stat has more than half the allocated points above the four minima.', '']
         lines.extend(_markdown_table(('Snapshot', 'Field', 'Records', 'Min', 'Median', 'Mean', 'Max', 'Zero share'),
             [(where, key, sum(group.values()), min(group), _fmt(_median(group), '.2f'),
               _fmt(_ratio(sum(v * n for v, n in group.items()), sum(group.values())), '.2f'),
@@ -414,8 +557,9 @@ def generate_report(db_path, output_dir, baseline_db=None):
             [(name, n, stats.uses[name, 0], _fmt(_ratio(sum(k * c for (skill, k), c in stats.uses.items()
                                                          if skill == name), n), '.2f'))
              for name, n in stats.skills.most_common(20)]))
-        lines.extend(_markdown_table(('Prediction band', 'Labeled', 'Mean prediction', 'Observed success', 'Brier score'),
-            [(f'{band / 10:.1f}–{(band + 1) / 10:.1f}', row['n'], _percent(row['predictions'], row['n']),
+        lines.extend(_dqn_lines(stats))
+        lines.extend(_markdown_table(('Exit score band', 'Labeled', 'Mean exit score', 'Observed success', 'Squared error'),
+            [(_q_band_label(band), row['n'], _fmt(_ratio(row['predictions'], row['n']), '.4f'),
               _percent(row['success'], row['n']), _fmt(_ratio(row['squared_error'], row['n']), '.4f'))
              for band, row in sorted(stats.calibration.items())]))
     lines += ['### Shop sample balance by policy version', '']
@@ -443,6 +587,25 @@ def generate_report(db_path, output_dir, baseline_db=None):
         lines.extend(_markdown_table(('Profiled phase', 'Seconds', 'Calls'),
                                     [(name, _fmt(row['seconds'], '.3f'), row['calls'])
                                      for name, row in sorted(meta.get('phases', {}).items())]))
+    dqn_keys = ('dqn_loss', 'dqn_mean_q', 'dqn_mean_target', 'dqn_batch', 'dqn_terminal', 'epsilon', 'replay_size',
+                'replay_added', 'replay_reused', 'replay_rejected', 'dqn_updates')
+    last_values = {}
+    for step, row in reversed(updates):
+        for key in dqn_keys:
+            if key in row:
+                last_values.setdefault(key, (step, key, row[key]))
+        if len(last_values) == len(dqn_keys):
+            break
+    if last_values:
+        lines += ['## Latest DQN learner and replay diagnostics', '']
+        lines.extend(_markdown_table(('Step', 'Metric', 'Value'), last_values.values()))
+    replay = next(((step, row['replay']) for step, row in reversed(updates) if 'replay' in row), None)
+    if replay and replay[1]['count']:
+        step, summary = replay
+        lines += [f'Replay composition at checkpoint {step:,}.', '']
+        lines.extend(_markdown_table(('Cycle', 'Head', 'Source', 'Transitions', 'Terminals', 'Successes'),
+                                    [(row['cycle'], row['head'], row['source'], row['transitions'],
+                                      row['terminals'], row['successes']) for row in summary['groups']]))
     lines.extend(_markdown_table(('Step', 'Evaluation', 'Seconds'), [(s, p, _fmt(row.get('seconds'), '.2f'))
                                                                      for s, p, row in evaluation]))
     path = output / 'training_report.md'

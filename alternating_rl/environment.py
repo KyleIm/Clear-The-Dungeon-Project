@@ -1,15 +1,14 @@
 """Alternating experiment adapter over the unmodified dungeon simulator."""
 
 from collections import Counter
-from hashlib import sha256
 from operator import index
-from random import Random
 from unittest.mock import patch
 
 from combat_rl.environment import Run as CombatRun
 from simulator import combat
 
-from .candidates import encode, generate
+from .bootstrap import compatible_trace, shadow_shop
+from .shop import BUDGETS, Shop
 
 
 def attained_target(shop_floor, state):
@@ -43,16 +42,15 @@ def shop_state(state, area, action_count):
 class Run(CombatRun):
     """Pause at each shop and emit labels once the corresponding horizon resolves."""
 
-    def __init__(self, game_seed, policy_seed, action_cap, candidate_count, cycle, version,
-                 *, random_shop=False, max_edits=24, planner='uniform_menu'):
+    def __init__(self, game_seed, policy_seed, action_cap, cycle, version,
+                 *, random_shop=False, budgets=BUDGETS, collect_uniform=False, collect_replay=True):
         super().__init__(game_seed, policy_seed, action_cap)
-        self.candidate_count = candidate_count
         self.cycle = cycle
         self.start_version = self.version = version
         self.random_shop = random_shop
-        self.max_edits = max_edits
-        self.planner = planner
-        self.candidate_rng = Random(sha256(f'{policy_seed}:shop-candidates'.encode()).digest())
+        self.collect_uniform = collect_uniform
+        self.collect_replay = collect_replay
+        self.budgets = budgets
         self.event_route = None
         self.event_version = None
         self.shop_entries = []
@@ -60,10 +58,13 @@ class Run(CombatRun):
         self.skill_casts = Counter()
         self._entry = None
         self._entry_action_index = 0
-        self._plans = None
-        self._selection = None
+        self._shop = None
+        self._uniform_shadow = None
+        self._visit_decisions = []
+        self._active_transition = None
         self._pending = []
         self._samples = []
+        self._transitions = []
 
     @property
     def phase(self):
@@ -102,31 +103,30 @@ class Run(CombatRun):
             self._advance(self.policy_rng.choice(self.game.get_legal_actions()))
         return self._reward_since(floor_before)
 
-    def generate_candidates(self):
+    def shop_observation(self):
         if self.phase != 'shop' or self.random_shop:
-            raise RuntimeError('Candidate generation requires an optimized shop decision')
-        if self._plans is None:
-            self._plans = generate(self.game, self.candidate_count, self.candidate_rng,
-                                   previous_area=self._entry['region'], event_choice=self.event_route,
-                                   max_edits=self.max_edits, planner=self.planner)
-        return [plan.features for plan in self._plans]
+            raise RuntimeError('There is no ordered shop decision')
+        return self._shop.observation()
 
-    def choose_shop(self, choice, predicted_value, explored):
-        if self.phase != 'shop' or self._plans is None:
-            raise RuntimeError('There is no pending shop candidate batch')
-        choice = index(choice)
-        if not 0 <= choice < len(self._plans):
-            raise ValueError('Shop candidate is outside the batch')
+    def choose_shop(self, choice, q, explored):
         floor_before = self.floor
-        plan = self._plans[choice]
-        self._selection = dict(candidates=len(self._plans), explored=bool(explored),
-                               prediction=float(predicted_value) if predicted_value is not None else None)
-        for action in plan.actions:
+        transition = dict(state=self.shop_observation(), action=int(choice), source='dqn',
+                          version=self.version, cycle=self.cycle, terminal=False, reward=0.0)
+        self._active_transition = transition
+        transition['q'] = q
+
+        def advance(action):
             if self.done:
-                break
+                return False
             self._advance(action)
-        self._plans = None
-        self._selection = None
+            return True
+
+        info = self._shop.step(choice, advance)
+        self._visit_decisions.append(dict(info, q=q, explored=explored))
+        self._active_transition = None
+        if self.phase == 'shop' and self.collect_replay:
+            transition['next_state'] = self.shop_observation()
+            self._transitions.append(transition)
         return self._reward_since(floor_before)
 
     def choose_random_shop(self):
@@ -145,8 +145,20 @@ class Run(CombatRun):
         exiting = before['phase'] == 'shop' and action == ('leave_shop',)
         if exiting:
             region = self._entry['region']
-            features = encode(self.game, previous_area=region, event_choice=self.event_route)
             exit_state = shop_state(before, region, self.actions)
+            transitions = []
+            terminal = self._active_transition
+            if self._uniform_shadow is not None:
+                history = [tuple(row['action']) for row in self.shop_actions[self._entry_action_index:]]
+                verified = compatible_trace(self._uniform_shadow, self.game, history, region,
+                                            self.event_route, self.budgets)
+                if verified is not None:
+                    transitions = [dict(row, source='uniform', version=self.version, cycle=self.cycle,
+                                        terminal=False, reward=0.0) for row in verified]
+                    terminal = transitions.pop()
+                    self._transitions.extend(transitions)
+                exit_state['uniform_replay_compatible'] = verified is not None
+                self._uniform_shadow = None
         super()._advance(action)
         entered_shop = before['phase'] != 'shop' and self.state['phase'] == 'shop'
         if entered_shop:
@@ -154,14 +166,19 @@ class Run(CombatRun):
             self._entry.update(version=self.version, cycle=self.cycle)
             self.shop_entries.append(self._entry)
             self._entry_action_index = len(self.shop_actions)
+            self._visit_decisions = []
+            if self.random_shop:
+                self._uniform_shadow = shadow_shop(self.game) if self.collect_uniform else None
+            else:
+                self._shop = Shop(self.game, self._entry['region'], self.event_route, self.budgets)
         if exiting:
             row = self.shop_exits[-1]
+            q = terminal.get('q') if terminal else None
             row.update(exit_state, entry_gold=self._entry['gold'], exit_gold=before['gold'],
                        action_start=self._entry_action_index, action_stop=len(self.shop_actions),
-                       candidates=0, explored=False, prediction=None,
-                       version=self.version, cycle=self.cycle)
-            row.update(self._selection or {})
-            self._pending.append((features, row))
+                       exit_q=q, prediction=None if q is None else min(1.0, max(0.0, q)),
+                       dqn_actions=self._visit_decisions, version=self.version, cycle=self.cycle)
+            self._pending.append((terminal, row))
             self._entry = None
         # A successful transition can occur on the last allowed primitive action.
         reached_final_floor = before['floor'] < 100 and self.state['floor'] == 100
@@ -170,11 +187,11 @@ class Run(CombatRun):
 
     def _resolve_samples(self):
         remaining = []
-        for features, row in self._pending:
+        for terminal, row in self._pending:
             if attained_target(row['floor'], self.state):
                 target, reason = 1, 'milestone'
             elif not self.done:
-                remaining.append((features, row))
+                remaining.append((terminal, row))
                 continue
             elif self.state['phase'] == 'game_over':
                 target, reason = 0, 'game_over'
@@ -182,15 +199,22 @@ class Run(CombatRun):
                 target, reason = None, 'action_limit'
             row.update(target=target, target_reason=reason, resolution_version=self.version,
                        resolved_floor=self.floor, resolved_action=self.actions)
-            self._samples.append(dict(features=features, target=target, shop_floor=row['floor'],
+            self._samples.append(dict(target=target, shop_floor=row['floor'], exit_q=row['exit_q'],
                                       version=row['version'], cycle=row['cycle'], prediction=row['prediction'],
                                       game_seed=self.game_seed, policy_seed=self.policy_seed, reason=reason,
                                       resolution_version=self.version, exit_action=row['action'],
                                       resolved_action=self.actions, resolved_floor=self.floor))
+            if terminal is not None and target is not None and self.collect_replay:
+                self._transitions.append(dict(terminal, next_state=None, terminal=True,
+                                              reward=float(target)))
         self._pending = remaining
 
     def drain_samples(self):
         rows, self._samples = self._samples, []
+        return rows
+
+    def drain_transitions(self):
+        rows, self._transitions = self._transitions, []
         return rows
 
     def result(self):
@@ -199,5 +223,7 @@ class Run(CombatRun):
                     cycle=self.cycle, start_version=self.start_version, version=self.version,
                     event_route=self.event_route, event_version=self.event_version,
                     effective_ella_path=self.state['ella_path'], shop_entries=self.shop_entries,
+                    unfinished_shop=(None if self._entry is None else
+                                     dict(floor=self._entry['floor'], dqn_actions=self._visit_decisions)),
                     special_shop_entered=any(entry['floor'] == 99 for entry in self.shop_entries),
                     special_shop_exited=any(exit_state['floor'] == 99 for exit_state in self.shop_exits))

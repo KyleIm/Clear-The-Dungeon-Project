@@ -1,7 +1,6 @@
 """Standalone alternating learner with exact, restartable episode boundaries."""
 
 import argparse
-from collections import deque
 from copy import deepcopy
 import json
 import logging
@@ -20,7 +19,7 @@ from .report import Store, generate_report
 
 
 DEFAULT = ROOT / 'alternating_rl' / 'training.json'
-VERSION = 1
+VERSION = 2
 
 
 def read_config(path):
@@ -32,14 +31,17 @@ def read_config(path):
     if cfg['episodes'] % cfg['segment_episodes'] or cfg['workers'] % cfg['processes']:
         raise ValueError('Episode budget must divide into whole segments and processes must divide game slots')
     shop = cfg['shop']
-    for key in ('candidates', 'max_edits', 'batch_size', 'replay_window', 'warmup_updates'):
+    for key in ('batch_size', 'replay_capacity', 'target_updates', 'train_every',
+                'max_updates_per_rollout', 'epsilon_decay_steps', 'bootstrap_updates'):
         if type(shop[key]) is not int or shop[key] < 1:
             raise ValueError(f'shop.{key} must be a positive integer')
-    if (not 0 <= shop['epsilon'] <= 1 or not 0 < shop['learning_rate'] < 1
-            or not shop['hidden_dims'] or any(type(x) is not int or x < 1 for x in shop['hidden_dims'])):
-        raise ValueError('Invalid shop learner settings')
-    if shop.get('planner', 'uniform_menu') not in ('uniform_menu', 'uniform_action'):
-        raise ValueError('Unknown shop candidate planner')
+    if (not 0 <= shop['epsilon_min'] <= shop['epsilon_start'] <= 1
+            or not 0 < shop['learning_rate'] < 1 or not shop['hidden_dims']
+            or not 0 <= shop['recent_fraction'] <= 1 or not 0 < shop['recent_window'] <= 1
+            or any(type(x) is not int or x < 1 for x in shop['hidden_dims'])
+            or type(shop['previous_cycles']) is not int or shop['previous_cycles'] < 0
+            or shop['batch_size'] > shop['replay_capacity']):
+        raise ValueError('Invalid Shop DQN settings')
     return cfg
 
 
@@ -49,8 +51,15 @@ def segment(episodes, length):
 
 
 def pack(run, reward=0.0, delta=0):
-    return (reward, delta, run.phase, None if run.done or run.phase == 'shop' else run.observation(),
-            run.result() if run.done else None, run.drain_samples())
+    observation = None
+    if not run.done:
+        if run.phase == 'shop':
+            if not run.random_shop:
+                observation = run.shop_observation()
+        else:
+            observation = run.observation()
+    return (reward, delta, run.phase, observation, run.result() if run.done else None,
+            run.drain_samples(), run.drain_transitions())
 
 
 def advance_worker(runs, slot, op, arg):
@@ -64,8 +73,6 @@ def advance_worker(runs, slot, op, arg):
     run = runs[slot]
     if op == 'snapshot':
         return run
-    if op == 'candidates':
-        return run.generate_candidates()
     before = run.actions
     if op == 'step':
         action, version = arg
@@ -73,47 +80,32 @@ def advance_worker(runs, slot, op, arg):
         reward = run.step(action)
     elif op == 'shop_random':
         reward = run.choose_random_shop()
-    elif op == 'shop_apply':
+    elif op == 'shop_step':
         reward = run.choose_shop(*arg)
     else:
         raise ValueError(f'Unknown alternating worker operation {op}')
     return pack(run, reward, run.actions - before)
 
 
-def bridge(pool, replies, shop_model, profile, rng, *, random_shop, epsilon, trained):
-    pending = [slot for slot, reply in replies.items() if reply[4] is None and reply[2] == 'shop']
-    if not pending:
-        return replies
-    if random_shop:
-        with profile.measure('shop_random'):
-            processed = pool.call('shop_random', dict.fromkeys(pending))
-    else:
-        with profile.measure('candidate_generation'):
-            proposals = pool.call('candidates', dict.fromkeys(pending))
-        with profile.measure('shop_inference'):
-            import torch
-
-            packed = np.concatenate([proposals[slot] for slot in pending])
-            with torch.inference_mode():
-                probabilities = shop_model(packed).cpu().numpy()
-        choices = {}
-        offset = 0
-        for slot in pending:
-            count = len(proposals[slot])
-            scores = probabilities[offset:offset + count]
-            explore = not trained or rng.random() < epsilon
-            choice = rng.randrange(count) if explore else int(scores.argmax())
-            choices[slot] = (choice, float(scores[choice]) if trained else None, explore)
-            offset += count
-        with profile.measure('shop_application'):
-            processed = pool.call('shop_apply', choices)
-    for slot, (reward, delta, phase, observation, result, samples) in processed.items():
-        earlier_reward, earlier_steps, _, _, _, earlier_samples = replies[slot]
-        replies[slot] = (earlier_reward + reward, earlier_steps + delta, phase, observation, result,
-                         earlier_samples + samples)
-    if any(item[4] is None and item[2] == 'shop' for item in replies.values()):
-        raise RuntimeError('Shop bridge did not advance to a decision or episode end')
-    return replies
+def bridge(pool, replies, shop_model, profile, rng, *, random_shop, epsilon):
+    decisions = 0
+    while pending := [slot for slot, reply in replies.items() if reply[4] is None and reply[2] == 'shop']:
+        if random_shop:
+            with profile.measure('shop_random'):
+                processed = pool.call('shop_random', dict.fromkeys(pending))
+        else:
+            with profile.measure('shop_inference'):
+                choices = shop_model.act([replies[slot][3] for slot in pending], rng, epsilon)
+            with profile.measure('shop_application'):
+                processed = pool.call('shop_step', dict(zip(pending, choices)))
+            decisions += len(pending)
+        for slot, (reward, delta, phase, observation, result, samples, transitions) in processed.items():
+            earlier_reward, earlier_steps, _, _, _, earlier_samples, earlier_transitions = replies[slot]
+            earlier_samples.extend(samples)
+            earlier_transitions.extend(transitions)
+            replies[slot] = (earlier_reward + reward, earlier_steps + delta, phase, observation, result,
+                             earlier_samples, earlier_transitions)
+    return replies, decisions
 
 
 class Experiment:
@@ -121,7 +113,9 @@ class Experiment:
         import torch
 
         from combat_rl.ppo import ActorCritic
-        from .shop_value import ShopValue
+        from .dqn import ShopDQN
+        from .replay import Replay
+        from .shop import FEATURE_COUNT, HEAD_SIZES
 
         self.torch = torch
         self.cfg, self.initial, self.store = cfg, initial, store
@@ -136,19 +130,22 @@ class Experiment:
         self.data_rng = np.random.default_rng(seed(cfg['master_seed'], 'alternating-samples'))
         self.model = ActorCritic([128, 128]).to(self.device)
         self.combat_optimizer = torch.optim.Adam(self.model.parameters(), lr=initial['config']['ppo']['learning_rate'])
-        self.shop = ShopValue(cfg['shop']['hidden_dims']).to('cpu')
+        self.shop = ShopDQN(FEATURE_COUNT, HEAD_SIZES, cfg['shop']['hidden_dims']).to(self.device)
+        self.shop_target = deepcopy(self.shop).eval()
+        self.replay = Replay(store.db, cfg['shop']['replay_capacity'], cfg['shop']['previous_cycles'],
+                             recent_fraction=cfg['shop']['recent_fraction'], recent_window=cfg['shop']['recent_window'])
         self.shop_optimizer = torch.optim.Adam(self.shop.parameters(), lr=cfg['shop']['learning_rate'])
         self.state = dict(episodes=0, started=0, steps=0, decisions=0, rounds=0, version=0,
-                          shop_updates=0, train_seconds=0.0, wall_seconds=0.0, last_eval=-1)
+                          shop_updates=0, shop_decisions=0, received_replay=0, learned_replay=0, replay_reused=0,
+                          replay_rejected=0, train_seconds=0.0, wall_seconds=0.0, last_eval=-1)
         self.active = {}
         self.old = old
-        self.samples = deque(maxlen=cfg['shop']['replay_window'])
-        self.last_data_segment = None
         self.resource_summary = {}
         self.model.load_state_dict((old or initial)['model'])
         self.combat_optimizer.load_state_dict((old or initial)['combat_optimizer'] if old else initial['optimizer'])
         if old:
             self.shop.load_state_dict(old['shop'])
+            self.shop_target.load_state_dict(old['shop_target'])
             self.shop_optimizer.load_state_dict(old['shop_optimizer'])
             self.state.update(old['state'])
             self.active.update(old['observations'])
@@ -158,8 +155,10 @@ class Experiment:
             self.rng.setstate(old['exploration_rng'])
             self.data_rng.bit_generator.state = old['data_rng']
             self.store.restore(old['marks'])
+            self.replay.restore(old['replay_mark'])
         self.prior_wall = self.state['wall_seconds']
         self.actor = self.model if self.device.type == 'cpu' else deepcopy(self.model).to('cpu')
+        self.shop_actor = self.shop if self.device.type == 'cpu' else deepcopy(self.shop).to('cpu')
         self.runtime = dict(inference_batch=cfg['workers'], bundle_inference=False)
 
     def pool(self):
@@ -169,11 +168,10 @@ class Experiment:
     def request(self, split, index, cycle, random_shop):
         master = self.cfg['master_seed'] if split == 'train' else self.cfg['evaluation_seed']
         prefix = 'alternating-training' if split == 'train' else 'evaluation'
-        shop = self.cfg['shop']
         args = (seed(master, f'{prefix}-game', index), seed(master, f'{prefix}-policy', index),
-                self.cfg['action_cap'], shop['candidates'], cycle, self.state['version'])
-        return args, dict(random_shop=random_shop, max_edits=shop['max_edits'],
-                          planner=shop.get('planner', 'uniform_menu'))
+                self.cfg['action_cap'], cycle, self.state['version'])
+        return args, dict(random_shop=random_shop, collect_uniform=split == 'train' and random_shop,
+                          collect_replay=split == 'train')
 
     def refill(self, pool, slots, boundary, cycle, random_shop):
         requests = {}
@@ -192,11 +190,13 @@ class Experiment:
         else:
             schedule = dict(segment=number + 1, cycle=cycle, target=target)
         self.state['wall_seconds'] = self.prior_wall + perf_counter() - self.started_at
+        replay_mark = self.replay.mark()
         payload = dict(version=VERSION, config=self.cfg, combat_config=self.initial['config'],
                        schedule=schedule,
                        state=self.state, observations=self.active,
                        workers=pool.call('snapshot', dict.fromkeys(self.active)), marks=self.store.marks(),
-                       model=self.model.state_dict(), shop=self.shop.state_dict(),
+                       model=self.model.state_dict(), shop=self.shop.state_dict(), replay_mark=replay_mark,
+                       shop_target=self.shop_target.state_dict(),
                        combat_optimizer=self.combat_optimizer.state_dict(),
                        shop_optimizer=self.shop_optimizer.state_dict(),
                        torch_rng=self.torch.get_rng_state(),
@@ -213,6 +213,7 @@ class Experiment:
                 temp = checkpoint.with_suffix('.tmp')
                 shutil.copyfile(self.directory / 'latest.pt', temp)
                 temp.replace(checkpoint)
+        self.replay.prune(replay_mark)
 
     def evaluate(self, pool, step):
         cfg = self.cfg
@@ -239,10 +240,10 @@ class Experiment:
         while active:
             chosen, _, _ = self.actor.act(batch(active.values()), deterministic=True)
             requests = {slot: (int(action), self.state['version']) for slot, action in zip(active, chosen)}
-            replies = bridge(pool, pool.call('step', requests), self.shop, profile, rng,
-                             random_shop=random_shop, epsilon=0, trained=self.state['shop_updates'] > 0)
+            replies, _ = bridge(pool, pool.call('step', requests), self.shop_actor, profile, rng,
+                                random_shop=random_shop, epsilon=0)
             finished = []
-            for slot, (_, delta, _, observation, result, samples) in replies.items():
+            for slot, (_, delta, _, observation, result, samples, _) in replies.items():
                 actions += delta
                 for sample in samples:
                     self.store.sample('eval', step, sample)
@@ -260,23 +261,29 @@ class Experiment:
         self.state['last_eval'] = step
         print(f'Evaluation {step:,} | {completed}/{count} games | {actions:,} actions', flush=True)
 
-    def learn_shop(self, iterations, segment_index):
-        from .shop_value import update_shop
+    def epsilon(self):
+        cfg = self.cfg['shop']
+        fraction = min(1.0, self.state['shop_decisions'] / cfg['epsilon_decay_steps'])
+        return cfg['epsilon_start'] + fraction * (cfg['epsilon_min'] - cfg['epsilon_start'])
 
-        if segment_index != self.last_data_segment:
-            with self.profile.measure('shop_replay_read'):
-                recent = self.store.recent_samples(self.cfg['shop']['replay_window'], self.state['version'])
-            self.samples.clear()
-            self.samples.extend(recent)
-            self.last_data_segment = segment_index
-        if not self.samples:
-            return {}
+    def learn_shop(self, iterations, cycle):
+        from .dqn import update_dqn
+
+        cfg = self.cfg['shop']
         metrics = {}
-        with self.profile.measure('shop_learning'):
-            for _ in range(iterations):
-                metrics = update_shop(self.shop, self.shop_optimizer, self.samples,
-                                      self.cfg['shop']['batch_size'], self.data_rng)
-                self.state['shop_updates'] += 1
+        for _ in range(iterations):
+            with self.profile.measure('shop_replay_read'):
+                rows = self.replay.sample(cfg['batch_size'], self.data_rng, cycle, self.state['version'])
+            if not rows:
+                break
+            with self.profile.measure('shop_learning'):
+                metrics = update_dqn(self.shop, self.shop_target, self.shop_optimizer, rows)
+            self.state['shop_updates'] += 1
+            self.state['learned_replay'] += cfg['train_every']
+            if self.state['shop_updates'] % cfg['target_updates'] == 0:
+                self.shop_target.load_state_dict(self.shop.state_dict())
+        if metrics and self.shop_actor is not self.shop:
+            self.shop_actor.load_state_dict(self.shop.state_dict())
         return metrics
 
     def rounds(self, pool, boundary, cycle, target, random_shop):
@@ -293,18 +300,22 @@ class Experiment:
             if pending:
                 fill_bootstraps(rollout, pending, dict(zip(slots, values)))
             requests = {slot: (int(action), self.state['version']) for slot, action in zip(slots, chosen)}
-            replies = bridge(pool, pool.call('step', requests), self.shop, self.profile,
-                             self.rng, random_shop=random_shop, epsilon=0 if train_combat else self.cfg['shop']['epsilon'],
-                             trained=self.state['shop_updates'] > 0)
+            replies, decision_count = bridge(pool, pool.call('step', requests), self.shop_actor, self.profile,
+                                             self.rng, random_shop=random_shop,
+                                             epsilon=0 if train_combat else self.epsilon())
+            if not train_combat:
+                self.state['shop_decisions'] += decision_count
             finished = []
             for i, slot in enumerate(slots):
-                reward, delta, _, observation, result, samples = replies[slot]
+                reward, delta, _, observation, result, samples, transitions = replies[slot]
                 self.state['steps'] += delta
                 self.state['decisions'] += 1
                 for sample in samples:
                     self.store.sample('train', self.state['episodes'], sample)
-                    if not train_combat and sample['target'] is not None:
-                        self.samples.appendleft(sample)
+                for transition in transitions:
+                    self.replay.append(transition)
+                    self.state['received_replay'] += 1
+                    self.state['replay_reused'] += transition['source'] == 'uniform'
                 if train_combat:
                     rollout.append(Transition(*observations[i], int(chosen[i]), float(logs[i]),
                                               float(values[i]), reward, 0, result is not None, slot))
@@ -314,6 +325,8 @@ class Experiment:
                     self.active[slot] = observation
                 else:
                     self.state['episodes'] += 1
+                    self.state['replay_rejected'] += sum(
+                        visit.get('uniform_replay_compatible') is False for visit in result['shop_exits'])
                     self.store.episode('train', self.state['episodes'],
                                        dict(result, segment=boundary // self.cfg['segment_episodes'],
                                             training_target=target))
@@ -332,7 +345,9 @@ class Experiment:
             if self.actor is not self.model:
                 self.actor.load_state_dict(self.model.state_dict())
         else:
-            metrics = self.learn_shop(1, boundary // self.cfg['segment_episodes'] - 1)
+            shop_cfg = self.cfg['shop']
+            due = max(0, (self.state['received_replay'] - self.state['learned_replay']) // shop_cfg['train_every'])
+            metrics = self.learn_shop(min(due, shop_cfg['max_updates_per_rollout']), cycle)
         seconds = perf_counter() - started
         self.state['train_seconds'] += seconds
         self.state['rounds'] += 1
@@ -340,7 +355,10 @@ class Experiment:
             self.resource_summary = self.resources.summary()
         rate = (self.state['episodes'] - starting_episodes) / seconds
         action_rate = (self.state['steps'] - starting_actions) / seconds
-        metrics.update(self.state, cycle=cycle, target=target, episodes_per_second=rate,
+        metrics.update(self.state, cycle=cycle, target=target, epsilon=0 if train_combat else self.epsilon(),
+                       dqn_updates=self.state['shop_updates'], replay_added=self.state['received_replay'],
+                       replay_size=min(self.replay.mark(), self.cfg['shop']['replay_capacity']),
+                       episodes_per_second=rate,
                        actions_per_second=action_rate, elapsed_seconds=self.prior_wall + perf_counter() - self.started_at,
                        phases=self.profile.summary(), resources=self.resource_summary)
         self.store.update(self.state['episodes'], metrics)
@@ -360,6 +378,8 @@ class Experiment:
                     self.save(train_pool)
                     with self.pool() as eval_pool:
                         self.evaluate(eval_pool, completed)
+                    self.store.update(completed, dict(target='boundary_replay', replay=self.replay.summary(),
+                                                      dqn_updates=self.state['shop_updates']))
                     self.save(train_pool, archive=True)
                 if completed == cfg['episodes']:
                     return
@@ -367,8 +387,9 @@ class Experiment:
                 boundary = (index + 1) * length
                 assert self.state['started'] <= boundary
                 if not self.active and target == 'shop' and self.state['shop_updates'] == 0:
-                    warmup = self.learn_shop(cfg['shop']['warmup_updates'], index)
+                    warmup = self.learn_shop(cfg['shop']['bootstrap_updates'], cycle)
                     if warmup:
+                        self.state['learned_replay'] = self.state['received_replay']
                         self.store.update(completed, dict(warmup, cycle=cycle, target='shop_warmup'))
                 self.refill(train_pool, (slot for slot in range(cfg['workers']) if slot not in self.active),
                             boundary, cycle, index == 0)

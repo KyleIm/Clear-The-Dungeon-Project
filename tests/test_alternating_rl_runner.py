@@ -19,24 +19,6 @@ class AlternatingRunnerTests(unittest.TestCase):
         self.assertEqual(segment(24_999, 25_000), (0, 1, 'combat_reward'))
         self.assertEqual(segment(25_000, 25_000), (1, 1, 'shop'))
 
-    def test_shop_updates_only_its_parameters(self):
-        import numpy as np
-        import torch
-
-        from combat_rl.ppo import ActorCritic
-        from alternating_rl.shop_value import ShopValue, update_shop
-
-        combat = ActorCritic([128, 128])
-        control = [value.detach().clone() for value in combat.parameters()]
-        model = ShopValue([8])
-        before = [value.detach().clone() for value in model.parameters()]
-        optimizer = torch.optim.Adam(model.parameters())
-        rows = [dict(features=np.full(671, target, dtype=np.float32), target=target) for target in (0, 1)]
-        result = update_shop(model, optimizer, rows, 2, np.random.default_rng(17))
-        self.assertTrue(np.isfinite(result['shop_loss']))
-        self.assertTrue(any(not torch.equal(x, y) for x, y in zip(before, model.parameters())))
-        self.assertTrue(all(torch.equal(x, y) for x, y in zip(control, combat.parameters())))
-
     def test_resume_active_slots_and_freeze_combat_in_shop_segment(self):
         import torch
 

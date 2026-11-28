@@ -1,5 +1,5 @@
 {
-  "output": "data/alternating_combat_shop",
+  "output": "data/alternating_ppo_dqn",
   "master_seed": 290187,
   "evaluation_seed": 321092,
   "episodes": 1000000,
@@ -12,14 +12,19 @@
   "rollout_rounds": 128,
   "checkpoint_rounds": 10,
   "shop": {
-    "candidates": 16,
-    "max_edits": 24,
-    "planner": "uniform_menu",
-    "epsilon": 0.15,
+    "epsilon_start": 1.0,
+    "epsilon_min": 0.10,
+    "epsilon_decay_steps": 500000,
     "hidden_dims": [128, 64],
     "learning_rate": 0.001,
     "batch_size": 128,
-    "replay_window": 4096,
-    "warmup_updates": 16
+    "replay_capacity": 32768,
+    "previous_cycles": 2,
+    "recent_fraction": 0.75,
+    "recent_window": 0.25,
+    "target_updates": 250,
+    "train_every": 128,
+    "max_updates_per_rollout": 8,
+    "bootstrap_updates": 16
   }
 }
